@@ -8,6 +8,8 @@ RUN apt-get update && \
 WORKDIR /var/www/qst
 COPY qst_linux/qst ./
 COPY qst_linux/schools ./schools
+RUN mkdir -p schools/qst_files/photos && \
+    chmod 777 schools schools/qst_files schools/qst_files/photos
 
 WORKDIR /home/MyApache2
 COPY --chmod=715 qst_linux/QST.pm ./

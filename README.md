@@ -19,6 +19,8 @@ services:
       - DB_USER=qst
       - DB_PASSWORD=Qst#captain2
       - DB_DATABASE=qst
+    ports:
+      - 127.0.0.1:8080:80
 
   db:
     image: mysql:8.2.0
@@ -31,6 +33,15 @@ services:
     volumes:
       - ./db_data:/var/lib/mysql
 ```
+
+Start the container and initialize the database schema:
+
+```sh
+docker-compose up -d
+docker-compose exec app init-db
+```
+
+Now QST is accessible at http://localhost:8080.
 
 ## Development
 

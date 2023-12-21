@@ -1,11 +1,10 @@
 # QST Docker
 
-QST (Quiz/Survey/Test) in a Docker container.
+[QST (Quiz/Survey/Test)](https://sourceforge.net/projects/qstonline/) in a Docker container.
 
 ## Usage
 
-### docker-compose.yml
-
+`docker-compose.yml`:
 ```yaml
 version: '3'
 services:

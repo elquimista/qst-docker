@@ -1,0 +1,651 @@
+/*---------------------------------MyColor4020----------------------------------*/
+#MyColor4020 ul li a
+{
+    background: url(image/Color4020.png) no-repeat;
+}
+
+#MyColor4020 ul li
+{
+    padding-left:0px;
+    padding-right:0px;
+}
+
+#MyColor4020 ul li a.aqua{ background-position: 0 0; width: 40px; height: 20px; } 
+#MyColor4020 ul li a.black{ background-position: -40px 0; width: 40px; height: 20px; } 
+#MyColor4020 ul li a.blue{ background-position: -80px 0; width: 40px; height: 20px; } 
+#MyColor4020 ul li a.fuchsia{ background-position: -120px 0; width: 40px; height: 20px; } 
+#MyColor4020 ul li a.gray{ background-position: -160px 0; width: 40px; height: 20px; } 
+#MyColor4020 ul li a.green{ background-position: -200px 0; width: 40px; height: 20px; } 
+#MyColor4020 ul li a.lime{ background-position: -240px 0; width: 40px; height: 20px; } 
+#MyColor4020 ul li a.maroon{ background-position: -280px 0; width: 40px; height: 20px; } 
+#MyColor4020 ul li a.navy{ background-position: -320px 0; width: 40px; height: 20px; } 
+#MyColor4020 ul li a.olive{ background-position: -360px 0; width: 40px; height: 20px; } 
+#MyColor4020 ul li a.orange{ background-position: -400px 0; width: 40px; height: 20px; } 
+#MyColor4020 ul li a.purple{ background-position: -440px 0; width: 40px; height: 20px; } 
+#MyColor4020 ul li a.red{ background-position: -480px 0; width: 40px; height: 20px; } 
+#MyColor4020 ul li a.silver{ background-position: -520px 0; width: 40px; height: 20px; } 
+#MyColor4020 ul li a.teal{ background-position: -560px 0; width: 40px; height: 20px; } 
+#MyColor4020 ul li a.yellow{ background-position: -600px 0; width: 40px; height: 20px; } 
+
+/*---------------------------------MyColor4020----------------------------------*/
+
+
+/*---------------------------------MyFontStyleHeigh20---------------------------*/
+#MyFontStyleHeigh20 ul li a
+{
+    background: url(image/FontStyleHeigh20.png) no-repeat;
+}
+#MyFontStyleHeigh20 ul li
+{
+    padding-left:0px;
+    padding-right:0px;
+}
+
+#MyFontStyleHeigh20 ul li a.Bold{ background-position: 0 0; width: 40px; height: 20px; } 
+#MyFontStyleHeigh20 ul li a.Italic{ background-position: -40px 0; width: 40px; height: 20px; } 
+#MyFontStyleHeigh20 ul li a.TrueType{ background-position: -80px 0; width: 60px; height: 20px; } 
+/*---------------------------------MyFontStyleHeigh20---------------------------*/
+
+
+
+/*---------------------------------MyFontSizeHeigh20---------------------------*/
+#MyFontSizeHeigh20 ul li a
+{
+    background: url(image/FontSizeHeigh20.png) no-repeat;
+}
+#MyFontSizeHeigh20 ul li
+{
+    padding-left:0px;
+    padding-right:0px;
+}
+
+#MyFontSizeHeigh20 ul li a.huge{ background-position: 0 0; width: 40px; height: 20px; } 
+#MyFontSizeHeigh20 ul li a.large{ background-position: -40px 0; width: 40px; height: 20px; } 
+#MyFontSizeHeigh20 ul li a.normalsize{ background-position: -80px 0; width: 40px; height: 20px; } 
+#MyFontSizeHeigh20 ul li a.scriptsize{ background-position: -120px 0; width: 40px; height: 20px; } 
+#MyFontSizeHeigh20 ul li a.small{ background-position: -160px 0; width: 40px; height: 20px; } 
+#MyFontSizeHeigh20 ul li a.tiny{ background-position: -200px 0; width: 40px; height: 20px; } 
+
+/*---------------------------------MyFontSizeHeigh20---------------------------*/
+
+
+
+/*---------------------------------MySymbol20-----------------------------------*/
+#MySymbol20 ul li a
+{
+    background: url(image/Symbol20.png) no-repeat;
+}
+
+#MySymbol20 ul li a.Bbbk{ background-position: 0 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.Box{ background-position: -20px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.Cap{ background-position: -40px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.Cup{ background-position: -60px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.Finv{ background-position: -80px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.Game{ background-position: -100px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.Im{ background-position: -120px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.Re{ background-position: -140px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.S{ background-position: -160px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.aleph{ background-position: -180px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.angle{ background-position: -200px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.backprime{ background-position: -220px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.barwedge{ background-position: -240px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.because{ background-position: -260px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.bigstar{ background-position: -280px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.blacklozenge{ background-position: -300px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.blacksquare{ background-position: -320px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.blacktriangle{ background-position: -340px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.blacktriangledown{ background-position: -360px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.blacktriangleleft{ background-position: -380px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.blacktriangleright{ background-position: -400px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.bot{ background-position: -420px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.boxdot{ background-position: -440px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.boxminus{ background-position: -460px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.boxplus{ background-position: -480px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.boxtimes{ background-position: -500px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.cdot{ background-position: -520px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.cdots{ background-position: -540px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.checkmark{ background-position: -560px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.circ{ background-position: -580px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.circledR{ background-position: -600px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.circledS{ background-position: -620px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.circledast{ background-position: -640px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.circledcirc{ background-position: -660px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.circleddash{ background-position: -680px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.clubsuit{ background-position: -700px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.complement{ background-position: -720px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.curlyvee{ background-position: -740px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.curlywedge{ background-position: -760px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.ddots{ background-position: -780px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.diagdown{ background-position: -800px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.diagup{ background-position: -820px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.diamond{ background-position: -840px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.diamondsuit{ background-position: -860px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.divideontimes{ background-position: -880px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.dotplus{ background-position: -900px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.doublebarwedge{ background-position: -920px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.ell{ background-position: -940px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.emptyset{ background-position: -960px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.eth{ background-position: -980px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.exists{ background-position: -1000px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.flat{ background-position: -1020px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.forall{ background-position: -1040px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.hbar{ background-position: -1060px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.heartsuit{ background-position: -1080px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.hslash{ background-position: -1100px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.imath{ background-position: -1120px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.infty{ background-position: -1140px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.intercal{ background-position: -1160px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.jmath{ background-position: -1180px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.ldots{ background-position: -1200px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.leftthreetimes{ background-position: -1220px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.llcorner{ background-position: -1240px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.lozenge{ background-position: -1260px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.lrcorner{ background-position: -1280px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.ltimes{ background-position: -1300px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.maltese{ background-position: -1320px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.mho{ background-position: -1340px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.nabla{ background-position: -1360px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.natural{ background-position: -1380px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.neg{ background-position: -1400px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.nexists{ background-position: -1420px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.ominus{ background-position: -1440px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.oplus{ background-position: -1460px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.oslash{ background-position: -1480px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.otimes{ background-position: -1500px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.partial{ background-position: -1520px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.prime{ background-position: -1540px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.rightthreetimes{ background-position: -1560px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.rtimes{ background-position: -1580px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.sharp{ background-position: -1600px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.smallsetminus{ background-position: -1620px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.spadesuit{ background-position: -1640px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.sphericalangle{ background-position: -1660px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.square{ background-position: -1680px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.surd{ background-position: -1700px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.therefore{ background-position: -1720px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.top{ background-position: -1740px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.triangle{ background-position: -1760px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.triangledown{ background-position: -1780px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.triangleleft{ background-position: -1800px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.triangleright{ background-position: -1820px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.ulcorner{ background-position: -1840px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.urcorner{ background-position: -1860px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.varnothing{ background-position: -1880px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.vartriangle{ background-position: -1900px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.vdots{ background-position: -1920px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.veebar{ background-position: -1940px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.wp{ background-position: -1960px 0; width: 20px; height: 20px; } 
+#MySymbol20 ul li a.yen{ background-position: -1980px 0; width: 20px; height: 20px; } 
+
+/*---------------------------------MySymbol20-----------------------------------*/
+
+
+
+/*---------------------------------MyArrow20-----------------------------------*/
+#MyArrow20 ul li a
+{
+    background: url(image/Arrow20.png) no-repeat;
+}
+
+#MyArrow20 ul li a.DDownarrow{ background-position: 0 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.DLeftarrow{ background-position: -20px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.DLeftrightarrow{ background-position: -40px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.DRightarrow{ background-position: -60px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.DUparrow{ background-position: -80px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.DUpdownarrow{ background-position: -100px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.DnLeftarrow{ background-position: -120px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.DnLeftrightarrow{ background-position: -140px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.DnRightarrow{ background-position: -160px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.Lleftarrow{ background-position: -180px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.Lsh{ background-position: -200px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.Rrightarrow{ background-position: -220px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.Rsh{ background-position: -240px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.amalg{ background-position: -260px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.backslash{ background-position: -280px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.bigcirc{ background-position: -300px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.cap{ background-position: -320px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.circlearrowleft{ background-position: -340px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.circlearrowright{ background-position: -360px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.cup{ background-position: -380px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.curvearrowleft{ background-position: -400px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.curvearrowright{ background-position: -420px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.dagger{ background-position: -440px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.dashleftarrow{ background-position: -460px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.dashrightarrow{ background-position: -480px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.ddagger{ background-position: -500px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.downarrow{ background-position: -520px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.downdownarrows{ background-position: -540px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.downharpoonleft{ background-position: -560px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.downharpoonright{ background-position: -580px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.hookleftarrow{ background-position: -600px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.hookrightarrow{ background-position: -620px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.langle{ background-position: -640px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.lceil{ background-position: -660px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.leftD{ background-position: -680px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.leftL{ background-position: -700px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.leftM{ background-position: -720px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.leftarrow{ background-position: -740px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.leftarrowtail{ background-position: -760px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.leftharpoondown{ background-position: -780px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.leftharpoonup{ background-position: -800px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.leftleftarrows{ background-position: -820px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.leftrightarrow{ background-position: -840px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.leftrightarrows{ background-position: -860px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.leftrightharpoons{ background-position: -880px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.leftrightsquigarrow{ background-position: -900px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.lfloor{ background-position: -920px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.looparrowleft{ background-position: -940px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.looparrowright{ background-position: -960px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.mapsto{ background-position: -980px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.multimap{ background-position: -1000px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.nleftarrow{ background-position: -1020px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.nleftrightarrow{ background-position: -1040px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.nrightarrow{ background-position: -1060px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.odot{ background-position: -1080px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.rangle{ background-position: -1100px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.rceil{ background-position: -1120px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.rfloor{ background-position: -1140px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.rightD{ background-position: -1160px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.rightL{ background-position: -1180px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.rightM{ background-position: -1200px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.rightarrow{ background-position: -1220px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.rightarrowtail{ background-position: -1240px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.rightharpoondown{ background-position: -1260px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.rightharpoonup{ background-position: -1280px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.rightleftarrows{ background-position: -1300px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.rightleftharpoons{ background-position: -1320px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.rightrightarrows{ background-position: -1340px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.rightsquigarrow{ background-position: -1360px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.setminus{ background-position: -1380px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.sqcap{ background-position: -1400px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.sqcup{ background-position: -1420px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.twoheadleftarrow{ background-position: -1440px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.twoheadrightarrow{ background-position: -1460px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.uparrow{ background-position: -1480px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.updownarrow{ background-position: -1500px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.upharpoonleft{ background-position: -1520px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.upharpoonright{ background-position: -1540px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.uplus{ background-position: -1560px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.upuparrows{ background-position: -1580px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.vee{ background-position: -1600px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.wedge{ background-position: -1620px 0; width: 20px; height: 20px; } 
+#MyArrow20 ul li a.wr{ background-position: -1640px 0; width: 20px; height: 20px; } 
+
+/*---------------------------------MyArrow20-----------------------------------*/
+
+
+
+/*---------------------------------MyLogic20-----------------------------------*/
+#MyLogic20 ul li a
+{
+    background: url(image/Logic20.png) no-repeat;
+}
+
+
+#MyLogic20 ul li a.Leftrightarrow{ background-position: 0 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.acute{ background-position: -20px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.approx{ background-position: -40px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.asymp{ background-position: -60px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.bar{ background-position: -80px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.bowtie{ background-position: -100px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.breve{ background-position: -120px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.check{ background-position: -140px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.cong{ background-position: -160px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.dashv{ background-position: -180px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.ddot{ background-position: -200px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.dot{ background-position: -220px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.doteq{ background-position: -240px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.equiv{ background-position: -260px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.frown{ background-position: -280px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.geq{ background-position: -300px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.gg{ background-position: -320px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.grave{ background-position: -340px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.hat{ background-position: -360px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.implies{ background-position: -380px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.in{ background-position: -400px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.leq{ background-position: -420px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.lhd{ background-position: -440px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.ll{ background-position: -460px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.mid{ background-position: -480px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.models{ background-position: -500px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.neq{ background-position: -520px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.ni{ background-position: -540px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.parallel{ background-position: -560px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.perp{ background-position: -580px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.prec{ background-position: -600px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.preceq{ background-position: -620px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.propto{ background-position: -640px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.rhd{ background-position: -660px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.rightleftharpoons{ background-position: -680px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.sim{ background-position: -700px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.simeq{ background-position: -720px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.smile{ background-position: -740px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.sqsubseteq{ background-position: -760px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.sqsupseteq{ background-position: -780px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.subset{ background-position: -800px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.subseteq{ background-position: -820px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.succ{ background-position: -840px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.succeq{ background-position: -860px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.supset{ background-position: -880px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.tilde{ background-position: -900px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.unlhd{ background-position: -920px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.unrhd{ background-position: -940px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.vdash{ background-position: -960px 0; width: 20px; height: 20px; } 
+#MyLogic20 ul li a.vec{ background-position: -980px 0; width: 20px; height: 20px; } 
+
+/*---------------------------------MyLogic20-----------------------------------*/
+
+
+
+/*---------------------------------MyGreek20-----------------------------------*/
+#MyGreek20 ul li a
+{
+    background: url(image/Greek20.png) no-repeat;
+}
+
+#MyGreek20 ul li a.alpha{ background-position: 0 0; width: 20px; height: 20px; } 
+#MyGreek20 ul li a.beta{ background-position: -20px 0; width: 20px; height: 20px; } 
+#MyGreek20 ul li a.chi{ background-position: -40px 0; width: 20px; height: 20px; } 
+#MyGreek20 ul li a.delta{ background-position: -60px 0; width: 20px; height: 20px; } 
+#MyGreek20 ul li a.epsilon{ background-position: -80px 0; width: 20px; height: 20px; } 
+#MyGreek20 ul li a.eta{ background-position: -100px 0; width: 20px; height: 20px; } 
+#MyGreek20 ul li a.gamma{ background-position: -120px 0; width: 20px; height: 20px; } 
+#MyGreek20 ul li a.iota{ background-position: -140px 0; width: 20px; height: 20px; } 
+#MyGreek20 ul li a.kappa{ background-position: -160px 0; width: 20px; height: 20px; } 
+#MyGreek20 ul li a.lambda{ background-position: -180px 0; width: 20px; height: 20px; } 
+#MyGreek20 ul li a.mu{ background-position: -200px 0; width: 20px; height: 20px; } 
+#MyGreek20 ul li a.nu{ background-position: -220px 0; width: 20px; height: 20px; } 
+#MyGreek20 ul li a.omega{ background-position: -240px 0; width: 20px; height: 20px; } 
+#MyGreek20 ul li a.phi{ background-position: -260px 0; width: 20px; height: 20px; } 
+#MyGreek20 ul li a.pi{ background-position: -280px 0; width: 20px; height: 20px; } 
+#MyGreek20 ul li a.psi{ background-position: -300px 0; width: 20px; height: 20px; } 
+#MyGreek20 ul li a.rho{ background-position: -320px 0; width: 20px; height: 20px; } 
+#MyGreek20 ul li a.sigma{ background-position: -340px 0; width: 20px; height: 20px; } 
+#MyGreek20 ul li a.tau{ background-position: -360px 0; width: 20px; height: 20px; } 
+#MyGreek20 ul li a.theta{ background-position: -380px 0; width: 20px; height: 20px; } 
+#MyGreek20 ul li a.upsilon{ background-position: -400px 0; width: 20px; height: 20px; } 
+#MyGreek20 ul li a.xi{ background-position: -420px 0; width: 20px; height: 20px; } 
+#MyGreek20 ul li a.zeta{ background-position: -440px 0; width: 20px; height: 20px; } 
+
+/*---------------------------------MyGreek20-----------------------------------*/
+
+
+/*---------------------------------Fun4020-------------------------------------*/
+
+#MyFun4020 ul li a
+{
+    background: url(image/Fun4020.png) no-repeat;
+}
+
+#MyFun4020 ul li
+{
+    padding-left:0px;
+    padding-right:0px;
+}
+
+#MyFun4020 ul li a.arccos{ background-position: 0 0; width: 40px; height: 20px; } 
+#MyFun4020 ul li a.arcsin{ background-position: -40px 0; width: 40px; height: 20px; } 
+#MyFun4020 ul li a.arctan{ background-position: -80px 0; width: 40px; height: 20px; } 
+#MyFun4020 ul li a.bmod{ background-position: -120px 0; width: 40px; height: 20px; } 
+#MyFun4020 ul li a.cos{ background-position: -160px 0; width: 40px; height: 20px; } 
+#MyFun4020 ul li a.cosh{ background-position: -200px 0; width: 40px; height: 20px; } 
+#MyFun4020 ul li a.cot{ background-position: -240px 0; width: 40px; height: 20px; } 
+#MyFun4020 ul li a.coth{ background-position: -280px 0; width: 40px; height: 20px; } 
+#MyFun4020 ul li a.csc{ background-position: -320px 0; width: 40px; height: 20px; } 
+#MyFun4020 ul li a.det{ background-position: -360px 0; width: 40px; height: 20px; } 
+#MyFun4020 ul li a.exp{ background-position: -400px 0; width: 40px; height: 20px; } 
+#MyFun4020 ul li a.gcd{ background-position: -440px 0; width: 40px; height: 20px; } 
+#MyFun4020 ul li a.hom{ background-position: -480px 0; width: 40px; height: 20px; } 
+#MyFun4020 ul li a.inf{ background-position: -520px 0; width: 40px; height: 20px; } 
+#MyFun4020 ul li a.ker{ background-position: -560px 0; width: 40px; height: 20px; } 
+#MyFun4020 ul li a.lim{ background-position: -600px 0; width: 40px; height: 20px; } 
+#MyFun4020 ul li a.ln{ background-position: -640px 0; width: 40px; height: 20px; } 
+#MyFun4020 ul li a.log{ background-position: -680px 0; width: 40px; height: 20px; } 
+#MyFun4020 ul li a.max{ background-position: -720px 0; width: 40px; height: 20px; } 
+#MyFun4020 ul li a.min{ background-position: -760px 0; width: 40px; height: 20px; } 
+#MyFun4020 ul li a.sec{ background-position: -800px 0; width: 40px; height: 20px; } 
+#MyFun4020 ul li a.sin{ background-position: -840px 0; width: 40px; height: 20px; } 
+#MyFun4020 ul li a.sinh{ background-position: -880px 0; width: 40px; height: 20px; } 
+#MyFun4020 ul li a.sup{ background-position: -920px 0; width: 40px; height: 20px; } 
+#MyFun4020 ul li a.tan{ background-position: -960px 0; width: 40px; height: 20px; } 
+#MyFun4020 ul li a.tanh{ background-position: -1000px 0; width: 40px; height: 20px; } 
+/*---------------------------------Fun4020-------------------------------------*/
+
+
+/*---------------------------------MyMath20-----------------------------------*/
+#MyMath20 ul li a
+{
+    background: url(image/Math20.png) no-repeat;
+}
+
+#MyMath20 ul li
+{
+    padding-top:0px;
+    padding-bottom :0px;
+}
+
+#MyMath20 ul li a.amalg{ background-position: 0 0; width: 20px; height: 20px; } 
+#MyMath20 ul li a.ast{ background-position: -20px 0; width: 20px; height: 20px; } 
+#MyMath20 ul li a.bigcirc{ background-position: -40px 0; width: 20px; height: 20px; } 
+#MyMath20 ul li a.cap{ background-position: -60px 0; width: 20px; height: 20px; } 
+#MyMath20 ul li a.cdot{ background-position: -80px 0; width: 20px; height: 20px; } 
+#MyMath20 ul li a.circ{ background-position: -100px 0; width: 20px; height: 20px; } 
+#MyMath20 ul li a.cup{ background-position: -120px 0; width: 20px; height: 20px; } 
+#MyMath20 ul li a.dagger{ background-position: -140px 0; width: 20px; height: 20px; } 
+#MyMath20 ul li a.ddagger{ background-position: -160px 0; width: 20px; height: 20px; } 
+#MyMath20 ul li a.diamond{ background-position: -180px 0; width: 20px; height: 20px; } 
+#MyMath20 ul li a.div{ background-position: -200px 0; width: 20px; height: 20px; } 
+#MyMath20 ul li a.mp{ background-position: -220px 0; width: 20px; height: 20px; } 
+#MyMath20 ul li a.odot{ background-position: -240px 0; width: 20px; height: 20px; } 
+#MyMath20 ul li a.ominus{ background-position: -260px 0; width: 20px; height: 20px; } 
+#MyMath20 ul li a.oplus{ background-position: -280px 0; width: 20px; height: 20px; } 
+#MyMath20 ul li a.oslash{ background-position: -300px 0; width: 20px; height: 20px; } 
+#MyMath20 ul li a.otimes{ background-position: -320px 0; width: 20px; height: 20px; } 
+#MyMath20 ul li a.pm{ background-position: -340px 0; width: 20px; height: 20px; } 
+#MyMath20 ul li a.setminus{ background-position: -360px 0; width: 20px; height: 20px; } 
+#MyMath20 ul li a.sqcap{ background-position: -380px 0; width: 20px; height: 20px; } 
+#MyMath20 ul li a.sqcup{ background-position: -400px 0; width: 20px; height: 20px; } 
+#MyMath20 ul li a.star{ background-position: -420px 0; width: 20px; height: 20px; } 
+#MyMath20 ul li a.times{ background-position: -440px 0; width: 20px; height: 20px; } 
+#MyMath20 ul li a.triangleleft{ background-position: -460px 0; width: 20px; height: 20px; } 
+#MyMath20 ul li a.triangleright{ background-position: -480px 0; width: 20px; height: 20px; } 
+#MyMath20 ul li a.uplus{ background-position: -500px 0; width: 20px; height: 20px; } 
+#MyMath20 ul li a.vee{ background-position: -520px 0; width: 20px; height: 20px; } 
+#MyMath20 ul li a.wedge{ background-position: -540px 0; width: 20px; height: 20px; } 
+#MyMath20 ul li a.wr{ background-position: -560px 0; width: 20px; height: 20px; } 
+
+/*---------------------------------MyMath20-----------------------------------*/
+
+
+/*-------------------------------MyMath3528-----------------------------------*/
+#MyMath3528 ul li a
+{
+    background: url(image/Math3528.png) no-repeat;
+}
+
+#MyMath3528 ul li
+{
+    padding-top:0px;
+    padding-bottom :0px;
+}
+
+#MyMath3528 ul li a.UpAndDown{ background-position: 0 0; width: 35px; height: 28px; } 
+#MyMath3528 ul li a.abDown{ background-position: -35px 0; width: 35px; height: 28px; } 
+#MyMath3528 ul li a.abUP{ background-position: -70px 0; width: 35px; height: 28px; } 
+#MyMath3528 ul li a.lg{ background-position: -105px 0; width: 35px; height: 28px; } 
+#MyMath3528 ul li a.log{ background-position: -140px 0; width: 35px; height: 28px; } 
+#MyMath3528 ul li a.overbrace{ background-position: -175px 0; width: 35px; height: 28px; } 
+#MyMath3528 ul li a.overleftarrow{ background-position: -210px 0; width: 35px; height: 28px; } 
+#MyMath3528 ul li a.overline{ background-position: -245px 0; width: 35px; height: 28px; } 
+#MyMath3528 ul li a.overrightarrow{ background-position: -280px 0; width: 35px; height: 28px; } 
+#MyMath3528 ul li a.sqrt{ background-position: -315px 0; width: 35px; height: 28px; } 
+#MyMath3528 ul li a.sqrtn{ background-position: -350px 0; width: 35px; height: 28px; } 
+#MyMath3528 ul li a.underbrace{ background-position: -385px 0; width: 35px; height: 28px; } 
+#MyMath3528 ul li a.underline{ background-position: -420px 0; width: 35px; height: 28px; } 
+#MyMath3528 ul li a.widehat{ background-position: -455px 0; width: 35px; height: 28px; } 
+#MyMath3528 ul li a.widetilde{ background-position: -490px 0; width: 35px; height: 28px; } 
+/*-------------------------------MyMath3528-----------------------------------*/
+
+
+/*-------------------------------MyMath3545-----------------------------------*/
+#MyMath3545 ul li a
+{
+    background: url(image/Math3545.png) no-repeat;
+}
+
+#MyMath3545 ul li
+{
+    padding-top:1px;
+    padding-bottom :1px;
+}
+
+#MyMath3545 ul li a.arrayA{ background-position: 0 0; width: 35px; height: 45px; } 
+#MyMath3545 ul li a.bigcap{ background-position: -35px 0; width: 35px; height: 45px; } 
+#MyMath3545 ul li a.bigcup{ background-position: -70px 0; width: 35px; height: 45px; } 
+#MyMath3545 ul li a.bigsqcup{ background-position: -105px 0; width: 35px; height: 45px; } 
+#MyMath3545 ul li a.bigvee{ background-position: -140px 0; width: 35px; height: 45px; } 
+#MyMath3545 ul li a.bigwedge{ background-position: -175px 0; width: 35px; height: 45px; } 
+#MyMath3545 ul li a.coprod{ background-position: -210px 0; width: 35px; height: 45px; } 
+#MyMath3545 ul li a.fracA{ background-position: -245px 0; width: 35px; height: 45px; } 
+#MyMath3545 ul li a.fracB{ background-position: -280px 0; width: 35px; height: 45px; } 
+#MyMath3545 ul li a.fracC{ background-position: -315px 0; width: 35px; height: 45px; } 
+#MyMath3545 ul li a.intA{ background-position: -350px 0; width: 35px; height: 45px; } 
+#MyMath3545 ul li a.lim{ background-position: -385px 0; width: 35px; height: 45px; } 
+#MyMath3545 ul li a.oint{ background-position: -420px 0; width: 35px; height: 45px; } 
+#MyMath3545 ul li a.prod{ background-position: -455px 0; width: 35px; height: 45px; } 
+#MyMath3545 ul li a.sumA{ background-position: -490px 0; width: 35px; height: 45px; } 
+
+/*-------------------------------MyMath3545-----------------------------------*/
+
+
+/*-------------------------------MyMathHeigh45-----------------------------------*/
+#MyMathHeigh45 ul li a
+{
+    background: url(image/MathHeigh45.png) no-repeat;
+}
+
+#MyMathHeigh45 ul li a.arrayA{ background-position: 0 0; width: 45px; height: 45px; } 
+#MyMathHeigh45 ul li a.bmatrix{ background-position: -45px 0; width: 60px; height: 45px; } 
+#MyMathHeigh45 ul li a.casesA{ background-position: -105px 0; width: 80px; height: 45px; } 
+/*-------------------------------MyMathHeigh45-----------------------------------*/
+
+
+/*---------------------------------MyTools-------------------------------------*/
+#MyTools
+{
+    background-image: linear-gradient(yellow , white);
+    height: 33px;
+    width: 100%;
+    border: 1px solid #999999;
+} 
+#MyTools ul
+{
+    margin: 1px;
+    margin-left:5px;
+    padding: 1px;
+    float: left;
+}
+#MyTools ul li
+{
+    list-style-type: none;
+    float: left;
+    padding-top : 2px;
+    padding-bottom:2px;
+    padding-left:3px;
+    padding-right:3px;
+}
+#MyTools ul li:hover
+{
+    border: solid 1px #FF00FF;
+    margin-left:-2px; /* 减去两边的边框厚度 */
+    /* background: #ddd; */
+}
+#MyTools ul li a
+{
+    display: block;
+    width: 20px;
+    height: 20px;
+    background: url(image/Tool.png) no-repeat;
+    border: none;
+    cursor: pointer;
+    margin-top:2px;
+    margin-left:4px;
+    margin-right:4px;
+}
+#MyTools ul li.separator
+{
+    height: 20px;
+    margin: 3px 6px 0 7px;
+    padding: 1px;
+    border-left: 1px solid  #9966FF;
+    border-top: none;
+    border-bottom: none;
+    border-right: none;
+}
+
+.CheckedStatus
+{
+    border-style: solid;
+    border-width: 1px;
+    border-color: #9A9A9A #FFFFFF #FFFFFF #9A9A9A;
+    margin-left: -2px;
+    background-color: #DBDB;
+}
+
+#MyTools ul li a.Asc{ background-position: 0 0; width: 20px; height: 20px; } 
+#MyTools ul li a.Clear{ background-position: -20px 0; width: 20px; height: 20px; } 
+#MyTools ul li a.Copy{ background-position: -40px 0; width: 20px; height: 20px; } 
+#MyTools ul li a.Cut{ background-position: -60px 0; width: 20px; height: 20px; } 
+#MyTools ul li a.Paste{ background-position: -80px 0; width: 20px; height: 20px; } 
+#MyTools ul li a.Redo{ background-position: -100px 0; width: 20px; height: 20px; } 
+#MyTools ul li a.Undo{ background-position: -120px 0; width: 20px; height: 20px; } 
+#MyTools ul li a.UseDefaultValue{ background-position: -140px 0; width: 20px; height: 20px; } 
+
+/*---------------------------------MyTools-------------------------------------*/
+
+
+/*---------------------------------ForAllNormal--------------------------------*/
+.ForAllNormal
+{
+    background: #F0F0F0;
+}
+
+.ForAllNormal ul
+{
+    margin: 1px;
+    padding: 1px;
+    float: left;
+}
+.ForAllNormal ul li
+{
+    list-style-type: none;
+    float: left;
+    padding-top : 2px;
+    padding-bottom:2px;
+    padding-left:3px;
+    padding-right:3px;
+}
+.ForAllNormal ul li:hover
+{
+    border: solid 1px #FF00FF;
+    margin-left:-2px; /* 减去两边的边框厚度 */
+    margin-top:-2px;  /* 减去上下的边框厚度 */
+    background: #ddd;
+}
+.ForAllNormal ul li a
+{
+    display: block;
+    border: none;
+    cursor: pointer;
+    margin:2px;
+}
+.ForAllNormal ul li.separator
+{
+    margin: 3px 13px 0 14px;
+    padding: 1px;
+    border-left: 1px solid  #9966FF;
+    border-top: none;
+    border-bottom: none;
+    border-right: none;
+}
+/*---------------------------------ForAllNormal--------------------------------*/

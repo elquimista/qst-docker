@@ -1,0 +1,160 @@
+.MainTable
+{
+    margin-top: 10px;
+    margin-bottom:15px;
+    width: 100%;
+}   
+        
+.MainTable tr
+{
+    vertical-align: top;
+}  
+        
+#TextAreaLinkCode
+{
+    width: 536px;
+    height: 124px;
+    color: #333333;
+}
+
+
+#MyInput {
+    height: 180px;
+    width: 100%;
+    border-style: solid;
+    border-width: 1px;
+    border-top-width: 0px;
+    border-color: #999999 #999999 #999999 #999999;
+}
+
+
+#ADofInput {
+    text-align: center;
+    margin-top: 10px;
+}
+
+
+#MathOutput {
+    margin-top: 5px;
+    font-size: 14px;
+    width: 600px;
+    height: 160px;
+    border: 1px solid #999999;
+    text-align: center;
+}
+
+
+#CommandButtons {
+    position: absolute;
+    color: #2955A0;
+    font-size: 11px;
+    margin-top: 177px;
+    margin-left: 155px;
+}
+
+
+#AD
+{
+    position:absolute;
+    margin-top: 205px;
+    margin-left:125px;
+}
+
+#ForLatext {
+    margin-top: 25px;
+    width: 600px;
+    height: 150px;
+    overflow: auto
+}
+
+#ForASC {
+    margin-top: 25px;
+    width: 600px;
+    height: 150px;
+    overflow: auto
+}
+
+.SingleButton
+{
+    cursor: pointer; 
+    display: inline-block;
+    text-decoration: underline;
+    margin-left:15px;
+}
+
+#divURL
+{
+    margin-top:12px;
+    border: 1px solid #999999;
+    padding:10px;  
+    word-break:break-all;
+}
+
+#divMathML {
+    margin-top: 12px;
+    border: 1px solid #999999;
+    padding-top: 10px;
+    line-height: 1.2em;
+    white-space: pre;
+    width: 600px;
+    height: 180px;
+    overflow: auto;
+}
+
+
+#divEmbed {
+    margin-top:12px;
+}
+
+#TextAreaLinkCode
+{
+   width: 595px;
+   height:95px;
+   font-family: verdana, arial, helvetica, sans-serif;
+   font-size:12px;  
+   padding-top:10px;
+   resize:none;
+   border: 1px solid #999999;
+}
+
+
+/*-------------------- Override  codemirror.css ----------------------*/
+.CodeMirror {
+    /*-------加了AD Of Input 后,不用了 height: 230px; ---------*/
+    width: 100%;
+    margin-top: 0px;   
+    line-height: 1.6em;
+    font-size: 16px;
+    font-family: verdana, arial, helvetica, sans-serif;
+    color: Black;
+    letter-spacing: 0.12em;
+}
+        
+.CodeMirror-scroll
+{
+    overflow: auto;
+    width: 600px;
+    height: 190px;
+    position: relative;
+}
+
+.cm-s-default span.cm-atom
+{
+    color: black;
+}
+
+.cm-s-default span.cm-bracket
+{
+    color: blue;
+}
+
+.cm-s-default span.cm-tag
+{
+    color: blue;
+}
+
+.CodeMirror-focused div.CodeMirror-selected { background: #3399FF; }
+
+.cm-s-default span.cm-comment {color: #a50; font-size:12px;}
+/*--------------------Override  codemirror.css ----------------------*/
+      

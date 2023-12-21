@@ -1,0 +1,34 @@
+version: '3'
+services:
+  app:
+    container_name: qst
+    build:
+      context: .
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=qst_db
+      - DB_USER=qst
+      - DB_PASSWORD=Qst#captain2
+      - DB_DATABASE=qst
+    networks:
+      - nginx_net
+
+  db:
+    container_name: qst_db
+    image: mysql:8.2.0
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=Qst#captain2root
+      - MYSQL_USER=qst
+      - MYSQL_PASSWORD=Qst#captain2
+      - MYSQL_DATABASE=qst
+    volumes:
+      - ./db_data:/var/lib/mysql
+    networks:
+      - nginx_net
+
+networks:
+  nginx_net:
+    external: true

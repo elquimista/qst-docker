@@ -1,0 +1,63 @@
+<HTML><HEAD><TITLE>QST</TITLE></HEAD>
+<script language = "Javascript" type="text\/javascript">
+ var orig_Window
+ window.name = "orig_Window"
+ var qst_left
+var qst_right
+var right_top
+var right_bot
+
+
+function check_handler(inn){
+var no_good = 1;
+var replace_string =""
+var reg_exp1 = /\s/g
+var replace_string2 ="%20"
+var user_name_in_string = document.form1.user.value
+var user_name_new_string = user_name_in_string.replace(reg_exp1,replace_string)
+var new_string2 = user_name_in_string.replace(reg_exp1,replace_string2)
+
+var pass_name_in_string = document.form1.pass.value
+var pass_name_new_string = pass_name_in_string.replace(reg_exp1,replace_string)
+var new_string2 = pass_name_in_string.replace(reg_exp1,replace_string2)
+if(pass_name_new_string ==""){
+no_good = 2
+}
+
+
+if(user_name_new_string ==""){
+no_good = 2
+}
+
+
+if(no_good == 2){
+alert("A User name or password was not entered.")
+return false;
+}
+else {
+document.form1.submit()
+}
+}
+
+function doo_modal() {
+alert("OOO")
+}
+
+</script>
+<BODY>
+<TABLE width="100%"><TR><TD width="30%">
+<center><img src="/qst.gif"></center>
+<center>
+<Form name="form1" method="POST" ACTION="/qst">
+<P><TABLE><TR><TD>User name:</TD><TD> <input type="text" name="user" value="" size="10"></TD></TR>
+<TR><TD>Password:</TD><TD><input type="password" name="pass" value="" size="10"> </TD></TR>
+<TR><TD></TD><TD><input type="hidden" name="login" value="1"> </TD></TR>
+<TR><TD></TD><TD></TD></TR>
+<TR><TD></TD><TD><input type="submit" name="" value="Log In" OnClick="return check_handler()"></TD></TR>
+</TABLE></FORM></center><P>
+</TD><TD></TD>
+</TR></TABLE>
+
+</BODY>
+ </HTML>
+

@@ -1,0 +1,66 @@
+<HTML><HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<TITLE>Login to QST and start creating quizzes, surveys and tests.</TITLE>
+</HEAD><BODY onkeypress="if(event.keyCode==13) {javascript:check_handler();}" style='font-family="Arial"'>
+<script language="Javascript" type="text/javascript">
+<!--
+function check_handler(inn){
+var no_good = 1;
+var replace_string =""
+var reg_exp1 = /\s/g
+var replace_string2 ="%20"
+var user_name_in_string = document.form1.user.value
+var user_name_new_string = user_name_in_string.replace(reg_exp1,replace_string)
+var new_string2 = user_name_in_string.replace(reg_exp1,replace_string2)
+
+var pass_name_in_string = document.form1.pass.value
+var pass_name_new_string = pass_name_in_string.replace(reg_exp1,replace_string)
+var new_string2 = pass_name_in_string.replace(reg_exp1,replace_string2)
+if(pass_name_new_string ==""){
+no_good = 2
+}
+
+
+if(user_name_new_string ==""){
+no_good = 2
+}
+
+
+if(no_good == 2){
+alert("A User name or password was not entered.")
+return false;
+}
+else {
+document.form1.submit()
+
+}
+}
+
+function abc() {
+
+if(confirm("I am not a robot."))
+return true;
+
+}
+
+//-->
+</script>
+<style>
+table{ border-radius:4px; font-size:10pt; font-family:Arial;}
+</style>
+<BR><P>
+<center><img src="qst_app.jpg" alt="Logo"></center>
+<center>
+<Form name="form1" method="POST" ACTION="/qst">
+<P><TABLE><TR><TD><input type="text" name="user" value="" size="10" placeholder="  Username" aria-label="Username"></TD></TR>
+<TR><TD><input type="password" name="pass" value="" size="10" placeholder="  Password" aria-label="Password"> </TD></TR>
+<TR><TD></TD><TD><input type="hidden" name="login" value="1"> </TD></TR>
+<TR><TD></TD><TD></TD></TR>
+</Table></center>
+</FORM><P>
+<center><img src="/login_icon.jpg" style="cursor:pointer" OnClick=" check_handler()" alt="Log in"></center>
+<BR><P>
+<center><B><a href="/mobile_qst.htm" target="_parent" style="text-decoration:none">Phone Browser</a><B></center>
+</body>
+</HTML>

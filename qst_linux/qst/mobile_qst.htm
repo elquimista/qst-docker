@@ -1,0 +1,95 @@
+<HTML><HEAD>
+<meta name="description" content="Easily take Quizzes, Surveys and Tests on your mobile device.">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<TITLE>QST  Mobile Browser</TITLE>
+<meta name="keywords" content="qst,quiz,survey,test,gradebook,exam,enterprise grade,quizzes,surveys,open source software,e-assessment,mobile assessment">
+</HEAD><BODY onkeypress="if(event.keyCode==13) {javascript:check_handler();}" style='font-family="Arial"'>
+<script language="Javascript" type="text/javascript">
+<!--
+
+function check_handler(inn){
+
+var no_good = 1;
+var replace_string =""
+var reg_exp1 = /\s/g
+var replace_string2 ="%20"
+var url_end_string ="/qst/one";
+var front_url_string="https:"
+var url
+var user_name_in_string = document.form1.user.value
+var user_name_new_string = user_name_in_string.replace(reg_exp1,replace_string)
+var new_string2 = user_name_in_string.replace(reg_exp1,replace_string2)
+
+var pass_name_in_string = document.form1.pass.value
+var pass_name_new_string = pass_name_in_string.replace(reg_exp1,replace_string)
+var new_string2 = pass_name_in_string.replace(reg_exp1,replace_string2)
+
+if(pass_name_new_string ==""){
+no_good = 2
+}
+
+
+if(user_name_new_string ==""){
+no_good = 2
+}
+
+
+if(no_good == 2){
+alert("A user name or password was not entered.")
+return false;
+}
+else {
+document.form1.submit()
+}
+}
+
+
+function abc() {
+
+if(confirm("I am not a robot."))
+return true;
+
+}
+
+
+function checkSubmit(e) {
+   if(e && e.keyCode == 13) {
+      document.check_handler();
+   }
+}
+
+//-->
+</script>
+<body>
+<style>
+table{ border-radius:4px; font-size:10pt; font-family:Arial;}
+</style>
+
+<style>table{ border-radius:6px; font-size:13pt; font-family:Arial;}</style>
+<style>table{ border-radius:6px; font-size:13pt; font-family:Arial;}</style>
+<BR>
+<P>
+<center><img src="qst_app.jpg" alt="Logo"></center>
+
+<center>
+<Form name="form1" method="POST" ACTION="/qst/one">
+<TABLE width="100%" ">
+<TR><TD>
+<center>
+<TABLE>
+<TR><TD style="padding-top:9px"></TD><TD></TD></TR>
+<TR><TD><font style="font-family:Arial; font-size:10pt;"><input type="text" name="user" value="" size="10" placeholder="  Username" aria-label="Username"></TD></TR></center>
+<TR><TD><font style="font-family:Arial; font-size:10pt;"><input type="password" name="pass" value="" size="10" placeholder="  Password" aria-label="Password"></center> </TD></TR>
+<TR><TD></TD><TD><input type="hidden" name="login" value="1"> </TD></TR>
+<TR><TD></TD><TD><input type="hidden" name="mobile" value="3"></TD></TR>
+<TR><TD></TD><TD></TD></TR>
+</TABLE>
+</TD></TR>
+</TABLE></FORM></center><P>
+<center><img src="/schools/qst_builder.png" style="cursor:pointer;" OnClick="return check_handler()" alt="Log in"></center>
+
+</body>
+</HTML>
+</body></HTML>

@@ -1,0 +1,198 @@
+
+      Hardware and Performance Optimization
+
+QST was created to scale economically - non geek: runs cheap.
+
+By running on Apache 2.x server using the event MPM module which runs multi-threaded on linux, our mod_perl module QST.pm runs multi-threaded also.
+
+Apache 2.x also runs mutithreaded on Windows 10/11 through winnt MPM and mod_perl runs multithreaded QST.pm on it too. The default configuration of 1,923 threads is production grade.
+
+MySQL runs multithreaded on both linux and windows and the database was designed for maximum performance in conjunction with the software.
+
+Running multi-threaded means significantly less resources and memory are required, and all cpu cores/threads are being used efficiently.
+
+With our Linux performance configuration of: 50 Apache children, each child running 100 threads means you have 5,000 threads waiting to answer requests.
+
+Inside of this we have Apache linked to 50 perl interpreters, each running 50 threads for a total of 2,500 threads waiting for requests.
+
+This requires approx. 365 MB of memory and will grow, but memory is shared/reused and after a child process has handled 10,000 requests it is killed and memory will be freed.
+
+Everything has been optimized for heavy simultaneous use.
+
+All this happens on one machine, no multiple web servers, no load balancers, no cloud, etc. needed.
+
+Upgrading is easy, as all that is usually required is replacing your QST.pm file with the new one.
+
+And best of all, we help you install/tune it if you require (free), and then document it so others can benefit also.
+
+------------------------------------------------
+
+QST will run best on a linux OS.
+
+QST will run on a laptop, server or in the cloud.
+    - run it on a laptop if you have only a few hundred users and wish it to be portable
+      and you can plug your laptop into different networks for different groups of users.
+
+We recommend a Core I7 processor with 8 cores/16 threads, 32GB ram and 500GB NVME SSD with a gigabit network card.
+  Only run Apache, MYSQL and QST on the machine.
+    - MySQL 5.7 will run better because it caches results (MySQL 8 does not do this).
+        - This only helps if you do not have other users creating questions while the quiz/test
+           is being run.
+  Perl likes RAM, so more is always better.
+     32 GB ram means about 30 GB is available for QST.
+     Apache and QST's server memory footprint is about 7 MB.
+
+      
+The NVME SSD will ensure the database will have very good response times.
+
+QST is not processor intensive, and all tables in the database have been optimized by indexing.
+
+Lesser configurations will also work, it mainly depends on the number of
+ simultaneous users you expect.
+ 
+   * You may have 10,000 users taking a test, but only 1 in 4 may be clicking on an answer at any one
+     time. Therefore there are only 2,500 simultaneous requests.
+  
+If your usage is high, a reverse proxy server (eg. squid) in front of the web server will lighten the load on serving 
+ images from the web server if you use a lot of images in your questions. 
+
+Using the Communal Question Bank will significantly reduce the amount of space required in 
+ the database and decrease the number of similiar questions.
+
+-------------------------------------------------------------
+-------------------------------------------------------------
+
+Apache on Windows:
+
+ By default, Apache starts with 1 child process and 1 thread.
+  ** If you are doing testing with default, do not restart the server as it resets the threads to 1, and it will have to load the     	threads again.
+ 
+ Apache on Windows will create up to 1920 threads as it feels it needs them, but this will take time.
+   We want a large number of threads (1920) waiting for requests as our initial load is high for a quiz/test.
+   These threads will not die until you restart the server or kill the child. 
+   In the following text, we kill the child off in case of memory leaks. So a new child is spawned.
+
+ We recommend the following text be added to the end of C:\Apache24\conf\http.conf:
+ 
+ <ifModule mpm_winnt_module>
+ThreadsPerChild  1920
+MaxConnectionsPerChild  30000
+</IfModule>
+ 
+ Save the file and stop then start apache.
+ 
+------------------------------------------------------------
+------------------------------------------------------------
+ 
+Apache on Ubuntu uses the event_mpm.
+
+ By default, the event_mpm begins with 3 child processes and 25 threads. It will max out to 16 child process for a total 
+  of 400 threads.
+ The threads answer the requests from browsers.
+ If there are not enough threads to answer the requests, apache will create another child process, then each second will
+ double the number of children (1-2,2-4,2-8,2-16 up to 32 per second) until it creates enough threads to handle the incoming requests.
+ On a regular webserver this would usually suffice to handle the increase in requests.
+  
+  What we find, is the default settings in Apache are usually good for around 30-50 individuals taking a test at the same time.
+   Any more, and you need to alter the settings to the example we give below in apache2.conf.
+   With this mpm you can change the children and requests according to your needs and memory available.
+   
+  If for example you have 50 questions in your test and each question has an image in it and each answer (4 answers) has
+   an image in it, and all questions are displayed at once, You have 50 x 5 = 250 requests per each users browser when 
+   starting a test. Multiply that by 100 users starting the test at the same time, and the webserver is swamped by 25,000
+   requests in the first few seconds.
+   The default settings will not handle this type of load.
+   
+  With the settings we provide in our install docs (500 threads available) you should be able to easily handle 100+ individual test    	takers.
+   
+   ** Remember that your network must be able to handle the traffic also.
+   
+   Any more, and you may need to alter the settings to the example we give below in apache2.conf.
+   With this mpm you can change the children and requests according to your needs and memory available.
+ 
+  Therefore, with the QST configurations below, we start Apache with 50 children, and each child can handle 100 requests,
+  for a total ability to handle 5,000 requests concurrently (we are assuming you have 32G of ram and only QST and the database
+  are running on the server). There is no need to save ram for other uses as only QST is running.
+  
+    In this scenario, apache will keep creating children as they are needed up to 200 children. 200 children x 100 threads per
+    child = 20,000 requests. Also, it will always try to have 3000 threads available for requests.
+    After each child has handled 10,000 requests, it is closed (in case of memory leaks).
+  
+    We also start with 50 Perl interpreters and each one will have 50 threads, so 2500 threads to answer requests.
+  
+---------- 
+Add the following 5 lines to /etc/apache2/apache2.conf below Include ports.conf:
+
+<Directory />
+        Options FollowSymLinks
+        AllowOverride None
+        Require all denied
+</Directory>
+
+The above turns off .htaccess lookup which will save the server the expense of checking who can 
+ access files.
+
+Set the following in apache2.conf:
+HostnameLookups Off
+KeepAlive  Off
+
+
+The following you should change so there are many threads available (5,000) when apache first starts.
+
+StartServers  5
+MaxRequestWorkers    10000
+ServerLimit   100
+ThreadsPerChild   100
+ThreadLimit  100
+
+to the following:
+
+StartServers 50
+MaxRequestWorkers    20000
+ServerLimit   200
+ThreadsPerChild   100
+ThreadLimit  200
+MinSpareThreads     3000
+MaxSpareThreads     4000
+
+Save the file, run:
+sudo service apache2 stop
+sudo service apache2 start
+** Do not do a restart, it will not reread apache2.conf!
+----------------------
+-----------------------
+
+Go to /etc/mysql
+Copy mysql.cnf to my.cnf
+
+Put the following into the file:
+
+[mysqld]
+max_connections=1000
+
+
+Save the file.
+Restart mysql:
+
+Open /etc/apache2/sites-enabled/000-default.conf
+and change to:
+PerlInterpStart     50
+PerlInterpMax      100
+PerlInterpMaxSpare  50
+	
+Save the file.
+	
+sudo systemctl daemon-reload
+sudo systemctl restart mysql
+--------------------------
+--------------------------
+
+Be sure your internet connection can handle the number of users you are expecting.
+
+Have all your users attempt a quiz at the same time to gauge the load on the server before
+doing any important testing to ensure it will handle the load.
+
+Of course you can fine tune the above as required.
+
+Contact us at qstsupport@shaw.ca if you have questions regarding scalability.
+

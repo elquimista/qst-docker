@@ -19,6 +19,8 @@ services:
       - DB_USER=qst
       - DB_PASSWORD=Qst#captain2
       - DB_DATABASE=qst
+    volumes:
+      - ./qst_files:/var/www/qst/schools/qst_files
     ports:
       - 127.0.0.1:8080:80
 

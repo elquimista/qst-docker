@@ -16,6 +16,7 @@ services:
       - db
     environment:
       - DB_HOST=db
+      - DB_ROOT_PASSWORD=Qst#captain2root
       - DB_USER=qst
       - DB_PASSWORD=Qst#captain2
       - DB_DATABASE=qst
@@ -44,6 +45,30 @@ docker-compose exec app init-db
 ```
 
 Now QST is accessible at http://localhost:8080.
+
+If you want to start a new container completely from scratch and want to retain
+the existing database, this Docker image has two commands available:
+
+```sh
+docker-compose exec app dump-db
+docker-compose exec app restore-db
+```
+
+Run `dump-db` command before deleting database container (e.g., before running
+`docker-compose down`). It writes to `/var/www/qst/schools/qst_files/qst.sql`.
+Similarly, `restore-db` expects an SQL file in the above path. Run the restore
+command after running `docker-compose up -d`.
+
+You might wonder why these extra commands are needed when we can simply reuse
+Docker volume (`db_data` folder as shown in the sample `docker-compose.yml`).
+Good question! I tried it and it doesn't work unfortunately in this specific
+case. Perl's DBI module (or could it be Apache?) complaints about some secure
+connection error and I couldn't figure it out why. So the above approach is more
+like a workaround for now. Exact error message says:
+
+```
+DBI connect (...) failed: Authentication plugin 'caching_sha2_password' reported error: Authentication requires secure connection. at /home/MyApache2/QST.pm line 67.
+```
 
 ## Development
 

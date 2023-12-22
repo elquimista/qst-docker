@@ -31,6 +31,7 @@ RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'install Bundle::DBI' && \
 
 COPY qst_linux/qst.sql /temp/
 ENV DB_HOST=db
+ENV DB_ROOT_PASSWORD=Qst#captain2root
 ENV DB_USER=qst
 ENV DB_PASSWORD=Qst#captain2
 ENV DB_NAME=qst
@@ -38,6 +39,8 @@ ENV DB_NAME=qst
 WORKDIR /home/MyApache2
 
 COPY init-db.sh /usr/local/sbin/init-db
+COPY dump-db.sh /usr/local/sbin/dump-db
+COPY restore-db.sh /usr/local/sbin/restore-db
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]
 

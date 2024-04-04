@@ -50,7 +50,7 @@ If you want to start a new container completely from scratch and want to retain
 the existing database, this Docker image has two commands available:
 
 ```sh
-docker-compose exec app dump-db > qst.sql
+docker exec qst dump-db > qst.sql
 docker exec -i qst restore-db -t < qst.sql
 ```
 

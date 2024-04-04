@@ -50,14 +50,13 @@ If you want to start a new container completely from scratch and want to retain
 the existing database, this Docker image has two commands available:
 
 ```sh
-docker-compose exec app dump-db
-docker-compose exec app restore-db
+docker-compose exec app dump-db > qst.sql
+docker exec -i qst restore-db -t < qst.sql
 ```
 
 Run `dump-db` command before deleting database container (e.g., before running
-`docker-compose down`). It writes to `/var/www/qst/schools/qst_files/qst.sql`.
-Similarly, `restore-db` expects an SQL file in the above path. Run the restore
-command after running `docker-compose up -d`.
+`docker-compose down`).
+Similarly, run `restore-db` command after running `docker-compose up -d`.
 
 You might wonder why these extra commands are needed when we can simply reuse
 Docker volume (`db_data` folder as shown in the sample `docker-compose.yml`).

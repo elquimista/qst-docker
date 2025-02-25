@@ -1,4 +1,21 @@
-<HTML><HEAD><TITLE>blank</TITLE></HEAD>
-<body>
+<HTML oncontextmenu="return false"><HEAD>
+<meta http-equiv='cache-control' content='no-cache'>
+<meta http-equiv='expires' content='0'>
+<meta http-equiv='pragma' content='no-cache'>
+<TITLE>blank</TITLE></HEAD>
+<script>
+document.onkeydown = function (event) {
+	event = (event || window.event);
+	return keyFunction(event);
+	}
+
+function keyFunction(event){
+	if (event.keyCode == 123) {
+	return false;
+	}
+    }
+</script>
+<body oncontextmenu="return false">
+
 </body>
 </html>

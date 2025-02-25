@@ -2,11 +2,11 @@ README.txt
 
 qst.zip is rather large because it contains the files to install Perl and MySQL and Apache on Windows.
 Download qst_linux_mac.zip if you are doing a linux or mac install.
-QST.pm (the program) is only 3.6 MB.
+QST.pm (the program) is only 3.8 MB.
 
 The zips contain installation instructions.
 
-Usually if you are upgrading you only have to replace the QST.pm you have with the new QST.pm (or WINQST.pm or mac_QST.pm) contained in the zip, then stop and start apache.
+Usually if you are upgrading you only have to replace the QST.pm you have with the new QST.pm (or WINQST.pm or mac_QST.pm) contained in the zip, then stop and start apache. **Always read below for upgrading.
 
 The languages other than English were done through Google Translate. If you notice issues let us know so we can fix them.
 
@@ -20,16 +20,61 @@ Download qst-android-https.apk if you have a self signed or real certificate for
   - This is the same one as in the Google Play Store.
   
 We release versions of QST on a irregular basis.
+ - This depends upon the complexity of what we are adding.
+   - Some requests can be accomplished quickly.
+   
+ - Bugs are fixed as quickly as possible.
 
-
-Version 3.11.01 is our latest release.
+  *****************
+  
+Version 3.12.07 is our latest release.
 
 Upgrading:
 
+- Windows versions before 3.12.05 should be upgraded with the following replacing what is there at the end of the httpd.conf file         found under C:\Apache24\conf\:
+
+        <ifModule mpm_winnt_module>
+	ThreadStackSize  16888888
+	ThreadsPerChild  1920
+	MaxConnectionsPerChild  0
+	</IfModule>
+
+	Save and restart Apache.
+	
+	Additionally, open  C:\ProgramData\MySQL\MySQL Server 5.7\my.ini and change the following:
+
+	max_connections=350
+	innodb_buffer_pool_size=1028
+	innodb_thread_concurrency=500
+	max_connect_errors=200
+	thread_cache_size=50 
+
+	Under thread_cache_size=50 
+	Add:
+	back_log=200
+
+	Stop and start MySQL, then stop and start apache.
+	
+      This improves the ability to handle larger numbers of users on Windows;
+      ************************
+     
+- To upgrade from version 3.12.06:
+	Copy the file show_wordxml_format.htm under the /qst directory in the download
+	to your /qst directory to replace the one there.
+
+- To upgrade from version 3.11.xx:
+   	At a mysql prompt run:
+   	mysql> use qst;
+   	mysql> alter table questions add column memory varchar(5000) DEFAULT NULL;
+   	mysql> alter table posted_qst add column memori int(1) DEFAULT NULL;
+        mysql> exit;
+        
+        Restart Apache.
+        
    - To upgrade from version 3.10.xx:
    	At a mysql prompt run:
    	mysql> use qst;
-   	mysql> alter table posted_qst add column explanation int(1) DEFAULT NULL;
+   	mysql> alter table posted_qst add column explanations int(1) DEFAULT NULL;
         mysql> alter table posted_qst add column source int(1) DEFAULT NULL;
         mysql> exit;
         Copy red_pin.png from the qst/schools folder where you unzipped QST to the qst/schools folder in your

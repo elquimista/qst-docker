@@ -1,6 +1,5 @@
-<HTML><HEAD><TITLE>QST</TITLE>
+<HTML oncontextmenu="return false"><HEAD><TITLE>QST</TITLE>
 <script language="Javascript" type="text/javascript">
-<!--
 var what = 1;
 function delete_handler() {
 alert("No questions have been added yet.")
@@ -8,10 +7,21 @@ alert("No questions have been added yet.")
 function focus_handler() {
 alert("No questions have been added yet.")
 }
-//-->
+
+document.onkeydown = function (event) {
+	event = (event || window.event);
+	return keyFunction(event);
+	}
+
+function keyFunction(event){
+	if (event.keyCode == 123) {
+	return false;
+	}
+    }
+
 </script>
 </head>
-<body>
+<body oncontextmenu ="return false">
 <form method="POST" name="focus1">
 <input type="hidden" name="quiz_no" value="">
 

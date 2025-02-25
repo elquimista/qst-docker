@@ -360,6 +360,7 @@ CREATE TABLE `posted_qst` (
   `shuffle_ans` int(1) DEFAULT NULL,
   `explanations` int(1) DEFAULT NULL,
   `source` int(1) DEFAULT NULL,
+  `memori` int(1) DEFAULT NULL,
   PRIMARY KEY (`qst`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -572,6 +573,7 @@ CREATE TABLE `qsts` (
   `time_stamp` varchar(11) DEFAULT NULL,
   `quest_order` int(5) unsigned DEFAULT NULL,
   `referer` int(10) unsigned DEFAULT NULL,
+  `viewed` int(1) DEFAULT NULL,
   KEY `u_id` (`u_id`,`qst`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -667,6 +669,7 @@ CREATE TABLE `questions` (
   `ans_mode` varchar(1) DEFAULT NULL,
   `pdf` int(10) unsigned DEFAULT NULL,
   `explanation` varchar(5000) DEFAULT NULL,
+  `memory` varchar(5000) DEFAULT NULL,
   PRIMARY KEY (`number`),
   KEY `u_id` (`u_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=76 DEFAULT CHARSET=utf8mb4;

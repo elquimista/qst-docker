@@ -34,6 +34,12 @@ QST will run on a laptop, server or in the cloud.
       and you can plug your laptop into different networks for different groups of users.
 
 We recommend a Core I7 processor with 8 cores/16 threads, 32GB ram and 500GB NVME SSD with a gigabit network card.
+  *** UPDATE Aug. 5, 2024
+      We recently updated our QST servers to HP Workstations Z 840's
+         Each contain 2-Xeon 24 core 48 thread processors, 128 GB ram, 1TB NVME ssd's.
+         These can be found for bargain prices - Ours were $750.00 CAD each at bestbuy.ca
+         If you plan on conducting extremely large assessments, these will handle the load.
+         
   Only run Apache, MYSQL and QST on the machine.
     - MySQL 5.7 will run better because it caches results (MySQL 8 does not do this).
         - This only helps if you do not have other users creating questions while the quiz/test

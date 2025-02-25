@@ -1,5 +1,33 @@
-<HTML><HEAD><TITLE>QST</TITLE>
+<HTML oncontextmenu="return false"><HEAD>
+<meta http-equiv='cache-control' content='no-cache'>
+<meta http-equiv='expires' content='0'>
+<meta http-equiv='pragma' content='no-cache'>
+<TITLE>QST</TITLE>
 </head>
+<script language="Javascript" type="text/javascript">
+
+var what = 1;
+function delete_handler() {
+alert("No questions have been added yet.")
+}
+
+function focus_handler() {
+alert("No questions have been added yet.")
+}
+
+document.onkeydown = function (event) {
+	event = (event || window.event);
+	return keyFunction(event);
+	}
+
+function keyFunction(event){
+	if (event.keyCode == 123) {
+	return false;
+	}
+    }
+
+</script>
+
 <body>
 </BODY>
 </HTML>

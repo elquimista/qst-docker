@@ -17,9 +17,9 @@ package QST;
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 # ====================
 #
-# version 3.11.01    English
+# version 3.12.07    English
 #
-#  In memory of Patricia Herchek. R.I.P. November 29, 1954 - July 21, 2020.
+#  In Memory of Patricia Herchek. R.I.P. November 29, 1954 - July 21, 2020.
 #
 #            Requiescat in pace ...
 #            domit in pace
@@ -27,7 +27,17 @@ package QST;
 #############################################################
 
 use File::Path qw(rmtree);
-use MIME::Base64;
+
+#Uncomment below for Windows QST. Only uncomment Net::LDAP if you are using it.
+#use strict;
+#use File::Path;
+#use Net::LDAP;
+#use POSIX qw(strftime);
+#use Crypt::PBKDF2;
+#use MIME::Base64;
+#use Archive::Zip qw(:ERROR_CODES :CONSTANTS);
+#use Exporter 'import';
+#use DBI;
 
 # Debug database. Only uncomment if there are database issues on linux
 #$Apache::DBI::DEBUG = 2;
@@ -86,6 +96,9 @@ my $mode;
 my $mc_num = 15; #max number of mc answers
 my $ma_num = 15; #max number of ma answers
 my $mx_num = 12; #max number of mx answers
+my $lt_num = 6;  #max number of lt answers
+my $lt_list = 6;  #max number of Lists to show
+my $or_num = 15;  #max number of or answers
 
 my @f_ile = ("quizzes","tests","surveys");
 my @lalpha_bet = ("a","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o");
@@ -136,7 +149,9 @@ my $page_top1 = "<TABLE width=\"100%\" $style1 border-radius:6px\;\"  border=\"0
 
 
 my %LANGUAGE = ();
-my $set_language = 1; # English
+my $set_language = 1; # English  If using Another Language Pack below, set it to 2
+my $language_direction = "ltr"; # rtl (Arabic, etc.) or ltr (English, French, etc.)
+my $lang = "en"; #fr for FRENCH, en for ENGLISH, ar for ARABIC
 
 ####### English              #####################################################################
 # Phrases
@@ -275,6 +290,9 @@ $LANGUAGE{1}{Arrow} = "Arrow";
 $LANGUAGE{1}{Afiledescripwasnotentered} = "A file description was not entered.";
 $LANGUAGE{1}{Answeredon} = "Answered on (M/D/Time)";
 $LANGUAGE{1}{Answertoobig} = "Answer too big";
+$LANGUAGE{1}{AddList} = "Add List";
+$LANGUAGE{1}{AddMatch} = "Add Match";
+$LANGUAGE{1}{AsciiMathMode} = "AsciiMath Mode";
 
 $LANGUAGE{1}{Basic} = "Basic";
 $LANGUAGE{1}{Bonus} = "Bonus";
@@ -326,6 +344,7 @@ $LANGUAGE{1}{CorrectAnswer} = "Correct Answer";
 $LANGUAGE{1}{ClicktheSubmitQSTbuttontoseeyourresults} = "Click the Submit QST button to see your results.";
 $LANGUAGE{1}{Columns} = "Columns";
 $LANGUAGE{1}{ClicktoseeWordXMLformat} = "Click to see Word XML format";
+$LANGUAGE{1}{ClicktoseeTextformat} = "Click to see Text format";
 $LANGUAGE{1}{ClicktoseeMoodlequestiontypes} = "Click to see Moodle question types";
 $LANGUAGE{1}{ClicktoseeQTIquestiontypes} = "Click to see QTI question types";
 $LANGUAGE{1}{CreateOrganization} = "Create Organization";
@@ -362,6 +381,8 @@ $LANGUAGE{1}{Copyandpasteintoanswerssurroundedby} = "Copy and paste into answers
 $LANGUAGE{1}{Copyandpasteintoanswerssurroundedbycode} = "Copy and paste into answers surrounded by <code>'</code>";
 $LANGUAGE{1}{ChangeFileDescrip} = "Change File Description";
 $LANGUAGE{1}{Comments} = "Comments";
+$LANGUAGE{1}{Cloze} = "Cloze";
+$LANGUAGE{1}{CreateaMemory} = "Create a Memory";
 
 $LANGUAGE{1}{Default} = "Default";
 $LANGUAGE{1}{DeleteQuestions} = "Delete Questions";
@@ -413,7 +434,7 @@ $LANGUAGE{1}{Entermatchingtexthere} = "Enter matching text here.";
 $LANGUAGE{1}{Explanation} = "Explanation";
 $LANGUAGE{1}{Explanationlongerthen5000characters} = "Explanation longer then 5000 characters";
 $LANGUAGE{1}{Explanationimagenamelongerthen} = "Explanation image name longer then";
-$LANGUAGE{1}{Explanations} = "Explanations";
+$LANGUAGE{1}{Explanations} = "Explanation";
 
 $LANGUAGE{1}{Focus} = "Focus";
 $LANGUAGE{1}{files} = "files";
@@ -423,7 +444,7 @@ $LANGUAGE{1}{False} = "False";
 $LANGUAGE{1}{File} = "File";
 $LANGUAGE{1}{Foldertoplaceunder} = "Folder to place under";
 $LANGUAGE{1}{Fileofusersandclasses} = "File of users and classes";
-$LANGUAGE{1}{ForsecuritythisfileisparsedinmemoryontheserverAllpasswordsareencrypted} = "For security this file is parsed in memory on the server.<BR>*All passwords are encrypted.";
+$LANGUAGE{1}{ForsecuritythisfileisparsedinMemoryontheserverAllpasswordsareencrypted} = "For security this file is parsed in Memory on the server.<BR>*All passwords are encrypted.";
 $LANGUAGE{1}{Formatoffile} = "Format of file:";
 $LANGUAGE{1}{February} = "February";
 $LANGUAGE{1}{Filecontents} = "File contents";
@@ -440,12 +461,15 @@ $LANGUAGE{1}{GradeBook} = "GradeBook";
 $LANGUAGE{1}{GradeBooks} = "GradeBooks";
 $LANGUAGE{1}{Grade} = "Grade";
 $LANGUAGE{1}{GreekandFunction} = "Greek and Function";
+$LANGUAGE{1}{GKFunc} = "GK/Func";
 
 $LANGUAGE{1}{hasnotbeencreatedyet} = " has not been created yet.";
 $LANGUAGE{1}{HidePreview} = "Hide Preview";
 $LANGUAGE{1}{Hide} = "<font color=\"red\" data-toggle=\"tooltip\" title=\" Hide \">X</font>";
 $LANGUAGE{1}{hasnotstarted} = "has not started ";
 $LANGUAGE{1}{hasalreadybeenstartedbystudentsandcannotbechanged} = "has already been started by students and cannot be changed.";
+$LANGUAGE{1}{HideMemory} = "Hide Memory";
+$LANGUAGE{1}{HideSource} = "Hide Source";
 
 $LANGUAGE{1}{Instructions} = "Instructions";
 $LANGUAGE{1}{Importquestions} = "Import questions";
@@ -471,6 +495,7 @@ $LANGUAGE{1}{InsertPDF} = "Insert PDF";
 $LANGUAGE{1}{ifmultipleattempts} ="if multiple attempts records highest mark only if all questions are T/F, Y/N, multiple choice, multiple answer, or matchxng, otherwise records last attempt.";
 $LANGUAGE{1}{Imagenametoobig} = "Image name too big";
 $LANGUAGE{1}{Imagenamelongerthen50} = "Image name longer then 50";
+$LANGUAGE{1}{ImportAI} = "Import AI";
 
 $LANGUAGE{1}{January} = "January";
 $LANGUAGE{1}{June} = "June";
@@ -482,6 +507,8 @@ $LANGUAGE{1}{Logout} = "Log Out";
 $LANGUAGE{1}{Login} = "Log In";
 $LANGUAGE{1}{lengthofeitherinstitutionidfirstnamelastnameusernamepasswordclassidorclassnameistoolong} = "length of either institution id, first name, last name, username, password, class id or class name is too long";
 $LANGUAGE{1}{Logic} = "Logic";
+$LANGUAGE{1}{List} = "List";
+$LANGUAGE{1}{LaTeXTeXMode} = "LaTeX/TeX Mode";
 
 $LANGUAGE{1}{marks} = "marks.";
 $LANGUAGE{1}{Marks} = "Marks";
@@ -498,7 +525,6 @@ $LANGUAGE{1}{MYQSTFiles} = "My QST Files";
 $LANGUAGE{1}{Mark} = "Mark";
 $LANGUAGE{1}{minutes} = "minutes";
 $LANGUAGE{1}{Marked} = "Marked";
-$LANGUAGE{1}{ModalNoresize} = "Modal - No resize";
 $LANGUAGE{1}{maxOnlygifjpegandpngfiles} = "max. <BR>Only .gif, .jpeg, .png and .pdf files";
 $LANGUAGE{1}{MBmaxOnlytxtfiles} = "MB max. Only .txt files";
 $LANGUAGE{1}{March} = "March";
@@ -509,6 +535,8 @@ $LANGUAGE{1}{Matchingmayonlybetext} = "Matching may only be text.";
 $LANGUAGE{1}{Minutesaddedto} = "minutes added to";
 $LANGUAGE{1}{MoodleXML} = "Moodle XML";
 $LANGUAGE{1}{Math} = "Math";
+$LANGUAGE{1}{MathMLMode} = "MathML Mode";
+$LANGUAGE{1}{Memory} = "Memory";
 
 $LANGUAGE{1}{Nofileselected} = "No file selected.";
 $LANGUAGE{1}{Notenoughfilespace} = "Not enough file space available.";
@@ -523,6 +551,7 @@ $LANGUAGE{1}{Notmarked} = "Not marked.";
 $LANGUAGE{1}{Noquestionshavebeenaddedyet} = "No questions have been added yet.";
 $LANGUAGE{1}{Nostudentswerechosen} = "No students were chosen.";
 $LANGUAGE{1}{NewWindowResizeable} = "New Window - Resizeable";
+$LANGUAGE{1}{NewWindowNoresize} = "New Window - No resize";
 $LANGUAGE{1}{Noquestionswereuploaded} = "No questions were uploaded.";
 $LANGUAGE{1}{Noquestionsavailable} = "No questions available.";
 $LANGUAGE{1}{NoAnswers} = "No Answers";
@@ -680,18 +709,18 @@ $LANGUAGE{1}{submissionfor} = "submission for";
 $LANGUAGE{1}{September} = "September";
 $LANGUAGE{1}{spaceswillberemoved} = "spaces will be removed";
 $LANGUAGE{1}{Studentidmustbenumeric} = "Student id must be numeric.";
-$LANGUAGE{1}{ServerAdministration} = "Server Adminstration";
+$LANGUAGE{1}{ServerAdministration} = "Server Administration";
 $LANGUAGE{1}{School} = "School";
 $LANGUAGE{1}{Subject} = "Subject";
 $LANGUAGE{1}{StronglyAgree} = "Strongly Agree";
 $LANGUAGE{1}{StronglyDisagree} = "Strongly Disagree";
-$LANGUAGE{1}{SelectanitemorinputLaTeXTeXMathMLorAsciiMathnotation} = "Select an item from left menu or input LaTeX, TeX, MathML or <i><B>A</B></i>sciiMath notation.";
+$LANGUAGE{1}{SelectanitemorinputLaTeXTeXMathMLorAsciiMathnotation} = "Select an item from left menu or input LaTeX, TeX, MathML, mhchem or <i><B>A</B></i>sciiMath.";
 $LANGUAGE{1}{Symbol} = "Symbol";
 $LANGUAGE{1}{Submitit} = "Submit it.";
 $LANGUAGE{1}{Server} = "Server";
 $LANGUAGE{1}{SOURCE} = "Source";
 $LANGUAGE{1}{ShowSource} = "Show Source";
-$LANGUAGE{1}{HideSource} = "Hide Source";
+$LANGUAGE{1}{ShowMemory} = "Show Memory";
 
 $LANGUAGE{1}{The} = "The ";
 $LANGUAGE{1}{Thefilewasuploaded} = "The file was uploaded.";
@@ -788,7 +817,6 @@ $LANGUAGE{1}{ViewwQuestion} = "View-Question";
 
 $LANGUAGE{1}{Weight} = "Weight";
 $LANGUAGE{1}{WriteanExplanationforchosenanswer} ="Write an Explanation for chosen answer";
-
 $LANGUAGE{1}{xmlorzip} = "xml or zip";
 
 $LANGUAGE{1}{Youraccounthasbeenlockedfor3minutes} = "Your account has been locked for 3 minutes.";
@@ -823,7 +851,7 @@ $LANGUAGE{2}{10} = "If using images or pdf's in your questions or answers, click
 $LANGUAGE{2}{11} = "To begin, click on <B>Question Bank</B>, then open the Questions Bank folder.";
 $LANGUAGE{2}{12} = "TIP - Create folders under Questions Bank, so that it is easier to group your organizations questions.";
 $LANGUAGE{2}{13} = "Click on a folder name and select Create Question.";
-$LANGUAGE{2}{13} = "Only QST, Word XML, Moodle XML or QTI 2 Formats. 30 MB Max";
+$LANGUAGE{2}{13} = "Only QST XML, Word XML, Text, Moodle XML or QTI 2 Formats. 30 MB Max";
 $LANGUAGE{2}{14} = "Change the admin password!!<BR> Click on Server Administration, then Head Administrator.";
 $LANGUAGE{2}{15} = "Create an Organization  (the name may be changed at anytime).";
 $LANGUAGE{2}{16} = "Click on  Organizations to  add users and classes to it (or upload a file of users and classes).";
@@ -946,6 +974,9 @@ $LANGUAGE{2}{Arrow} = "Arrow";
 $LANGUAGE{2}{Afiledescripwasnotentered} = "A file description was not entered.";
 $LANGUAGE{2}{Answeredon} = "Answered on (M/D/Time)";
 $LANGUAGE{2}{Answertoobig} = "Answer too big";
+$LANGUAGE{2}{AddList} = "Add List";
+$LANGUAGE{2}{AddMatch} = "Add Match";
+$LANGUAGE{2}{AsciiMathMode} = "AsciiMath Mode";
 
 $LANGUAGE{2}{Basic} = "Basic";
 $LANGUAGE{2}{Bonus} = "Bonus";
@@ -997,6 +1028,7 @@ $LANGUAGE{2}{CorrectAnswer} = "Correct Answer";
 $LANGUAGE{2}{ClicktheSubmitQSTbuttontoseeyourresults} = "Click the Submit QST button to see your results.";
 $LANGUAGE{2}{Columns} = "Columns";
 $LANGUAGE{2}{ClicktoseeWordXMLformat} = "Click to see Word XML format";
+$LANGUAGE{2}{ClicktoseeTextformat} = "Click to see Text format";
 $LANGUAGE{2}{ClicktoseeMoodlequestiontypes} = "Click to see Moodle question types";
 $LANGUAGE{2}{ClicktoseeQTIquestiontypes} = "Click to see QTI question types";
 $LANGUAGE{2}{CreateOrganization} = "Create Organization";
@@ -1033,6 +1065,8 @@ $LANGUAGE{2}{Copyandpasteintoanswerssurroundedby} = "Copy and paste into answers
 $LANGUAGE{2}{Copyandpasteintoanswerssurroundedbycode} = "Copy and paste into answers surrounded by <code>'</code>";
 $LANGUAGE{2}{ChangeFileDescrip} = "Change File Description";
 $LANGUAGE{2}{Comments} = "Comments";
+$LANGUAGE{2}{Cloze} = "Cloze";
+$LANGUAGE{2}{CreateaMemory} = "Create a Memory";
 
 $LANGUAGE{2}{Default} = "Default";
 $LANGUAGE{2}{DeleteQuestions} = "Delete Questions";
@@ -1094,7 +1128,7 @@ $LANGUAGE{2}{False} = "False";
 $LANGUAGE{2}{File} = "File";
 $LANGUAGE{2}{Foldertoplaceunder} = "Folder to place under";
 $LANGUAGE{2}{Fileofusersandclasses} = "File of users and classes";
-$LANGUAGE{2}{ForsecuritythisfileisparsedinmemoryontheserverAllpasswordsareencrypted} = "For security this file is parsed in memory on the server.<BR>*All passwords are encrypted.";
+$LANGUAGE{2}{ForsecuritythisfileisparsedinMemoryontheserverAllpasswordsareencrypted} = "For security this file is parsed in Memory on the server.<BR>*All passwords are encrypted.";
 $LANGUAGE{2}{Formatoffile} = "Format of file:";
 $LANGUAGE{2}{February} = "February";
 $LANGUAGE{2}{Filecontents} = "File contents";
@@ -1111,12 +1145,15 @@ $LANGUAGE{2}{GradeBook} = "GradeBook";
 $LANGUAGE{2}{GradeBooks} = "GradeBooks";
 $LANGUAGE{2}{Grade} = "Grade";
 $LANGUAGE{2}{GreekandFunction} = "Greek and Function";
+$LANGUAGE{2}{GKFunc} = "GK/Func";
 
 $LANGUAGE{2}{hasnotbeencreatedyet} = " has not been created yet.";
 $LANGUAGE{2}{HidePreview} = "Hide Preview";
 $LANGUAGE{2}{Hide} = "<font color=\"red\" data-toggle=\"tooltip\" title=\" Hide \">X</font>";
 $LANGUAGE{2}{hasnotstarted} = "has not started ";
 $LANGUAGE{2}{hasalreadybeenstartedbystudentsandcannotbechanged} = "has already been started by students and cannot be changed.";
+$LANGUAGE{2}{HideMemory} = "Hide Memory";
+$LANGUAGE{2}{HideSource} = "Hide Source";
 
 $LANGUAGE{2}{Instructions} = "Instructions";
 $LANGUAGE{2}{Importquestions} = "Import questions";
@@ -1153,6 +1190,8 @@ $LANGUAGE{2}{Logout} = "Log Out";
 $LANGUAGE{2}{Login} = "Log In";
 $LANGUAGE{2}{lengthofeitherinstitutionidfirstnamelastnameusernamepasswordclassidorclassnameistoolong} = "length of either institution id, first name, last name, username, password, class id or class name is too long";
 $LANGUAGE{2}{Logic} = "Logic";
+$LANGUAGE{2}{List} = "List";
+$LANGUAGE{2}{LaTeXTeXMode} = "LaTeX/TeX Mode";
 
 $LANGUAGE{2}{marks} = "marks.";
 $LANGUAGE{2}{Marks} = "Marks";
@@ -1169,7 +1208,7 @@ $LANGUAGE{2}{MYQSTFiles} = "My QST Files";
 $LANGUAGE{2}{Mark} = "Mark";
 $LANGUAGE{2}{minutes} = "minutes";
 $LANGUAGE{2}{Marked} = "Marked";
-$LANGUAGE{2}{ModalNoresize} = "Modal - No resize";
+$LANGUAGE{2}{NewWindowNoresize} = "New Window - No resize";
 $LANGUAGE{2}{maxOnlygifjpegandpngfiles} = "max. <BR>Only .gif, .jpeg, .png and .pdf files";
 $LANGUAGE{2}{MBmaxOnlytxtfiles} = "MB max. Only .txt files";
 $LANGUAGE{2}{March} = "March";
@@ -1180,6 +1219,7 @@ $LANGUAGE{2}{Matchingmayonlybetext} = "Matching may only be text.";
 $LANGUAGE{2}{Minutesaddedto} = "minutes added to";
 $LANGUAGE{2}{MoodleXML} = "Moodle XML";
 $LANGUAGE{2}{Math} = "Math";
+$LANGUAGE{2}{MathMLMode} = "MathML Mode";
 
 $LANGUAGE{2}{Nofileselected} = "No file selected.";
 $LANGUAGE{2}{Notenoughfilespace} = "Not enough file space available.";
@@ -1351,7 +1391,7 @@ $LANGUAGE{2}{submissionfor} = "submission for";
 $LANGUAGE{2}{September} = "September";
 $LANGUAGE{2}{spaceswillberemoved} = "spaces will be removed";
 $LANGUAGE{2}{Studentidmustbenumeric} = "Student id must be numeric.";
-$LANGUAGE{2}{ServerAdministration} = "Server Adminstration";
+$LANGUAGE{2}{ServerAdministration} = "Server Administration";
 $LANGUAGE{2}{School} = "School";
 $LANGUAGE{2}{Subject} = "Subject";
 $LANGUAGE{2}{StronglyAgree} = "Strongly Agree";
@@ -1361,7 +1401,7 @@ $LANGUAGE{2}{Symbol} = "Symbol";
 $LANGUAGE{2}{Submitit} = "Submit it.";
 $LANGUAGE{2}{SOURCE} = "Source";
 $LANGUAGE{2}{ShowSource} = "Show Source";
-$LANGUAGE{2}{HideSource} = "Hide Source";
+$LANGUAGE{2}{ShowMemory} = "Show Memory";
 
 $LANGUAGE{2}{The} = "The ";
 $LANGUAGE{2}{Thefilewasuploaded} = "The file was uploaded.";
@@ -1610,10 +1650,12 @@ my %PASSED_VALUES = ("from","2","sub_type","1","type","1","expand","50","name","
 "number","10","qst","10","qst_no","10","class_id","10","class_name","80","forall","1","copy_quiz","10","parent","10","i_n","20","target","10","action_type","6","status","1","q_mark","2","q_select","2","s_id","50","mark","3","weight","3","marks","3","assign_qst","10","s_name","1","qst_id","10","bonus","3","assign_qst_name","50","assign_name","50","q_order","1","correct","2","score","3","na","2","value_to_mark","2","questions","100","wrong","2","to_mark","3","targit","100","qst_total","3","old_pass","1000","fake_quest_no","11","chosen_question","10","question","$max_question_size","value","2","select","2","TFans","1","SAans","75","Pans","$p_ans_length","MCans","1","select1","$max_advanced_answer","select2","$max_advanced_answer","select3","$max_advanced_answer","select4","$max_advanced_answer","select5","$max_advanced_answer","select6","$max_advanced_answer","select7","$max_advanced_answer","select8","$max_advanced_answer","select9","$max_advanced_answer","select10","$max_advanced_answer","select11","$max_advanced_answer","select12","$max_advanced_answer","select13","$max_advanced_answer","select14","$max_advanced_answer","select15","$max_advanced_answer","disply","1","answer","75","name4","1","name2","1","order_no","1","selection3","25","assign_id","10",
 "selection5","25","copy","10","quest_no","10","real_quest_no","10","qst_name","50","done","1","value_of_quests_to_be_marked","3","paste","10","cut","10","select1ma","1","select2ma","1","select3ma","1","select4ma","1","select5ma","1","select6ma","1","select7ma","1","select8ma","1","select9ma","1","select10ma","2","select11ma","2","select12ma","2","select13ma","2","select14ma","2","select15ma","2","start_day","3","avail","1","q_time","3","result","3","finish_month","2","submissions","2","start_month","2","start_hour","4","finish_day","2","rhm","1","finish_hour","4","attempts","1","attempt","2","post_qst","1","qtime","3","pass","1000","index_to_quest_no","1500","s_name","50","where","10","from_target","15","folder_no","10","institution_id","20","org_id","3","change","1","chosen_question","10","real_quest_no","10","f_name","40","m_name","20","l_name","40","u_name","50","pass1","30","org","80","org_letter","10","expand_it","100","selection6","25","view","10","org_type","2","org_name","80","u_type","1","institute_id","10","class","10","letter","3","u_id","10","i_id","10","add_user","10","image_number","10","image1","10","image1name","50","image2","10","image2name","50","image3","10","image3name","50","image4","10","image4name","50","image5","10","image5name",
 "50","image6","10","image6name","50","image7","10","image7name","50","image8","10","image8name","50","image9","10","image9name","50","image10","10","image11name","50","image12name","50","image13name","50","image14name","50","image15name","50","image11","10","image12","10","image13","10","image14","10","image15","10","insert_image_name","50","new","1","choice","1","saanswer","75","panswer","3000","user","50","login","1","session_id","50","uid","10","copy_quest","10","unpost","1","student_id","10","email","30","student_open","1","c_open","10","student_name","52","open_account","1","account_select","1","account_pref","1","terms","4","timezone","4","tx","300","amt","7","st","20","cc","4","cm","30","item_name","50","item_number","50","payment_status","20","mc_gross","10","mc_currency","5","receiver_email","50","payer_email","50","paste_students","3000","print","1","bank_no","10","qbank","1","question_mc","10","answertype","2","vlink","150","alink","150","qst_time","3","delivery","1","order","3","lquests","4000","select1mx","30","select2mx","30","select3mx","30","select4mx","30","select5mx","30","select6mx","30","select7mx","30","select8mx","30","select9mx","30","select10mx","30","select11mx","30","select12mx","30","select13mx","30","select14mx","30","select15mx",
-"30","mxselect","30","do","1","index","3","topass","350","branch","10","quest1","10","quest2","10","quest3","10","quest4","10","quest5","10","quest6","10","quest7","10","quest8","10","quest9","10","quest10","10","quest11","10","quest12","10","quest13","10","quest14","10","quest15","10","branch_it","2000","bquest","2000","branching","1","YNans","1","referer","10","refer","10","option","1","kolum","1","stats","1","shuffle","1","doo","1","mode","1","descrip","70","ans_mode","1","select1mam","1","select2mam","1","select3mam","1","select4mam","1","select5mam","1","select6mam","1","select7mam","1","select8mam","1","select9mam","1","select10mam","2","select11mam","2","select12mam","2","select13mam","2","select14mam","2","select15mam","2","select1maeq","1","select2maeq","1","select3maeq","1","select4maeq","1","select5maeq","1","select6maeq","1","select7maeq","1","select8maeq","1","select9maeq","1","select10maeq","2","select11maeq","2","select12maeq","2","select13maeq","2","select14maeq","2","select15maeq","2","eq","1","export_type","1","exportfile","30","import","1","import_type","1","display_num","3","display","1","view_org_id","10","again","1","reload","1","shuffle_ans","1","addp","1","return_user_id","10","photo","15","pptx_number","10","insert_pptx_name","50","mobile","1","screen_width","4","iphone","1","show_time","20","id","10","ad_time","2","dwnld","1","filedescrip","500","prev_quest_no","10","explanation","5000","explanations","1","source","1");
+"30","mxselect","30","do","1","index","3","topass","350","branch","10","quest1","10","quest2","10","quest3","10","quest4","10","quest5","10","quest6","10","quest7","10","quest8","10","quest9","10","quest10","10","quest11","10","quest12","10","quest13","10","quest14","10","quest15","10","branch_it","2000","bquest","2000","branching","1","YNans","1","referer","10","refer","10","option","1","kolum","1","stats","1","shuffle","1","doo","1","mode","1","descrip","70","ans_mode","1","select1mam","1","select2mam","1","select3mam","1","select4mam","1","select5mam","1","select6mam","1","select7mam","1","select8mam","1","select9mam","1","select10mam","2","select11mam","2","select12mam","2","select13mam","2","select14mam","2","select15mam","2","select1maeq","1","select2maeq","1","select3maeq","1","select4maeq","1","select5maeq","1","select6maeq","1","select7maeq","1","select8maeq","1","select9maeq","1","select10maeq","2","select11maeq","2","select12maeq","2","select13maeq","2","select14maeq","2","select15maeq","2","eq","1","export_type","1","exportfile","30","import","1","import_type","1","display_num","3","display","1","view_org_id","10","again","1","reload","1","shuffle_ans","1","addp","1","return_user_id","10","photo","15","pptx_number","10","insert_pptx_name","50",
+"mobile","1","screen_width","4","iphone","1","show_time","20","id","10","ad_time","2","dwnld","1","filedescrip","500","prev_quest_no","10","explanation","5000","explanations","1","source","1","LTans1","1","LTans2","1","LTans3","1","LTans4","1","LTans5","1","LTans6","1","selectlt11","30","selectlt12","30","selectlt13","30","selectlt14","30","selectlt15","30","selectlt21","30","selectlt22","30","selectlt23","30","selectlt24","30","selectlt25","30","selectlt31","30","selectlt32","30","selectlt33","30","selectlt34","30","selectlt35","30","selectlt41","30","selectlt42","30","selectlt43","30","selectlt44","30","selectlt45","30","selectlt51","30","selectlt52","30","selectlt53","30","selectlt54","30","selectlt55","30","selectlt61","30","selectlt62","30","selectlt63","30","selectlt64","30","selectlt65","30","LTmark1","2","LTmark2","2","LTmark3","2","LTmark4","2","LTmark5","2","LTmark6","2","m_match_ans1","22","m_match_ans2","22","m_match_ans3","22","m_match_ans4","22","m_match_ans5","22","m_match_ans6","22","Mmark1","2","Mmark2","2","Mmark3","2","Mmark4","2","Mmark5","2","Mmark6","2","selector1","75","selector2","75","selector3","75","selector4","75","selector5","75","selector6","75","selector7","75","selector8","75","selector9","75","selector10","75","selector11","75"
+,"selector12","75","selector13","75","selector14","75","selector15","75","memory","5000","viewed","1","memori","1","importai","15000");
 
 
-######################
+######################    #####################################################################
 #
 # MAIN PROGRAM
 #
@@ -1647,7 +1689,9 @@ sub handler {
     	if ($CONTENT_TYPE =~ /^multipart\/form-data/) { 
                 my $folder_to_put_into;
                 my $error = 0;
-		
+		my $import_error = 0;
+		my %IMPORT_VALUES = ("session_id","20","u_id","10","org_id","10","filename","50","expand","100","mode","1","folder_no","10","return_user_id","10");
+
 		if($CONTENT_LENGTH < $admin_max_upload_size) {
                         my @boundary = split(/\;/,$CONTENT_TYPE);
                         my @bound_piece = split(/=/,$boundary[1]);
@@ -1660,13 +1704,14 @@ sub handler {
 			my $zip = 0;
 			my $import_format = 0;
 			my $xml_uploaded_file;
+			my $orig_org_id;
 			
                         foreach my $section(@buffer_pieces) { #
                                 if($section =~ /name=\"import_type\"/) { #find the format
                         		$section =~ s/\s+//g;	
 				         my @type = split(/\"/,$section);
 				         $type[2] =~ s/\D//g;
-				         $import_format = $type[2];
+				         $import_format = $type[2];				         
                                         }
                                         
                                 if($section =~ /name=\"importxml\"/) {
@@ -1717,7 +1762,8 @@ sub handler {
 
                                         if($file_stuff[1] ne"") { # ACTUAL CONTENTS OF FILE
                                         	$xml_uploaded_file = $file_stuff[1];
-                                                if($file_stuff[1] =~/^\s*text\/plain/) {
+                                                if($file_stuff[1] =~/^\s*text\/plain/) { # Loading students or Text questions
+                                                	$orig_org_id = $INPUT{org_id}; # Have to save it for Text questions
                                                         $file_of_students = 1;
                                                         my @ff = split(/=/,$content_disposition[1]);
                                                         $ff[1] =~ s/\"//g;
@@ -1761,7 +1807,8 @@ sub handler {
                                                 }
                                         }
 
-                                @wwww = split(/\"/,$form_name[1]); # THE OTHER Name/Value pairs
+				# THE OTHER Name/Value pairs
+                                @wwww = split(/\"/,$form_name[1]); 
                                 
                                 if($wwww[1] eq"" || $wwww[2] eq"") {
                                         }
@@ -1770,10 +1817,16 @@ sub handler {
                                         }
 
                                 }
+                                # END OF READING FILE IN  ######
                         
                         if($import_format == 4 && $zip == 0) { # QTI XML
                         	$xmlcontents = $xml_uploaded_file;
                         	}
+
+                        if($import_format == 5) { # Text
+                        	$xmlcontents = $xml_uploaded_file;
+                        	}
+
 
                         $INPUT{session_id} =~ s/\D//g;
                         $INPUT{u_id} =~ s/\D//g;
@@ -1784,21 +1837,34 @@ sub handler {
                         $INPUT{folder_no} =~ s/\D//g;
                         $INPUT{return_user_id} =~ s/\D//g;
 
+			#CHECK VALIDITY AND LENGTH OF INPUT
+			foreach my $key_name(keys %INPUT) {
+				if( !defined $IMPORT_VALUES{$key_name}) {
+					delete($INPUT{$key_name});
+					}
+				else {
+			                $import_error = &check_many_length_return("$key_name","$IMPORT_VALUES{$key_name}");
+			                if($import_error == 1) {
+			                	delete($INPUT{key_name});
+			                	$import_error = 0;
+			                	}
+			                }
+				}
+
                         if($INPUT{mode} != 1) {
                                 &header;
-                                &body("in","1");
+                                &body("body","1");
                                 }
 
                         if($file_of_students == 0 && $INPUT{mode} != 4) { # only needed if uploading image
                                 my @expand = split(/,/,$INPUT{expand});
                                 $folder_to_put_into = pop(@expand);
-                                $error = &check_many_length_return("$folder_to_put_into","10","$INPUT{filename}","50","$INPUT{u_id}","10","$INPUT{org_id}","10","$INPUT{expand}","100");
+                                $folder_to_put_into =~ s/\D//g;
                                 }
 
                         # check there is a filename first
                         if ($INPUT{filename} eq"" && $INPUT{mode} != 4 && $INPUT{mode} != 5 && $INPUT{mode} != 6) { # print out the upload file screen again
-                                &upload_file("number","1","status","2","org_id","$INPUT{org_id}","u_id","$INPUT{u_id}","session_id","$INPUT{session_id}","expand","$INPUT{expand}");
-                                    
+                                &upload_file("number","1","status","2","org_id","$INPUT{org_id}","u_id","$INPUT{u_id}","session_id","$INPUT{session_id}","expand","$INPUT{expand}");                                    
                                 $error = 1;
                                 }
 
@@ -1806,8 +1872,14 @@ sub handler {
                                 $error = 0;
                                 }
                                                         
-                        elsif($INPUT{filename} =~ /\.zip$/ && $INPUT{mode} == 4) { # Import QTI Questions in a .zip
+                        elsif($INPUT{filename} =~ /\.zip$/ && $INPUT{mode} == 4) { # Import Questions in a .zip
 			        $error = 0;
+                                }
+                             
+                        elsif($INPUT{filename} =~ /\.txt$/ && $INPUT{mode} == 4) { # Import QST Questions in a .txt file
+				$error = 0;
+				$INPUT{org_id} = $orig_org_id;
+				$INPUT{org_id} =~ s/\D//g;
                                 }
                                 
                         elsif ($INPUT{filename} eq"" && ($INPUT{mode} == 5 || $INPUT{mode} == 6)) { # print out the photo upload screen again
@@ -1821,6 +1893,7 @@ sub handler {
 					
 			        $error = 1;
 			        }
+
 
                         # Check they are logged in
                         if($error == 0) {
@@ -1950,7 +2023,7 @@ sub handler {
                                         }
                                 }
 
-			elsif(($u_type == 2  || $u_type == 5) && $INPUT{filename} =~ /\.zip$/ && $INPUT{mode} == 4) { # INSTRUCTORS or QUESTION BANK ADMINS importing QTI questions in zip
+			elsif(($u_type == 2  || $u_type == 5) && $INPUT{filename} =~ /\.zip$/ && $INPUT{mode} == 4 && $error == 0) { # INSTRUCTORS or QUESTION BANK ADMINS importing QTI questions in zip
 				my $dir = "$INPUT{u_id}"."_"."$INPUT{u_id}";
 				my $dir_name = "$upload_directory"."$dir";
 				my @directories;
@@ -1996,7 +2069,7 @@ sub handler {
 	                        rmtree(@directories); # REMOVE EVERYTHING
                          	}
                          	
-                        elsif(($u_type == 2  || $u_type == 5) && $error != 3 && $INPUT{mode} == 4 ) { # INSTRUCTORS or QUESTION BANK ADMINS importing questions in xml files - QTI XML files too
+                        elsif(($u_type == 2  || $u_type == 5) && $error != 3 && $INPUT{mode} == 4) { # INSTRUCTORS or QUESTION BANK ADMINS importing questions in xml files - QST XML and QTI XML and MOODLE files too
                                 if($import_format == 2) { # WORD XML
                                         &import_quests("xmlcontents","$buffer","org_id","$INPUT{org_id}","u_id","$INPUT{u_id}","session_id","$INPUT{session_id}","folder_no","$INPUT{folder_no}","u_type","$u_type}","import_format","$import_format");
                         		}
@@ -2011,6 +2084,9 @@ sub handler {
                                         
                                 elsif($import_format == 1){ # QST XML
 				        &import_quests("xmlcontents","$xmlcontents","org_id","$INPUT{org_id}","u_id","$INPUT{u_id}","session_id","$INPUT{session_id}","folder_no","$INPUT{folder_no}","u_type","$u_type}","import_format","$import_format");
+                                        }
+                                elsif($import_format == 5){ # Text
+					&import_quests("xmlcontents","$xmlcontents","org_id","$INPUT{org_id}","u_id","$INPUT{u_id}","session_id","$INPUT{session_id}","folder_no","$INPUT{folder_no}","u_type","$u_type}","import_format","$import_format");
                                         }
                                 }
                                 
@@ -2106,7 +2182,9 @@ sub handler {
           	}
           	
           else { # NORMAL FORM INPUT         #######################################################################################
-                &header;
+          
+# REMOVE # BELOW FOR TROUBLE SHOOTING THEN UNCOMMENT the line further down               
+#&header;
                 $mode = 0;
           	@pairs = split(/&/, $buffer);
 
@@ -2282,34 +2360,27 @@ sub handler {
                   }
                   
                   
-        # Some cleaning of input
+        ##### Some cleaning of input  ##########
+        
 	$INPUT{session_id} =~ s/\D//g;
 	$INPUT{u_id} =~ s/\D//g;
 	$INPUT{u_type} =~ s/\D//g;
 	$INPUT{org_id} =~ s/\D//g;
+	$INPUT{user} =~ tr/A-Za-z0-9//cd;
 	$INPUT{view_org_id} =~ s/\D//g;
-#	$INPUT{descrip} =~ s/[^a-zA-Z0-9 _+-=]//g;
-	$INPUT{descrip} = &funny_char("$INPUT{descrip}","0");
-
+	$INPUT{descrip} = &funny_char2("$INPUT{descrip}","0");
+	
 	if($INPUT{descrip} eq "") {
                 delete($INPUT{descrip});
                 }
-	
-	# block right click for Single Question - Next and Single Question - Answer does not entirely work
-	if($INPUT{input} eq "do_type3" || $INPUT{input} eq "qst_side3" || $INPUT{input} eq "question_done" || $INPUT{input} eq "next_question3" || $INPUT{input} eq"resume_next_question3" || $INPUT{input} eq"resume_qst_side3" || $INPUT{input} eq "do_type4" || $INPUT{input} eq "next_question4") {
-	        &body("body","2");
-                }
-        else {
-        	&body("body","1");
-        	}
-                
-    #### Short Answer
+		                
+        #### Short Answer
         if(defined $INPUT{SAans}) {
                 $INPUT{SAans} =~ s/"/&quot;/g;
                 $INPUT{SAans} =~ s/'/&apos;/g;
                 }
         
-    #### Paragraph Answer
+        #### Paragraph Answer
         if(defined $INPUT{Pans}) {
                 if($INPUT{Pans} =~ /float\:/){
                         # do nothing
@@ -2327,13 +2398,37 @@ sub handler {
                 $INPUT{Pans} =~ s/\/textarea/&#47;textarea/ig;
                 }
 	
-    #### Decide how to handle the question
+        #### Explanation
+        if(defined $INPUT{explanation}) {
+                $INPUT{explanation} =~ s/"/&quot;/g;
+                $INPUT{explanation} =~ s/'/&apos;/g;
+		}
+
+        #### Memory
+        $INPUT{memory} =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+        if(defined $INPUT{memory}) {                
+                if($INPUT{memory} ne "") {                	
+			# only certain iframes
+		        if($INPUT{memory} =~ /<\s*iframe/) {
+		        	if($INPUT{memory} =~ /src=\"\/\/www.youtube.com/ || $INPUT{memory} =~ /src=\"\/\/www.vimeo.com/  || $INPUT{memory} =~ /src=\"\/\/www.vine.co/  || $INPUT{memory} =~ /src=\"\/\/www.instagram.com/ || $INPUT{memory} =~ /src=\"\/\/www.dailymotion.com/ || $INPUT{memory} =~ /src=\"\/\/www.youku.com/) {
+		                        }
+		                else {
+		                	$INPUT{memory} =~ s/iframe/&#105;frame/ig;
+		                        }
+                                }
+                                
+                        $INPUT{memory} =~ s/"/&quot;/g;
+			$INPUT{memory} =~ s/'/&apos;/g;
+                        }
+		}
+
+        #### Decide how to handle the QUESTION
         if($INPUT{mode} == 1) { # Advanced Editor
                 $INPUT{question} =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
 
                 if($INPUT{question} ne "") {                	
                         # only certain iframes
-                        if($INPUT{question} =~ /<\s*iframe/) {
+                        if($INPUT{question} =~ /<\s*iframe/i) {
                         	if($INPUT{question} =~ /src=\"\/\/www.youtube.com/ || $INPUT{question} =~ /src=\"\/\/www.vimeo.com/  || $INPUT{question} =~ /src=\"\/\/www.vine.co/  || $INPUT{question} =~ /src=\"\/\/www.instagram.com/ || $INPUT{question} =~ /src=\"\/\/www.dailymotion.com/ || $INPUT{question} =~ /src=\"\/\/www.youku.com/) {
 	                                # do nothing
                                 	}
@@ -2397,6 +2492,10 @@ sub handler {
 			my @row = $sth->fetchrow_array();
 			$u_type = $row[1];
 			$ids = $INPUT{u_id};
+			
+			# SEND HEADER AND BODY NOW THAT WE KNOW WHO THEY ARE  - STUDENTS WE WANT TO ENABLE THE LANGUAGE DIRECTION
+			&header;
+			&body;
 			
 			if(defined $row[2]) {
 				my $old_time = $row[2] + $time_out; #6000; # 60 min. time out
@@ -2469,12 +2568,17 @@ sub handler {
                                 my @row = $sth->fetchrow_array();
                                 my $len = 0;
                                 $len = @row;
+                                $u_type = "$row[3]";
                                 
+                                # SEND HEADER AND BODY NOW THAT WE KNOW WHO THEY ARE  - STUDENTS WE WANT RIGHT TO CHANGE LANGUAGE DIRECTION
+				&header;
+				&body;
+				
                                 #compare passwords if they are there
                                 my $compare_password = 0;;
 
                                 if($len > 0) {
- #                                      $compare_password  = &authenticate_ldap("username","$INPUT{user}","password","$INPUT{pass}");
+ #                                      $compare_password  = &authenticate_ldap("user","$INPUT{user}","pass","$INPUT{pass}");
                                         $compare_password = &compare_password("password","$INPUT{pass}","hash","$row[2]");
                                         }
                                 else {
@@ -2558,7 +2662,7 @@ sub handler {
                                 my $compare_password = 0;
 
                                 if($len > 0) {
- #                                       $compare_password = &authenticate_ldap("username","$INPUT{user}","password","$INPUT{pass}");
+ #                                       $compare_password = &authenticate_ldap("user","$INPUT{user}","pass","$INPUT{pass}");
                                         $compare_password = &compare_password("password","$INPUT{pass}","hash","$row[2]");
                                         }
                                 else {
@@ -2666,6 +2770,7 @@ sub handler {
         	   	
         # Done logging in
 
+	
         ##############################################################################################
 
         
@@ -2809,6 +2914,7 @@ sub handler {
                  	/^print_eq_answer\b/i and do {print_eq_answer(@cc); last CASE;};
                  	/^print_export_quest\b/i and do {print_export_quest(@cc); last CASE;};
                  	/^print_import_quest\b/i and do {print_import_quest(@cc); last CASE;};
+                 	/^print_import_ai\b/i and do {print_import_ai(@cc); last CASE;};
                  	/^print_mida\b/i and do {print_mida(@cc); last CASE;};
                  	/^print_topa\b/i and do {print_topa(@cc); last CASE;};
                  	/^print_instructors_screen\b/i and do {print_instructors_screen(@cc); last CASE;};
@@ -2821,7 +2927,9 @@ sub handler {
                  	/^question_tf\b/i and do {question_tf(@cc); last CASE;};  
                  	/^question_yn\b/i and do {question_yn(@cc); last CASE;};  
                  	/^question_sa\b/i and do {question_sa(@cc); last CASE;};                	
-                 	/^question_ad\b/i and do {question_ad(@cc); last CASE;};                 	
+                 	/^question_ad\b/i and do {question_ad(@cc); last CASE;};              
+                 	/^question_cz\b/i and do {question_cz(@cc); last CASE;};
+                 	/^question_or\b/i and do {question_or(@cc); last CASE;};
                 	/^questions\b/i and do {questions(@cc); last CASE;};                	
                  	/^qst_mark_ins\b/i and do {qst_mark_ins(@cc); last CASE;};                 	
                   	/^rename_it\b/i and do {rename_it(@cc); last CASE;};
@@ -2881,6 +2989,11 @@ sub handler {
                  		/^modal4_do_type4\b/i and do {modal4_do_type4(@dd); last CASE;};
                  		/^modal5_do_type5\b/i and do {modal5_do_type5(@dd); last CASE;};
                  		/^modal_qst_mark\b/i and do {modal_qst_mark(@dd); last CASE;};
+                 		/^mem_quest3\b/i and do {mem_quest3(@dd); last CASE;};
+                 		/^modal_mem_quest\b/i and do {modal_mem_quest(@dd); last CASE;};
+                 		/^modal_mem_quest2\b/i and do {modal_mem_quest2(@dd); last CASE;};
+                 		/^modal_mem_quest3\b/i and do {modal_mem_quest3(@dd); last CASE;};
+                 		/^modal_mem_quest4\b/i and do {modal_mem_quest4(@dd); last CASE;};
                  		/^next_question2\b/i and do {next_question2(@dd); last CASE;};
                  		/^next_question3\b/i and do {next_question3(@dd); last CASE;};
                  		/^next_question4\b/i and do {next_question4(@dd); last CASE;};
@@ -2923,6 +3036,7 @@ sub handler {
                  		/^show_qsts_for_students\b/i and do {show_qsts_for_students(@dd); last CASE;};
                  		/^show_mobile_qsts_for_students\b/i and do {show_mobile_qsts_for_students(@dd); last CASE;};
                  		/^students_view_qst\b/i and do {students_view_qst(@dd); last CASE;};
+                 		/^viewed\b/i and do {viewed(@dd); last CASE;};
 				}
 			}
 		}
@@ -2988,6 +3102,8 @@ sub handler {
                  	/^question_mx\b/i and do {question_mx(@cc); last CASE;};
                  	/^question_ma\b/i and do {question_ma(@cc); last CASE;};
                  	/^question_ad\b/i and do {question_ad(@cc); last CASE;};                 	
+                 	/^question_cz\b/i and do {question_cz(@cc); last CASE;};
+                 	/^question_or\b/i and do {question_or(@cc); last CASE;};
                 	/^questions_bank\b/i and do {questions_bank(@cc); last CASE;};                	
                  	/^qst_mark_ins\b/i and do {qst_mark_ins(@cc); last CASE;};                 	
                   	/^bank_rename_it\b/i and do {bank_rename_it(@cc); last CASE;};                  	
@@ -3775,7 +3891,7 @@ sub create_the_qst {
 	$CTQ{name} = &l_spaces("$CTQ{name}","0");
 	$CTQ{name} = &tr_spaces("$CTQ{name}","0");
 	$CTQ{name} = &x_spaces("$CTQ{name}","0");
-	$CTQ{name} = &funny_char("$CTQ{name}","0");
+	$CTQ{name} = &funny_char2("$CTQ{name}","0");
 	my $error = 0;
 	$error=&check_many_length_return("$CTQ{name}","50","$CTQ{type}","2","$CTQ{parent}","10","$CTQ{sub_type}","1","$CTQ{parent}","10","$CTQ{from}","1","$CTQ{quiz_no}","10","$CTQ{status}","10");
 
@@ -3800,7 +3916,6 @@ sub create_the_qst {
 				}
 			}
 		}
-
 	}
 	
 ######################
@@ -3835,15 +3950,28 @@ sub print_add_quest_to_qst {
 
 	if ($error != 1) {
 		if ($AQTQ{action_type} eq"mkadd") { #print create question from bank screen;
-		
+
                         &print_javascript_begin();
                 
                         &print_mode_display();
-                
+
+			&print_show_explan();
+			
+			&print_show_memory();
+			
+			&print_clear_memory();
+			
                         &print_javascript_end();
                 
                         &print_small_editor();
-                
+                        
+                        &print_explan_editor();
+					                
+		        &print_memory_editor();
+
+                        &print_active_summernote();
+                                                
+                                	
 			if(!defined $AQTQ{status}) {
       				&top_heading22("value","$assign[$AQTQ{type}]");
 				print" in folder: <i>$LANGUAGE{$set_language}{Default}</i></TD></TABLE><P>\n";
@@ -5749,28 +5877,28 @@ sub change_question_form {
 		
 	       # WHICH EDITOR ?
                if($RETURN{$CQF{number}}{mode} == 0) { #  BASIC CHOSEN
-                        print"<span ID=\"mode_display0\" style=\"display:block\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowAdvancedEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('1')\">$LANGUAGE{$set_language}{Advanced}</i>&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('2')\">$LANGUAGE{$set_language}{Equation}</i>&nbsp\;&nbsp\;&nbsp\;<B>$LANGUAGE{$set_language}{Basic}</B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B></span>
+                        print"<span ID=\"mode_display0\" style=\"display:block\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowAdvancedEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('1')\">$LANGUAGE{$set_language}{Advanced}</i>&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('2')\">$LANGUAGE{$set_language}{Equation}</i>&nbsp\;&nbsp\;&nbsp\;<B>$LANGUAGE{$set_language}{Basic}</B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{CreateaMemory}\" STYLE=\"cursor: pointer\" OnClick=\"show_Memory()\"><font color=\"#660616\">$LANGUAGE{$set_language}{Memory}</font></i></B></span>
                         
-                        <span ID=\"mode_display1\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B>$LANGUAGE{$set_language}{Advanced}</B>&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('2')\">$LANGUAGE{$set_language}{Equation}</i><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowBasicEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('0')\">&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Basic}</i>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B></span>
+                        <span ID=\"mode_display1\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B>$LANGUAGE{$set_language}{Advanced}</B>&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('2')\">$LANGUAGE{$set_language}{Equation}</i><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowBasicEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('0')\">&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Basic}</i>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{CreateaMemory}\" STYLE=\"cursor: pointer\" OnClick=\"show_Memory()\"><font color=\"#660616\">$LANGUAGE{$set_language}{Memory}</font></i></B></span>
                         
-                        <span ID=\"mode_display2\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowAdvancedEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('1')\">$LANGUAGE{$set_language}{Advanced}</i>&nbsp\;&nbsp\;&nbsp\;<b>$LANGUAGE{$set_language}{Equation}</b><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowBasicEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('0')\">&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Basic}</i>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B></span>
+                        <span ID=\"mode_display2\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowAdvancedEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('1')\">$LANGUAGE{$set_language}{Advanced}</i>&nbsp\;&nbsp\;&nbsp\;<b>$LANGUAGE{$set_language}{Equation}</b><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowBasicEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('0')\">&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Basic}</i>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{CreateaMemory}\" STYLE=\"cursor: pointer\" OnClick=\"show_Memory()\"><font color=\"#660616\">$LANGUAGE{$set_language}{Memory}</font></i></B></span>
                         \n";
                         }
                         
                 elsif($RETURN{$CQF{number}}{mode} == 1)  { #  ADVANCED CHOSEN
-                        print"<span ID=\"mode_display0\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('1')\">$LANGUAGE{$set_language}{Advanced}</i>&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('2')\">$LANGUAGE{$set_language}{Equation}</i>&nbsp\;&nbsp\;&nbsp\;<B>$LANGUAGE{$set_language}{Basic}</B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B></span>
+                        print"<span ID=\"mode_display0\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('1')\">$LANGUAGE{$set_language}{Advanced}</i>&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('2')\">$LANGUAGE{$set_language}{Equation}</i>&nbsp\;&nbsp\;&nbsp\;<B>$LANGUAGE{$set_language}{Basic}</B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{CreateaMemory}\" STYLE=\"cursor: pointer\" OnClick=\"show_Memory()\"><font color=\"#660616\">$LANGUAGE{$set_language}{Memory}</font></i></B></span>
                         
-                        <span ID=\"mode_display1\" style=\"display:block\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B>$LANGUAGE{$set_language}{Advanced}</B>&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('2')\">$LANGUAGE{$set_language}{Equation}</i><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowBasicEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('0')\">&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Basic}</i>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B></span>
+                        <span ID=\"mode_display1\" style=\"display:block\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B>$LANGUAGE{$set_language}{Advanced}</B>&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('2')\">$LANGUAGE{$set_language}{Equation}</i><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowBasicEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('0')\">&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Basic}</i>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{CreateaMemory}\" STYLE=\"cursor: pointer\" OnClick=\"show_Memory()\"><font color=\"#660616\">$LANGUAGE{$set_language}{Memory}</font></i></B></span>
                         
-                        <span ID=\"mode_display2\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowAdvancedEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('1')\">$LANGUAGE{$set_language}{Advanced}</i>&nbsp\;&nbsp\;&nbsp\;<b>$LANGUAGE{$set_language}{Equation}</b><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowBasicEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('0')\">&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Basic}</i>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B></span>\n";
+                        <span ID=\"mode_display2\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowAdvancedEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('1')\">$LANGUAGE{$set_language}{Advanced}</i>&nbsp\;&nbsp\;&nbsp\;<b>$LANGUAGE{$set_language}{Equation}</b><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowBasicEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('0')\">&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Basic}</i>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{CreateaMemory}\" STYLE=\"cursor: pointer\" OnClick=\"show_Memory()\"><font color=\"#660616\">$LANGUAGE{$set_language}{Memory}</font></i></B></span>\n";
                         }
                         
                 elsif($RETURN{$CQF{number}}{mode} == 2)  { #  EQUATION  CHOSEN
-                        print"<span ID=\"mode_display2\" style=\"display:block\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowAdvancedEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('1')\">$LANGUAGE{$set_language}{Advanced}</i>&nbsp\;&nbsp\;&nbsp\;<b>$LANGUAGE{$set_language}{Equation}</b><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowBasicEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('0')\">&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Basic}</i>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B></span>
+                        print"<span ID=\"mode_display2\" style=\"display:block\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowAdvancedEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('1')\">$LANGUAGE{$set_language}{Advanced}</i>&nbsp\;&nbsp\;&nbsp\;<b>$LANGUAGE{$set_language}{Equation}</b><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowBasicEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('0')\">&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Basic}</i>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{CreateaMemory}\" STYLE=\"cursor: pointer\" OnClick=\"show_Memory()\"><font color=\"#660616\">$LANGUAGE{$set_language}{Memory}</font></i></B></span>
                         
-                        <span ID=\"mode_display0\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('1')\">$LANGUAGE{$set_language}{Advanced}</i>&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('2')\">$LANGUAGE{$set_language}{Equation}</i>&nbsp\;&nbsp\;&nbsp\;<B>$LANGUAGE{$set_language}{Basic}</B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B></span>
+                        <span ID=\"mode_display0\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('1')\">$LANGUAGE{$set_language}{Advanced}</i>&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('2')\">$LANGUAGE{$set_language}{Equation}</i>&nbsp\;&nbsp\;&nbsp\;<B>$LANGUAGE{$set_language}{Basic}</B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{CreateaMemory}\" STYLE=\"cursor: pointer\" OnClick=\"show_Memory()\"><font color=\"#660616\">$LANGUAGE{$set_language}{Memory}</font></i></B></span>
                         
-                        <span ID=\"mode_display1\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B>$LANGUAGE{$set_language}{Advanced}</B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('2')\">&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Equation}</i><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowBasicEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('0')\">&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Basic}</i>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B></span>
+                        <span ID=\"mode_display1\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B>$LANGUAGE{$set_language}{Advanced}</B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('2')\">&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Equation}</i><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowBasicEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('0')\">&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Basic}</i>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{CreateaMemory}\" STYLE=\"cursor: pointer\" OnClick=\"show_Memory()\"><font color=\"#660616\">$LANGUAGE{$set_language}{Memory}</font></i></B></span>
                         \n";
                         }
             	print"</center>\n";
@@ -5828,6 +5956,11 @@ sub change_question_form {
 	     		print"<span onClick=\"set_active_summernote\('1'\)\" ID=\"explan\" style=\"display:none\; background: #666666\;\">\n";
 	     		print"<BR><center><TABLE><TR><TD><textarea class=\"summernote\" id=\"1summernote\" name=\"explanation\">$RETURN{$CQF{number}}{explanation}</textarea></TD></TR></TABLE></center>\n";
 	     		print"</span>\n";
+
+       		     #### SHOW Memory EDITOR
+			print"<span onClick=\"set_active_summernote\('3'\)\" ID=\"Memory\" style=\"display:none\; background: #660616\;\">\n";
+			print"<BR><center><TABLE><TR><TD><textarea class=\"summernote\" id=\"3summernote\" name=\"memory\">$RETURN{$CQF{number}}{memory}</textarea></TD></TR></TABLE></center>\n";
+			print"</span>\n";
 
                         # ADVANCED Editor
                         print"<div onClick=\"set_active_summernote\('2'\)\" ID=\"mode1\" style=\"display:none\; padding-top: 6px\">\n";
@@ -5894,6 +6027,11 @@ sub change_question_form {
 	     		print"<BR><center><TABLE><TR><TD><textarea class=\"summernote\" id=\"1summernote\" name=\"explanation\">$RETURN{$CQF{number}}{explanation}</textarea></TD></TR></TABLE></center>\n";
 	     		print"</span>\n";
 
+       		     #### SHOW Memory ADVANCED EDITOR
+			print"<span onClick=\"set_active_summernote\('3'\)\" ID=\"Memory\" style=\"display:none\; background: #660616\;\">\n";
+			print"<BR><center><TABLE><TR><TD><textarea class=\"summernote\" id=\"3summernote\" name=\"memory\">$RETURN{$CQF{number}}{memory}</textarea></TD></TR></TABLE></center>\n";
+			print"</span>\n";
+
                         # ADVANCED Editor
                         print"<div onClick=\"set_active_summernote\('2'\)\" ID=\"mode1\" style=\"display:block\; style=\"display:none\; padding-top: 6px\">\n";
                         print"<TABLE border=\"0\"><TR><TD width=\"20\"></TD><TD><textarea id=\"summernote\" name=\"question1\" value=\"\">$RETURN{$CQF{number}}{question}</textarea></TD></TR></TABLE></div>\n";
@@ -5958,6 +6096,11 @@ sub change_question_form {
 	     		print"<BR><center><TABLE><TR><TD><textarea class=\"summernote\" id=\"1summernote\" name=\"explanation\">$RETURN{$CQF{number}}{explanation}</textarea></TD></TR></TABLE></center>\n";
 	     		print"</span>\n";
 
+       		     #### SHOW Memory ADVANCED EDITOR
+			print"<span onClick=\"set_active_summernote\('3'\)\" ID=\"Memory\" style=\"display:none\; background: #660616\;\">\n";
+			print"<BR><center><TABLE><TR><TD><textarea class=\"summernote\" id=\"3summernote\" name=\"memory\">$RETURN{$CQF{number}}{memory}</textarea></TD></TR></TABLE></center>\n";
+			print"</span>\n";
+
                         # ADVANCED EDITOR
                         print"<div onClick=\"set_active_summernote\('2'\)\" ID=\"mode1\" style=\"display:none\; padding-top: 6px\">\n";
                         print"<TABLE border=\"0\"><TR><TD width=\"20\"></TD><TD><textarea id=\"summernote\" name=\"question1\" value=\"\"></textarea></TD></TR></TABLE></div>\n";
@@ -5971,8 +6114,19 @@ sub change_question_form {
                         }
             
                 #### QUESTION TYPES
-                print"<center><TABLE border=\"0\"><TR><TD><div ID=\"anstype1\" style=\"display:block\;\"><font OnClick=\"show_mc\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{MultipleChoice}</font></div><div ID=\"anstype1a\" style=\"display:none\;\"><font OnClick=\"show_mc\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{MultipleChoice}</B></font></div></TD><TD width=\"10\"></TD><TD><div ID=\"anstype2\" style=\"display:block\;\"><font OnClick=\"show_ma\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{MultipleAnswer}</font></div><div ID=\"anstype2a\" style=\"display:none\;\"><font OnClick=\"show_ma\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{MultipleAnswer}</B></font></div></TD><TD width=\"10\"></TD><TD><div ID=\"anstype7\" style=\"display:block\;\"><font OnClick=\"show_mx\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{MatchXng}</font></div><div ID=\"anstype7a\" style=\"display:none\;\"><font OnClick=\"show_mx\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{MatchXng}</B></font></div></TD><TD width=\"10\"></TD><TD><div ID=\"anstype3\" style=\"display:block\;\"><font OnClick=\"show_tf\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{TF}</font></div><div ID=\"anstype3a\" style=\"display:none\;\"><font OnClick=\"show_tf\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{TF}</B></font></div></TD><TD width=\"10\"></TD><TD><div ID=\"anstype8\" style=\"display:block\;\"><font OnClick=\"show_yn\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{YN}</font></div><div ID=\"anstype8a\" style=\"display:none\;\"><font OnClick=\"show_yn\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{YN}</B></font></div></TD><TD><div ID=\"anstype6\" style=\"display:block\;\"><font OnClick=\"show_ad\(\)\" STYLE=\"text-decoration:none\;\"></font></div><div ID=\"anstype6a\" style=\"display:none\;\"><font OnClick=\"show_ad\(\)\" STYLE=\"text-decoration:none\;\"></font></div></TD><TD width=\"10\"></TD><TD><div ID=\"anstype4\" style=\"display:block\;\"><font OnClick=\"show_sa\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{ShortAnswer}</font></div><div ID=\"anstype4a\" style=\"display:none\;\"><font OnClick=\"show_sa\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{ShortAnswer}</B></font></div></TD><TD width=\"10\"></TD><TD><div ID=\"anstype5\" style=\"display:block\;\"><font OnClick=\"show_p\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{Paragraph}</font></div><div ID=\"anstype5a\" style=\"display:none\;\"><font OnClick=\"show_p\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{Paragraph}</B></font></div></TD></TR></TABLE></center>\n";
-		
+                print"<center><TABLE border=\"0\"><TR><TD><span ID=\"anstype1\" style=\"display:block\;\"><font OnClick=\"show_mc\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">&nbsp\;&nbsp\;$LANGUAGE{$set_language}{MultipleChoice}</font></span><span ID=\"anstype1a\" style=\"display:none\;\"><font OnClick=\"show_mc\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{MultipleChoice}</B></font></span></TD>
+                <TD>&nbsp\;&nbsp\;&nbsp\;&nbsp\;</TD><TD><span ID=\"anstype2\" style=\"display:block\;\"><font OnClick=\"show_ma\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{MultipleAnswer}</font></span><span ID=\"anstype2a\" style=\"display:none\;\"><font OnClick=\"show_ma\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{MultipleAnswer}</B></font></span></TD>
+                <TD>&nbsp\;&nbsp\;&nbsp\;&nbsp\;</TD><TD><span ID=\"anstype7\" style=\"display:block\;\"><font OnClick=\"show_mx\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{MatchXng}</font></span><span ID=\"anstype7a\" style=\"display:none\;\"><font OnClick=\"show_mx\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{MatchXng}</B></font></span></TD>
+                <TD>&nbsp\;&nbsp\;&nbsp\;&nbsp\;</TD><TD><span ID=\"anstype3\" style=\"display:block\;\"><font OnClick=\"show_tf\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{TF}</font></span><span ID=\"anstype3a\" style=\"display:none\;\"><font OnClick=\"show_tf\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{TF}</B></font></span></TD>
+                <TD>&nbsp\;&nbsp\;&nbsp\;&nbsp\;</TD><TD><span ID=\"anstype8\" style=\"display:block\;\"><font OnClick=\"show_yn\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{YN}</font></span><span ID=\"anstype8a\" style=\"display:none\;\"><font OnClick=\"show_yn\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{YN}</B></font></span></TD>
+                <TD>&nbsp\;&nbsp\;&nbsp\;&nbsp\;</TD><TD><span ID=\"anstype6\" style=\"display:none\;\"><font OnClick=\"show_ad\(\)\" STYLE=\"text-decoration:none\;\"></font></span><span ID=\"anstype6a\" style=\"display:none\;\"><font OnClick=\"show_ad\(\)\" STYLE=\"text-decoration:none\;\"></font></span></TD>";
+                
+#                <TD>&nbsp\;&nbsp\;&nbsp\;&nbsp\;</TD><TD><span ID=\"anstype9\" style=\"display:block\;\"><font OnClick=\"show_cz\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{Cloze}</font></span><span ID=\"anstype9a\" style=\"display:none\;\"><font OnClick=\"show_cz\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{Cloze}</B></font></span></TD>
+#		<TD>&nbsp\;&nbsp\;&nbsp\;&nbsp\;</TD><TD><span ID=\"anstype10\" style=\"display:block\;\"><font OnClick=\"show_or\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{Order}Order</font></span><span ID=\"anstype10a\" style=\"display:none\;\"><font OnClick=\"show_or\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{Order}Order</B></font></span></TD>
+
+	        print"<TD>&nbsp\;&nbsp\;&nbsp\;&nbsp\;</TD><TD><span ID=\"anstype4\" style=\"display:block\;\"><font OnClick=\"show_sa\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{ShortAnswer}</font></span><span ID=\"anstype4a\" style=\"display:none\;\"><font OnClick=\"show_sa\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{ShortAnswer}</B></font></span></TD>
+                <TD>&nbsp\;&nbsp\;&nbsp\;&nbsp\;</TD><TD><span ID=\"anstype5\" style=\"display:block\;\"><font OnClick=\"show_p\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{Paragraph}</font></span><span ID=\"anstype5a\" style=\"display:none\;\"><font OnClick=\"show_p\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{Paragraph}</B></font></span></TD></TR></TABLE></center>\n";
+	
 		print"</FORM>\n"; 
 
                 &print_form("form_name","t_f","form_target","quest2","input","question_tf","answer","","u_id","$CQF{u_id}","session_id","$CQF{session_id}");
@@ -5996,6 +6150,7 @@ sub change_question_form {
                 &print_javascript_end();
                 
                 print"<script> document.getElementById(mode2).onload = load_handler\(\'$RETURN{$CQF{number}}{type}\'\)</script>\n";
+                
 		}
 	}
 	
@@ -6030,7 +6185,7 @@ sub change_bank_question_form {
 	$error = &check_many_length_return("$CQF{number}","10","$CQF{type}","5","$CQF{sub_type}","1");
 
 	if($error != 1 ) {
-		my %RETURN = &select_question("query","SELECT * from questions WHERE number=\"$CQF{number}\" AND org_id=\"$org_id\"");
+		my %RETURN = &select_question("query","SELECT * from questions WHERE number=\"$CQF{number}\" AND org_id=\"$org_id\" AND u_id=\"0\"");
 		my %RETURN1 = &select6("query","SELECT q_order,answer,c_answer,image_id from question_answers WHERE number=\"$CQF{number}\" AND org_id=\"$org_id\" AND u_id=\"0\"");
 		
 		print"<input type=\"hidden\" name=\"select\" value=\"$RETURN{$CQF{number}}{type}\">
@@ -6040,7 +6195,8 @@ sub change_bank_question_form {
                 <input type=\"hidden\" name=\"question\" value=\"\">
                 <input type=\"hidden\" name=\"ans_mode\" value=\"$RETURN{$CQF{number}}{ans_mode}\">
                 <input type=\"hidden\" name=\"active_summernote\" value=\"\">
-		<input type=\"hidden\" name=\"kolum\" value=\"$RETURN{$CQF{number}}{kolum}\">\n";
+		<input type=\"hidden\" name=\"kolum\" value=\"$RETURN{$CQF{number}}{kolum}\">
+		<input type=\"hidden\" name=\"pptx_number\" value=\"$RETURN{$CQF{number}}{pdf}\">\n";
 		
 		if ($RETURN{$CQF{number}}{type} eq"TF") {
 			print"<input type=\"hidden\" name=\"TFans\" value=\"$RETURN1{1}{answer}\">\n";
@@ -6198,38 +6354,39 @@ sub change_bank_question_form {
                         
                         
         #### PRINT THE SCREEN
-         	print"<BR><TABLE><TD width=\"20\"></TD><TD> <B>$LANGUAGE{$set_language}{Value}</B> <input STYLE=\"border-radius:.4em\; outline: none\;\" type=\"text\" size=\"2\" maxlength=\"2\" name=\"value\" value=\"1\" ></TD><TD width=\"80\"></TD><TD>";
-         	
+         	print"<span style=\"padding-top:5px\; display: inline-block\;\"></span><center><TABLE style=\" border-radius: 5px\; background: #A0AECD\;\"><TR><TD style=\"border: 1px solid black\; padding-top:7px\; padding-bottom: 7px\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Value} <input STYLE=\"border-radius:.4em\;\" type=\"text\" size=\"1\" maxlength=\"2\" name=\"value\" value=\"$RETURN{$CQF{number}}{value}\" >
+		&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Description} <input type=\"text\" name=\"descrip\" size=\"45\" maxlength=\"60\" STYLE=\"border-radius:.4em\; font-size:11pt\;\" value=\"$RETURN{$CQF{number}}{descrip} \">&nbsp\;&nbsp\;&nbsp\;&nbsp\;</TD>
+		</TR><TR></TABLE><P></center><center>\n";
+		print"<center>\n";
+		
          	if($RETURN{$CQF{number}}{mode} == 0) { #  BASIC CHOSEN
-                        print"<div ID=\"mode_display0\" style=\"display:block\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('1')\">$LANGUAGE{$set_language}{Advanced}</i>&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('2')\">$LANGUAGE{$set_language}{Equation}</i>&nbsp\;&nbsp\;&nbsp\;<B>$LANGUAGE{$set_language}{Basic}</B></div>
+                        print"<span ID=\"mode_display0\" style=\"display:block\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowAdvancedEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('1')\">$LANGUAGE{$set_language}{Advanced}</i>&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('2')\">$LANGUAGE{$set_language}{Equation}</i>&nbsp\;&nbsp\;&nbsp\;<B>$LANGUAGE{$set_language}{Basic}</B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{CreateaMemory}\" STYLE=\"cursor: pointer\" OnClick=\"show_Memory()\"><font color=\"#660616\">$LANGUAGE{$set_language}{Memory}</font></i></B></span>
                         
-                        <div ID=\"mode_display1\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B>$LANGUAGE{$set_language}{Advanced}</B>&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('2')\">$LANGUAGE{$set_language}{Equation}</i><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowBasicEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('0')\">&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Basic}</i></div>
+                        <span ID=\"mode_display1\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B>$LANGUAGE{$set_language}{Advanced}</B>&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('2')\">$LANGUAGE{$set_language}{Equation}</i><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowBasicEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('0')\">&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Basic}</i>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{CreateaMemory}\" STYLE=\"cursor: pointer\" OnClick=\"show_Memory()\"><font color=\"#660616\">$LANGUAGE{$set_language}{Memory}</font></i></B></span>
                         
-                        <div ID=\"mode_display2\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowAdvancedEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('1')\">$LANGUAGE{$set_language}{Advanced}</i>&nbsp\;&nbsp\;&nbsp\;<b>$LANGUAGE{$set_language}{Equation}</b><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowBasicEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('0')\">&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Basic}</i></div>
-                        </TD></TABLE>";
+                        <span ID=\"mode_display2\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowAdvancedEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('1')\">$LANGUAGE{$set_language}{Advanced}</i>&nbsp\;&nbsp\;&nbsp\;<b>$LANGUAGE{$set_language}{Equation}</b><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowBasicEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('0')\">&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Basic}</i>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{CreateaMemory}\" STYLE=\"cursor: pointer\" OnClick=\"show_Memory()\"><font color=\"#660616\">$LANGUAGE{$set_language}{Memory}</font></i></B></span>
+                        \n";
                         }
                         
                 elsif($RETURN{$CQF{number}}{mode} == 1)  { #  ADVANCED CHOSEN
-                        print"<div ID=\"mode_display0\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('1')\">$LANGUAGE{$set_language}{Advanced}</i>&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('2')\">$LANGUAGE{$set_language}{Equation}</i>&nbsp\;&nbsp\;&nbsp\;<B>$LANGUAGE{$set_language}{Basic}</B></div>
+                        print"<span ID=\"mode_display0\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('1')\">$LANGUAGE{$set_language}{Advanced}</i>&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('2')\">$LANGUAGE{$set_language}{Equation}</i>&nbsp\;&nbsp\;&nbsp\;<B>$LANGUAGE{$set_language}{Basic}</B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{CreateaMemory}\" STYLE=\"cursor: pointer\" OnClick=\"show_Memory()\"><font color=\"#660616\">$LANGUAGE{$set_language}{Memory}</font></i></B></span>
                         
-                        <div ID=\"mode_display1\" style=\"display:block\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B>$LANGUAGE{$set_language}{Advanced}</B>&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('2')\">$LANGUAGE{$set_language}{Equation}</i><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowBasicEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('0')\">&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Basic}</i></div>
+                        <span ID=\"mode_display1\" style=\"display:block\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B>$LANGUAGE{$set_language}{Advanced}</B>&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('2')\">$LANGUAGE{$set_language}{Equation}</i><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowBasicEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('0')\">&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Basic}</i>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{CreateaMemory}\" STYLE=\"cursor: pointer\" OnClick=\"show_Memory()\"><font color=\"#660616\">$LANGUAGE{$set_language}{Memory}</font></i></B></span>
                         
-                        <div ID=\"mode_display2\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowAdvancedEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('1')\">$LANGUAGE{$set_language}{Advanced}</i>&nbsp\;&nbsp\;&nbsp\;<b>$LANGUAGE{$set_language}{Equation}</b><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowBasicEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('0')\">&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Basic}</i></div></TD></TABLE>";
+                        <span ID=\"mode_display2\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowAdvancedEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('1')\">$LANGUAGE{$set_language}{Advanced}</i>&nbsp\;&nbsp\;&nbsp\;<b>$LANGUAGE{$set_language}{Equation}</b><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowBasicEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('0')\">&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Basic}</i>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{CreateaMemory}\" STYLE=\"cursor: pointer\" OnClick=\"show_Memory()\"><font color=\"#660616\">$LANGUAGE{$set_language}{Memory}</font></i></B></span>\n";
                         }
                         
                 elsif($RETURN{$CQF{number}}{mode} == 2)  { #  EQUATION  CHOSEN
-                        print"<div ID=\"mode_display2\" style=\"display:block\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowAdvancedEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('1')\">$LANGUAGE{$set_language}{Advanced}</i>&nbsp\;&nbsp\;&nbsp\;<b>$LANGUAGE{$set_language}{Equation}</b><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowBasicEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('0')\">&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Basic}</i></div>
+                        print"<span ID=\"mode_display2\" style=\"display:block\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowAdvancedEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('1')\">$LANGUAGE{$set_language}{Advanced}</i>&nbsp\;&nbsp\;&nbsp\;<b>$LANGUAGE{$set_language}{Equation}</b><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowBasicEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('0')\">&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Basic}</i>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{CreateaMemory}\" STYLE=\"cursor: pointer\" OnClick=\"show_Memory()\"><font color=\"#660616\">$LANGUAGE{$set_language}{Memory}</font></i></B></span>
                         
-                        <div ID=\"mode_display0\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('1')\">$LANGUAGE{$set_language}{Advanced}</i>&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('2')\">$LANGUAGE{$set_language}{Equation}</i>&nbsp\;&nbsp\;&nbsp\;<B>$LANGUAGE{$set_language}{Basic}</B></div>
+                        <span ID=\"mode_display0\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('1')\">$LANGUAGE{$set_language}{Advanced}</i>&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('2')\">$LANGUAGE{$set_language}{Equation}</i>&nbsp\;&nbsp\;&nbsp\;<B>$LANGUAGE{$set_language}{Basic}</B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{CreateaMemory}\" STYLE=\"cursor: pointer\" OnClick=\"show_Memory()\"><font color=\"#660616\">$LANGUAGE{$set_language}{Memory}</font></i></B></span>
                         
-                        <div ID=\"mode_display1\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B>$LANGUAGE{$set_language}{Advanced}</B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('2')\">&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Equation}</i><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowBasicEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('0')\">&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Basic}</i></div>
-                        </TD></TABLE>";
+                        <span ID=\"mode_display1\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B>$LANGUAGE{$set_language}{Advanced}</B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('2')\">&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Equation}</i><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowBasicEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('0')\">&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Basic}</i>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{CreateaMemory}\" STYLE=\"cursor: pointer\" OnClick=\"show_Memory()\"><font color=\"#660616\">$LANGUAGE{$set_language}{Memory}</font></i></B></span>
+                        \n";
                         }
          	
-         	
-            # PRINT DESCRIPTION
-            print"&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B>$LANGUAGE{$set_language}{Description} </B><input type=\"text\" name=\"descrip\" size=\"45\" maxlength=\"60\" STYLE=\"border-radius:.4em\; outline: none\;\" value=\"$RETURN{$CQF{number}}{descrip}\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B>\n";
-            
+         	print"</center>\n"
+         	            
             &print_javascript_begin();
             &print_show_explan();
             &print_javascript_end();
@@ -6237,22 +6394,35 @@ sub change_bank_question_form {
             
             ### PRINT QUESTION DISPLAY
                 if($RETURN{$CQF{number}}{mode} == 0) { # SHOW BASIC
-                        print"<div ID=\"mode0\" style=\"display:block\;\"><TABLE><TD width=\"20\"></TD><TD><textarea  style=\"resize\:none\;\" wrap=\"hard\"  maxlength=\"1500\" rows=\"4\" cols=\"52\" name=\"question0\" value=\"\">$RETURN{$CQF{number}}{question}</textarea></TD><TD>\n";
+                        print"<div ID=\"mode0\" style=\"display:block\; padding-top:6px\"><TABLE><TD width=\"20\"></TD><TD><textarea  style=\"resize\:none\; overflow:auto\;\" wrap=\"hard\"  maxlength=\"1500\" rows=\"4\" cols=\"52\" name=\"question0\" value=\"\">$RETURN{$CQF{number}}{question}</textarea></TD><TD>\n";
 
                         if( $RETURN{$CQF{number}}{image_id} > 0) {
                                 #get image name
                                 my %IMAGE_ID = &select4("query","select number,file_name from qst_files where number=\"$RETURN{$CQF{number}}{image_id}\" AND org_id=\"$org_id\" AND (u_id=\"$ids\" OR u_id=\"0\")");
 			
-                                print"<div ID=\"display1\" style=\"display:block\;\">&nbsp\;&nbsp\;&nbsp\; &nbsp\;&nbsp\;&nbsp\;<input STYLE=\"border-radius:.25em\; outline: none\;\" readonly type=\"text\" width=\"20\" name=\"insert_image_name\" value=\"&nbsp\;&nbsp\; $IMAGE_ID{$RETURN{$CQF{number}}{image_id}}\"><BR><center><B STYLE=\"cursor: pointer\" OnClick=\"question_image_delete_handler\(\)\">$LANGUAGE{$set_language}{Remove}</B></center></div>\n";
+                                print"<div ID=\"display1\" style=\"display:block\;\">&nbsp\;&nbsp\;&nbsp\; &nbsp\;&nbsp\;&nbsp\;<input STYLE=\"border-radius:.25em\; outline: none\;\" readonly type=\"text\" width=\"15\" name=\"insert_image_name\" value=\"$IMAGE_ID{$RETURN{$CQF{number}}{image_id}}\"><B STYLE=\"cursor: pointer\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{Remove}\" OnClick=\"question_image_delete_handler\(\)\">&nbsp\;&nbsp\;X</B></div>\n";
 
                                 print"<div ID=\"disp1\" style=\"display:none\;\"><B data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{Insertimage}\" STYLE=\"cursor: pointer\" OnClick=\"question_image_handler\(\'question\'\)\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$image30</B></div>\n";
                                 }
                         else {
                                 print"<div ID=\"disp1\" style=\"display:block\;\"><B data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{Insertimage}\" STYLE=\"cursor: pointer\" OnClick=\"question_image_handler\(\'question\'\)\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$image30</B></div>\n";
 
-                                print"<div ID=\"display1\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\; &nbsp\;&nbsp\;&nbsp\;<input readonly STYLE=\"border-radius:.25em\; outline: none\;\" type=\"text\" width=\"20\" name=\"insert_image_name\" value=\"\"><BR><center><B STYLE=\"cursor: pointer\" OnClick=\"question_image_delete_handler\(\)\">$LANGUAGE{$set_language}{Remove}</B></center></div>\n";
+                                print"<div ID=\"display1\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\; &nbsp\;&nbsp\;&nbsp\;<input readonly STYLE=\"border-radius:.25em\; outline: none\;\" type=\"text\" width=\"15\" name=\"insert_image_name\" value=\"\"><B STYLE=\"cursor: pointer\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{Remove}\" OnClick=\"question_image_delete_handler\(\)\">&nbsp&nbsp\;\;X</B></div>\n";
                                 }
 			
+			# Print PDF
+			if($RETURN{$CQF{number}}{pdf} > 0) {
+				#get image name
+				my %PDF_ID = &select4("query","select number,file_name from qst_files where number=\"$RETURN{$CQF{number}}{pdf}\" AND org_id=\"$org_id\" AND (u_id=\"$ids\" OR u_id=\"0\")");
+
+				print"<BR><span ID=\"ppt\" style=\"display:none\;\"><B data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{InsertPDF}\" STYLE=\"cursor: pointer\; font-size: 10pt\" OnClick=\"question_image_handler\(\'pptx\'\)\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{PDF}</B></span>\n";
+				print"<span ID=\"ppt1\" style=\"display:block\;\">&nbsp\;&nbsp\;&nbsp\; &nbsp\;&nbsp\;&nbsp\;<input STYLE=\"border-radius:.4em\; outline: none\;\"  readonly type=\"text\" width=\"15\" name=\"insert_pptx_name\" value=\"$PDF_ID{$RETURN{$CQF{number}}{pdf}}\">&nbsp\;&nbsp\;<B data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{RemovePDF}\" STYLE=\"cursor: pointer\; OnClick=\"question_pptx_delete_handler\(\)\">X</B></span>\n";
+				}
+			else {
+				print"<BR><span ID=\"ppt\" style=\"display:block\;\"><B data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{InsertPDF}\" STYLE=\"cursor: pointer\; font-size: 10pt\" OnClick=\"question_image_handler\(\'pptx\'\)\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{PDF}</B></span>\n";
+			        print"<span ID=\"ppt1\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\; &nbsp\;&nbsp\;&nbsp\;<input STYLE=\"border-radius:.4em\; outline: none\;\"  readonly type=\"text\" width=\"15\" name=\"insert_pptx_name\" value=\"\">&nbsp\;&nbsp\;<B data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{RemovePDF}\" STYLE=\"cursor: pointer\; OnClick=\"question_pptx_delete_handler\($RETURN{$CQF{number}}{pdf}\)\">X</B></span>\n";
+				}
+				
 			print"</TD></TABLE><BR><P>\n";
 			
                         if( $RETURN{$CQF{number}}{vlink} ne "0") {
@@ -6263,16 +6433,21 @@ sub change_bank_question_form {
                                 }
                         
                         if( $RETURN{$CQF{number}}{alink} ne "0") {
-                                print"<B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{AudioLink}&nbsp\;&nbsp\;</B><input type=\"url\" style=\"resize:none\; font-family:Arial\; font-size: 10pt\;\" size=\"20\" maxlength=\"150\" name=\"alink\" value=\"$RETURN{$CQF{number}}{alink}\"></text><BR><BR></div>\n";
+                                print"<B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{AudioLink}&nbsp\;&nbsp\;</B><input type=\"url\" style=\"resize:none\; font-family:Arial\; font-size: 10pt\;\" size=\"20\" maxlength=\"150\" name=\"alink\" value=\"$RETURN{$CQF{number}}{alink}\"></text><BR></div><BR>\n";
                                 }
                         else {
-                                print"<B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{AudioLink}&nbsp\;&nbsp\;</B><input type=\"url\" style=\"resize:none\; font-family:Arial\; font-size: 10pt\;\" size=\"20\" maxlength=\"150\" name=\"alink\" value=\"\" placeholder=\"mp3, ogg, wav\"></text><BR><BR></div>\n";
+                                print"<B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{AudioLink}&nbsp\;&nbsp\;</B><input type=\"url\" style=\"resize:none\; font-family:Arial\; font-size: 10pt\;\" size=\"20\" maxlength=\"150\" name=\"alink\" value=\"\" placeholder=\"mp3, ogg, wav\"></text><BR></div><BR>\n";
                                 }
-                                
+                                                                
                      #### SHOW EXPLANATION ADVANCED EDITOR
 	     		print"<span onClick=\"set_active_summernote\('1'\)\" ID=\"explan\" style=\"display:none\; background: #666666\;\">\n";
 	     		print"<BR><center><TABLE><TR><TD><textarea class=\"summernote\" id=\"1summernote\" name=\"explanation\">$RETURN{$CQF{number}}{explanation}</textarea></TD></TR></TABLE></center>\n";
 	     		print"</span>\n";
+
+       		     #### SHOW Memory EDITOR
+			print"<span onClick=\"set_active_summernote\('3'\)\" ID=\"Memory\" style=\"display:none\; background: #660616\;\">\n";
+			print"<BR><center><TABLE><TR><TD><textarea class=\"summernote\" id=\"3summernote\" name=\"memory\">$RETURN{$CQF{number}}{memory}</textarea></TD></TR></TABLE></center>\n";
+			print"</span>\n";
 
                         # ADVANCED Editor
                         print"<div onClick=\"set_active_summernote\('2'\)\" ID=\"mode1\" style=\"display:none\;\">\n";
@@ -6287,24 +6462,38 @@ sub change_bank_question_form {
                         }
                         
                 elsif($RETURN{$CQF{number}}{mode} == 1) { # SHOW ADVANCED
-                        ## BASIC
-                        print"<div ID=\"mode0\" style=\"display:none\;\"><TABLE><TR><TD width=\"20\"></TD><TD><textarea  style=\"resize\:none\;\" wrap=\"hard\"  maxlength=\"1500\" rows=\"4\" cols=\"52\" name=\"question0\" value=\"\"></textarea></TD><TD>\n";
+                
+                        ## BASIC Editor
+                        print"<div ID=\"mode0\" style=\"display:none\; padding-top: 6px\"><TABLE><TR><TD width=\"20\"></TD><TD><textarea  style=\"resize\:none\;\" wrap=\"hard\"  maxlength=\"1500\" rows=\"4\" cols=\"52\" name=\"question0\" value=\"\"></textarea></TD><TD>\n";
 
                         if( $RETURN{$CQF{number}}{image_id} > 0) {
                                 #get image name
                                 my %IMAGE_ID = &select4("query","select number,file_name from qst_files where number=\"$RETURN{$CQF{number}}{image_id}\" AND org_id=\"$org_id\" AND (u_id=\"$ids\" OR u_id=\"0\")");
 			
-                                print"<div ID=\"display1\" style=\"display:block\;\">&nbsp\;&nbsp\;&nbsp\; &nbsp\;&nbsp\;&nbsp\;<input STYLE=\"border-radius:.25em\; outline: none\;\" readonly type=\"text\" width=\"20\" name=\"insert_image_name\" value=\"&nbsp\;&nbsp\; $IMAGE_ID{$RETURN{$CQF{number}}{image_id}}\"><BR><center><B STYLE=\"cursor: pointer\" OnClick=\"question_image_delete_handler\(\)\">$LANGUAGE{$set_language}{Remove}</B><center></div>\n";
+                                print"<div ID=\"display1\" style=\"display:block\;\">&nbsp\;&nbsp\;&nbsp\; &nbsp\;&nbsp\;&nbsp\;<input STYLE=\"border-radius:.25em\; outline: none\;\" readonly type=\"text\" width=\"20\" name=\"insert_image_name\" value=\"&nbsp\;&nbsp\; $IMAGE_ID{$RETURN{$CQF{number}}{image_id}}\"><B STYLE=\"cursor: pointer\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{Removeimage}\" OnClick=\"question_image_delete_handler\(\)\">&nbsp\;&nbsp\; X</B></center></div>\n";
 
-                                print"<div ID=\"disp1\" style=\"display:none\;\"><B data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{Insertimage}\" STYLE=\"cursor: pointer\" OnClick=\"question_image_handler\(\'question\'\)\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$image30</B></div>\n";
+                                print"<div ID=\"disp1\" style=\"display:none\;\"><B data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{Insertimage}\"STYLE=\"cursor: pointer\" OnClick=\"question_image_handler\(\'question\'\)\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$image30</B></div>\n";
                                 }
                         else {
                                 print"<div ID=\"disp1\" style=\"display:block\;\"><B data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{Insertimage}\" STYLE=\"cursor: pointer\" OnClick=\"question_image_handler\(\'question\'\)\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$image30</B></div>\n";
 
-                                print"<div ID=\"display1\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\; &nbsp\;&nbsp\;&nbsp\;<input readonly STYLE=\"border-radius:.25em\; outline: none\;\" type=\"text\" width=\"20\" name=\"insert_image_name\" value=\"\"><BR><center><B STYLE=\"cursor: pointer\" OnClick=\"question_image_delete_handler\(\)\">$LANGUAGE{$set_language}{Remove}</B></center></div>\n";
+                                print"<div ID=\"display1\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\; &nbsp\;&nbsp\;&nbsp\;<input readonly STYLE=\"border-radius:.25em\; outline: none\;\" type=\"text\" width=\"20\" name=\"insert_image_name\" value=\"\"><B STYLE=\"cursor: pointer\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{Removeimage}\" OnClick=\"question_image_delete_handler\(\)\">&nbsp\;&nbsp\; X</B></center></div>\n";
                                 }
 			
-			print"</TD></TR></TABLE><BR><P>\n";
+			# Print PDF
+			if($RETURN{$CQF{number}}{pdf} > 0) {
+				#get image name
+				my %PDF_ID = &select4("query","select number,file_name from qst_files where number=\"$RETURN{$CQF{number}}{pdf}\" AND org_id=\"$org_id\" AND (u_id=\"$ids\" OR u_id=\"0\")");
+
+				print"<BR><span ID=\"ppt\" style=\"display:none\;\"><B data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{InsertPDF}\" STYLE=\"cursor: pointer\; font-size: 10pt\" OnClick=\"question_image_handler\(\'pptx\'\)\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{PDF}</B></span>\n";
+				print"<span ID=\"ppt1\" style=\"display:block\;\">&nbsp\;&nbsp\;&nbsp\; &nbsp\;&nbsp\;&nbsp\;<input STYLE=\"border-radius:.4em\; outline: none\;\"  readonly type=\"text\" width=\"15\" name=\"insert_pptx_name\" value=\"$PDF_ID{$RETURN{$CQF{number}}{pdf}}\">&nbsp\;&nbsp\;<B data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{RemovePDF}\" STYLE=\"cursor: pointer\;\" OnClick=\"question_pptx_delete_handler\(\)\"> X</B></span>\n";
+				}
+			else {
+				print"<BR><span ID=\"ppt\" style=\"display:block\;\"><B data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{InsertPDF}\" STYLE=\"cursor: pointer\; font-size: 10pt\" OnClick=\"question_image_handler\(\'pptx\'\)\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{PDF}</B></span>\n";
+			        print"<span ID=\"ppt1\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\; &nbsp\;&nbsp\;&nbsp\;<input STYLE=\"border-radius:.4em\; outline: none\;\"  readonly type=\"text\" width=\"15\" name=\"insert_pptx_name\" value=\"\">&nbsp\;&nbsp\;<B data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{RemovePDF}\" STYLE=\"cursor: pointer\;\" OnClick=\"question_pptx_delete_handler\($RETURN{$CQF{number}}{pdf}\)\"> X</B></span>\n";
+				}
+
+			print"</TD></TABLE><BR><P>\n";
 			
                         if( $RETURN{$CQF{number}}{vlink} ne "0") {
                                 print"<B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{VideoLink}&nbsp\;&nbsp\;</B><input type=\"url\" style=\"resize:none\; font-family:Arial\; font-size: 10pt\;\" size=\"20\" maxlength=\"150\" name=\"vlink\" value=\"$RETURN{$CQF{number}}{vlink}\"></text>\n";
@@ -6314,16 +6503,21 @@ sub change_bank_question_form {
                                 }
                         
                         if( $RETURN{$CQF{number}}{alink} ne "0") {
-                                print"<B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{AudioLink}&nbsp\;&nbsp\;</B><input type=\"url\" style=\"resize:none\; font-family:Arial\; font-size: 10pt\;\" size=\"20\" maxlength=\"150\" name=\"alink\" value=\"$RETURN{$CQF{number}}{alink}\"></text><BR><BR></div>\n";
+                                print"<B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{AudioLink}&nbsp\;&nbsp\;</B><input type=\"url\" style=\"resize:none\; font-family:Arial\; font-size: 10pt\;\" size=\"20\" maxlength=\"150\" name=\"alink\" value=\"$RETURN{$CQF{number}}{alink}\"></text><P><BR></div>\n";
                                 }
                         else {
-                                print"<B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{AudioLink}&nbsp\;&nbsp\;</B><input type=\"url\" style=\"resize:none\; font-family:Arial\; font-size: 10pt\;\" size=\"20\" maxlength=\"150\" name=\"alink\" value=\"\" placeholder=\"mp3, ogg, wav\"></text><BR><BR></div>\n";
+                                print"<B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{AudioLink}&nbsp\;&nbsp\;</B><input type=\"url\" style=\"resize:none\; font-family:Arial\; font-size: 10pt\;\" size=\"20\" maxlength=\"150\" name=\"alink\" value=\"\" placeholder=\"mp3, ogg, wav\"></text><P><BR></div>\n";
                                 }
                                 
                      #### SHOW EXPLANATION ADVANCED EDITOR
 	     		print"<span onClick=\"set_active_summernote\('1'\)\" ID=\"explan\" style=\"display:none\; background: #666666\;\">\n";
 	     		print"<BR><center><TABLE><TR><TD><textarea class=\"summernote\" id=\"1summernote\" name=\"explanation\">$RETURN{$CQF{number}}{explanation}</textarea></TD></TR></TABLE></center>\n";
 	     		print"</span>\n";
+
+       		     #### SHOW Memory ADVANCED EDITOR
+			print"<span onClick=\"set_active_summernote\('3'\)\" ID=\"Memory\" style=\"display:none\; background: #660616\;\">\n";
+			print"<BR><center><TABLE><TR><TD><textarea class=\"summernote\" id=\"3summernote\" name=\"memory\">$RETURN{$CQF{number}}{memory}</textarea></TD></TR></TABLE></center>\n";
+			print"</span>\n";
 
                         # ADVANCED EDITOR
                         print"<div onClick=\"set_active_summernote\('2'\)\" ID=\"mode1\" style=\"display:block\;\">\n";
@@ -6339,23 +6533,36 @@ sub change_bank_question_form {
                         
                 elsif($RETURN{$CQF{number}}{mode} == 2) { # SHOW EQUATION
                         ## BASIC
-                        print"<div ID=\"mode0\" style=\"display:none\;\"><TABLE><TR><TD width=\"20\"></TD><TD><textarea  style=\"resize\:none\;\" wrap=\"hard\"  maxlength=\"1500\" rows=\"4\" cols=\"52\" name=\"question0\" value=\"\"></textarea></TD><TD>n";
+                        print"<div ID=\"mode0\" style=\"display:none\; padding-top: 6px\"><TABLE><TR><TD width=\"20\"></TD><TD><textarea  style=\"resize\:none\;\" wrap=\"hard\"  maxlength=\"1500\" rows=\"4\" cols=\"52\" name=\"question0\" value=\"\"></textarea></TD><TD>\n";
 
                         if( $RETURN{$CQF{number}}{image_id} > 0) {
                                 #get image name
                                 my %IMAGE_ID = &select4("query","select number,file_name from qst_files where number=\"$RETURN{$CQF{number}}{image_id}\" AND org_id=\"$org_id\" AND (u_id=\"$ids\" OR u_id=\"0\")");
 			
-                                print"<div ID=\"display1\" style=\"display:block\;\">&nbsp\;&nbsp\;&nbsp\; &nbsp\;&nbsp\;&nbsp\;<input STYLE=\"border-radius:.25em\; outline: none\;\" readonly type=\"text\" width=\"20\" name=\"insert_image_name\" value=\"&nbsp\;&nbsp\; $IMAGE_ID{$RETURN{$CQF{number}}{image_id}}\"><BR><center><B STYLE=\"cursor: pointer\" OnClick=\"question_image_delete_handler\(\)\">$LANGUAGE{$set_language}{Remove}</B></center></div>\n";
+                                print"<div ID=\"display1\" style=\"display:block\;\">&nbsp\;&nbsp\;&nbsp\; &nbsp\;&nbsp\;&nbsp\;<input STYLE=\"border-radius:.25em\; outline: none\;\" readonly type=\"text\" width=\"20\" name=\"insert_image_name\" value=\"&nbsp\;&nbsp\; $IMAGE_ID{$RETURN{$CQF{number}}{image_id}}\"><B STYLE=\"cursor: pointer\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{Removeimage}\" OnClick=\"question_image_delete_handler\(\)\">&nbsp\;&nbsp\; X</B></center></div>\n";
 
                                 print"<div ID=\"disp1\" style=\"display:none\;\"><B data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{Insertimage}\" STYLE=\"cursor: pointer\" OnClick=\"question_image_handler\(\'question\'\)\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$image30</B></div>\n";
                                 }
                         else {
                                 print"<div ID=\"disp1\" style=\"display:block\;\"><B data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{Insertimage}\" STYLE=\"cursor: pointer\" OnClick=\"question_image_handler\(\'question\'\)\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$image30</B></div>\n";
 
-                                print"<div ID=\"display1\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\; &nbsp\;&nbsp\;&nbsp\;<input readonly STYLE=\"border-radius:.25em\; outline: none\;\" type=\"text\" width=\"20\" name=\"insert_image_name\" value=\"\"><BR><center><B STYLE=\"cursor: pointer\" OnClick=\"question_image_delete_handler\(\)\">$LANGUAGE{$set_language}{Remove}</B></center></div>\n";
+                                print"<div ID=\"display1\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\; &nbsp\;&nbsp\;&nbsp\;<input readonly STYLE=\"border-radius:.25em\; outline: none\;\" type=\"text\" width=\"20\" name=\"insert_image_name\" value=\"\"><B STYLE=\"cursor: pointer\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{Removeimage}\" OnClick=\"question_image_delete_handler\(\)\">&nbsp\;&nbsp\; X</B></center></div>\n";
                                 }
 			
-			print"</TD></TR></TABLE><BR><P>\n";
+			# Print PDF
+			if($RETURN{$CQF{number}}{pdf} > 0) {
+				#get image name
+				my %PDF_ID = &select4("query","select number,file_name from qst_files where number=\"$RETURN{$CQF{number}}{pdf}\" AND org_id=\"$org_id\" AND (u_id=\"$ids\" OR u_id=\"0\")");
+
+				print"<BR><span ID=\"ppt\" style=\"display:none\;\"><B data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{InsertPDF}\" STYLE=\"cursor: pointer\; font-size: 10pt\" OnClick=\"question_image_handler\(\'pptx\'\)\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{PDF}</B></span>\n";
+				print"<span ID=\"ppt1\" style=\"display:block\;\">&nbsp\;&nbsp\;&nbsp\; &nbsp\;&nbsp\;&nbsp\;<input STYLE=\"border-radius:.4em\; outline: none\;\"  readonly type=\"text\" width=\"15\" name=\"insert_pptx_name\" value=\"$PDF_ID{$RETURN{$CQF{number}}{pdf}}\">&nbsp\;&nbsp\;<B data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{RemovePDF}\" STYLE=\"cursor: pointer\;\" OnClick=\"question_pptx_delete_handler\(\)\"> X</B></span>\n";
+				}
+			else {
+				print"<BR><span ID=\"ppt\" style=\"display:block\;\"><B data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{InsertPDF}\" STYLE=\"cursor: pointer\; font-size: 10pt\" OnClick=\"question_image_handler\(\'pptx\'\)\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{PDF}</B></span>\n";
+			        print"<span ID=\"ppt1\" style=\"display:none\;\">&nbsp\;&nbsp\;&nbsp\; &nbsp\;&nbsp\;&nbsp\;<input STYLE=\"border-radius:.4em\; outline: none\;\"  readonly type=\"text\" width=\"15\" name=\"insert_pptx_name\" value=\"\">&nbsp\;&nbsp\;<B data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{RemovePDF}\" STYLE=\"cursor: pointer\;\" OnClick=\"question_pptx_delete_handler\($RETURN{$CQF{number}}{pdf}\)\"> X</B></span>\n";
+				}
+
+			print"</TD></TABLE><BR><P>\n";
 			
                         if( $RETURN{$CQF{number}}{vlink} ne "0") {
                                 print"<B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{VideoLink}&nbsp\;&nbsp\;</B><input type=\"url\" style=\"resize:none\; font-family:Arial\; font-size: 10pt\;\" size=\"20\" maxlength=\"150\" name=\"vlink\" value=\"$RETURN{$CQF{number}}{vlink}\"></text>\n";
@@ -6370,11 +6577,17 @@ sub change_bank_question_form {
                         else {
                                 print"<B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{AudioLink}&nbsp\;&nbsp\;</B><input type=\"url\" style=\"resize:none\; font-family:Arial\; font-size: 10pt\;\" size=\"20\" maxlength=\"150\" name=\"alink\" value=\"\" placeholder=\"mp3, ogg, wav\"></text><BR></div>\n";
                                 }
+                              
                                 
                      #### SHOW EXPLANATION ADVANCED EDITOR
 	     		print"<span onClick=\"set_active_summernote\('1'\)\" ID=\"explan\" style=\"display:none\; background: #666666\;\">\n";
 	     		print"<BR><center><TABLE><TR><TD><textarea class=\"summernote\" id=\"1summernote\" name=\"explanation\">$RETURN{$CQF{number}}{explanation}</textarea></TD></TR></TABLE></center>\n";
 	     		print"</span>\n";
+
+       		     #### SHOW Memory ADVANCED EDITOR
+			print"<span onClick=\"set_active_summernote\('3'\)\" ID=\"Memory\" style=\"display:none\; background: #660616\;\">\n";
+			print"<BR><center><TABLE><TR><TD><textarea class=\"summernote\" id=\"3summernote\" name=\"memory\">$RETURN{$CQF{number}}{memory}</textarea></TD></TR></TABLE></center>\n";
+			print"</span>\n";
 
                         # ADVANCED Editor
                         print"<div onClick=\"set_active_summernote\('2'\)\" ID=\"mode1\" style=\"display:none\;\">\n";
@@ -6388,7 +6601,7 @@ sub change_bank_question_form {
                         print"</div>\n";
                         }
                 
-
+		#### QUESTION TYPES
                 print"<center><TABLE><TD>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;</TD>
 		<TD><div ID=\"anstype1\" style=\"display:block\;\"><font OnClick=\"show_mc\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{MultipleChoice}</font></div><div ID=\"anstype1a\" style=\"display:none\;\"><font OnClick=\"show_mc\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B >$LANGUAGE{$set_language}{MultipleChoice}</B></font></div></TD><TD width=\"10\"></TD><TD><div ID=\"anstype2\" style=\"display:block\;\"><font OnClick=\"show_ma\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{MultipleAnswer}</font></div><div ID=\"anstype2a\" style=\"display:none\;\"><font OnClick=\"show_ma\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{MultipleAnswer}</B></font></div></TD><TD width=\"10\"></TD><TD><div ID=\"anstype7\" style=\"display:block\;\"><font OnClick=\"show_mx\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{MatchXng}</font></div><div ID=\"anstype7a\" style=\"display:none\;\"><font OnClick=\"show_mx\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{MatchXng}</B></font></div></TD><TD width=\"10\"></TD><TD><div ID=\"anstype3\" style=\"display:block\;\"><font OnClick=\"show_tf\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{TF}</font></div><div ID=\"anstype3a\" style=\"display:none\;\"><font OnClick=\"show_tf\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{TF}</B></font></div></TD><TD width=\"10\"></TD><TD><div ID=\"anstype8\" style=\"display:block\;\"><font OnClick=\"show_yn\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">Y/N</font></div><div ID=\"anstype8a\" style=\"display:none\;\"><font OnClick=\"show_yn\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>Y/N</B></font></div></TD><TD><div ID=\"anstype6\" style=\"display:block\;\"><font OnClick=\"show_ad\(\)\" STYLE=\"text-decoration:none\;\"></font></div><div ID=\"anstype6a\" style=\"display:none\;\"><font OnClick=\"show_ad\(\)\" STYLE=\"text-decoration:none\;\"></font></div></TD><TD width=\"10\"></TD><TD><div ID=\"anstype4\" style=\"display:block\;\"><font OnClick=\"show_sa\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{ShortAnswer}</font></div><div ID=\"anstype4a\" style=\"display:none\;\"><font OnClick=\"show_sa\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{ShortAnswer}</B></font></div></TD><TD width=\"10\"></TD><TD><div ID=\"anstype5\" style=\"display:block\;\"><font OnClick=\"show_p\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{Paragraph}</font></div><div ID=\"anstype5a\" style=\"display:none\;\"><font OnClick=\"show_p\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{Paragraph}</B></font></div></TD></TABLE></center>\n";
         	
@@ -6410,6 +6623,12 @@ sub change_bank_question_form {
 
                 &print_form("form_name","eq_quest","form_target","MathJaax","input","print_eq_quest_ans","u_id","$CQF{u_id}","session_id","$CQF{session_id}","type","$CQF{type}","sub_type","$CQF{sub_type}","eq","1");
                 
+                &print_javascript_begin();
+
+                &print_mode_display();
+                
+                &print_javascript_end();
+
                 print"<script> document.getElementById\(mode2\).onload = load_handler\(\'$RETURN{$CQF{number}}{type}\'\)</script>\n";
 		}
 	}
@@ -6697,21 +6916,25 @@ sub change_quest {
 	&print_active_summernote();
 
         &print_explan_editor();
+                
+        &print_memory_editor();
         
         &print_javascript_begin();
+
+        &print_show_memory();
         
-	print"function ClearAType(i_n) \{
-         for (i = 1\; i <= 8\; i++) \{
-                if(i != i_n) \{
-                        var sel = 'anstype'+i;
-                        var sela = 'anstype'+i+'a';
-                        var y = document.getElementById(sel)\;
-                        y.style.display = \"block\"\;
-                        var x = document.getElementById(sela)\;
-                        x.style.display = \"none\"\;
-                        \}
-                \}
-        \}\n";
+#	print"function ClearAType(i_n) \{
+#         for (i = 1\; i <= 9\; i++) \{
+#                if(i != i_n) \{
+#                        var sel = 'anstype'+i;
+#                        var sela = 'anstype'+i+'a';
+#                        var y = document.getElementById(sel)\;
+#                        y.style.display = \"block\"\;
+#                        var x = document.getElementById(sela)\;
+#                        x.style.display = \"none\"\;
+#                        \}
+#                \}
+#        \}\n";
         
         &print_load_handler("sub_type","$CQUEST{sub_type}");
         
@@ -6738,6 +6961,9 @@ sub change_quest {
 	      	&show_mc();
 	      	&show_ma();
 	      	&show_mx();
+	      	&show_cz();
+		&show_or();
+
             	$CQUEST{name} =~ s/\"/&\#34/g;
             	
                 &print_form_wo_end_tag("form_name","question_form","form_target","theright","input","change_quest1","type","$CQUEST{type}","sub_type","$CQUEST{sub_type}","expand","$CQUEST{expand}","name","$CQUEST{name}","from","","u_id","$CQUEST{u_id}","session_id","$CQUEST{session_id}");
@@ -6863,6 +7089,13 @@ sub change_quest1{
                 $QUEST1{ans_mode} = 0;
                 }
 
+	if($QUEST1{explanation} eq "<p><br></p>") {
+		$QUEST1{explanation} = "";
+		}
+
+	if($QUEST1{memory} eq "<p><br></p>") {
+		$QUEST1{memory} = "";
+		}
 
 	if (($empty ne "" || $image_error == 0 || $QUEST1{vlink} ne"0" || $QUEST1{alink} ne"0") && $count == 1 && $error != 1 && $QUEST1{descrip} ne "" && $pdf_error == 0) {
 		if ($QUEST1{select} eq"TF") {
@@ -6870,7 +7103,7 @@ sub change_quest1{
 				$QUEST1{TFans} =~ s/[^T,F]//g;
 
 				if($QUEST1{TFans} ne"") {
-                                        &update_quote_question("question","$QUEST1{question}","type","$QUEST1{select}","value","$QUEST1{value}","number","$QUEST1{number}","image_id","$QUEST1{image_number}","vlink","$QUEST1{vlink}","alink","$QUEST1{alink}","kolum","0","mode","$QUEST1{mode}","descrip","$QUEST1{descrip}","ans_mode","$QUEST1{ans_mode}","pdf","$QUEST1{pptx_number}","explanation","$QUEST1{explanation}");
+                                        &update_quote_question("question","$QUEST1{question}","type","$QUEST1{select}","value","$QUEST1{value}","number","$QUEST1{number}","image_id","$QUEST1{image_number}","vlink","$QUEST1{vlink}","alink","$QUEST1{alink}","kolum","0","mode","$QUEST1{mode}","descrip","$QUEST1{descrip}","ans_mode","$QUEST1{ans_mode}","pdf","$QUEST1{pptx_number}","explanation","$QUEST1{explanation}","memory","$QUEST1{memory}");
                                         
 					&generic_delete("query","DELETE from question_answers WHERE number=\"$QUEST1{number}\" AND u_id=\"$ids\"");
 					
@@ -6891,7 +7124,7 @@ sub change_quest1{
 			if($QUEST1{sub_type} != 2) { #quiz/test questions
 				$QUEST1{YNans} =~ s/[^Y,N]//g;
 				if($QUEST1{YNans} ne"") {
-                                        &update_quote_question("question","$QUEST1{question}","type","$QUEST1{select}","value","$QUEST1{value}","number","$QUEST1{number}","image_id","$QUEST1{image_number}","vlink","$QUEST1{vlink}","alink","$QUEST1{alink}","kolum","0","mode","$QUEST1{mode}","descrip","$QUEST1{descrip}","ans_mode","$QUEST1{ans_mode}","pdf","$QUEST1{pptx_number}","explanation","$QUEST1{explanation}");
+                                        &update_quote_question("question","$QUEST1{question}","type","$QUEST1{select}","value","$QUEST1{value}","number","$QUEST1{number}","image_id","$QUEST1{image_number}","vlink","$QUEST1{vlink}","alink","$QUEST1{alink}","kolum","0","mode","$QUEST1{mode}","descrip","$QUEST1{descrip}","ans_mode","$QUEST1{ans_mode}","pdf","$QUEST1{pptx_number}","explanation","$QUEST1{explanation}","memory","$QUEST1{memory}");
                                         
 					&generic_delete("query","DELETE from question_answers WHERE number=\"$QUEST1{number}\" AND u_id=\"$ids\"");
 					
@@ -6909,8 +7142,7 @@ sub change_quest1{
 				}
 			}
 			
-		elsif ($QUEST1{select} eq"MC") { # Multiple Choice
-		
+		elsif ($QUEST1{select} eq"MC") { # Multiple Choice		
                         # check whether there are enough answers
 			my $enough_answers = 0;
 			my $no =1;
@@ -6952,7 +7184,7 @@ sub change_quest1{
 				}
 				
 			if($enough_answers > 1 && $image_error == 0) { # at least 2 answers and good image
-                                &update_quote_question("question","$QUEST1{question}","type","$QUEST1{select}","value","$QUEST1{value}","number","$QUEST1{number}","image_id","$QUEST1{image_number}","vlink","$QUEST1{vlink}","alink","$QUEST1{alink}","kolum","$QUEST1{kolum}","mode","$QUEST1{mode}","descrip","$QUEST1{descrip}","ans_mode","$QUEST1{ans_mode}","pdf","$QUEST1{pptx_number}","explanation","$QUEST1{explanation}");
+                                &update_quote_question("question","$QUEST1{question}","type","$QUEST1{select}","value","$QUEST1{value}","number","$QUEST1{number}","image_id","$QUEST1{image_number}","vlink","$QUEST1{vlink}","alink","$QUEST1{alink}","kolum","$QUEST1{kolum}","mode","$QUEST1{mode}","descrip","$QUEST1{descrip}","ans_mode","$QUEST1{ans_mode}","pdf","$QUEST1{pptx_number}","explanation","$QUEST1{explanation}","memory","$QUEST1{memory}");
                                 
                                 &generic_delete("query","DELETE from question_answers WHERE number=\"$QUEST1{number}\" AND u_id=\"$ids\"");
 
@@ -7017,7 +7249,7 @@ sub change_quest1{
 				}
 
 			if($not_enough_answers == 0 && $image_error == 0) { # add the question
-                                update_quote_question("question","$QUEST1{question}","type","$QUEST1{select}","value","$QUEST1{value}","number","$QUEST1{number}","image_id","$QUEST1{image_number}","vlink","$QUEST1{vlink}","alink","$QUEST1{alink}","kolum","$QUEST1{kolum}","mode","$QUEST1{mode}","descrip","$QUEST1{descrip}","ans_mode","$QUEST1{ans_mode}","pdf","$QUEST1{pptx_number}","explanation","$QUEST1{explanation}");
+                                update_quote_question("question","$QUEST1{question}","type","$QUEST1{select}","value","$QUEST1{value}","number","$QUEST1{number}","image_id","$QUEST1{image_number}","vlink","$QUEST1{vlink}","alink","$QUEST1{alink}","kolum","$QUEST1{kolum}","mode","$QUEST1{mode}","descrip","$QUEST1{descrip}","ans_mode","$QUEST1{ans_mode}","pdf","$QUEST1{pptx_number}","explanation","$QUEST1{explanation}","memory","$QUEST1{memory}");
                                 
 				&generic_delete("query","DELETE from question_answers WHERE number=\"$QUEST1{number}\" AND u_id=\"$ids\"");
                 
@@ -7081,7 +7313,7 @@ sub change_quest1{
 				if($QUEST1{sub_type} == 2) { # survey questions
 					}
 				else { # quiz/test questions
-                                        update_quote_question("question","$QUEST1{question}","type","$QUEST1{select}","value","$QUEST1{value}","number","$QUEST1{number}","image_id","$QUEST1{image_number}","vlink","$QUEST1{vlink}","alink","$QUEST1{alink}","kolum","0","mode","$QUEST1{mode}","descrip","$QUEST1{descrip}","ans_mode","$QUEST1{ans_mode}","pdf","$QUEST1{pptx_number}","explanation","$QUEST1{explanation}");
+                                        update_quote_question("question","$QUEST1{question}","type","$QUEST1{select}","value","$QUEST1{value}","number","$QUEST1{number}","image_id","$QUEST1{image_number}","vlink","$QUEST1{vlink}","alink","$QUEST1{alink}","kolum","0","mode","$QUEST1{mode}","descrip","$QUEST1{descrip}","ans_mode","$QUEST1{ans_mode}","pdf","$QUEST1{pptx_number}","explanation","$QUEST1{explanation}","memory","$QUEST1{memory}");
 					}
 		
                                 &generic_delete("query","DELETE from question_answers WHERE number=\"$QUEST1{number}\" AND u_id=\"$ids\"");
@@ -7118,7 +7350,7 @@ sub change_quest1{
 			$sa_ans =~ s/\s//g;
 			if($QUEST1{sub_type} != 2) { #quiz/test questions
 				if($sa_ans ne"") {
-                                        &update_quote_question("question","$QUEST1{question}","type","$QUEST1{select}","value","$QUEST1{value}","number","$QUEST1{number}","image_id","$QUEST1{image_number}","vlink","$QUEST1{vlink}","alink","$QUEST1{alink}","kolum","0","mode","$QUEST1{mode}","descrip","$QUEST1{descrip}","ans_mode","$QUEST1{ans_mode}","pdf","$QUEST1{pptx_number}","explanation","$QUEST1{explanation}");
+                                        &update_quote_question("question","$QUEST1{question}","type","$QUEST1{select}","value","$QUEST1{value}","number","$QUEST1{number}","image_id","$QUEST1{image_number}","vlink","$QUEST1{vlink}","alink","$QUEST1{alink}","kolum","0","mode","$QUEST1{mode}","descrip","$QUEST1{descrip}","ans_mode","$QUEST1{ans_mode}","pdf","$QUEST1{pptx_number}","explanation","$QUEST1{explanation}","memory","$QUEST1{memory}");
                                         
 					&generic_delete("query","DELETE from question_answers WHERE number=\"$QUEST1{number}\" AND u_id=\"$ids\"");
 					
@@ -7140,7 +7372,7 @@ sub change_quest1{
 			$p_ans =~ s/\s//g;
 			
 			if($p_ans ne"") {
-                                &update_quote_question("question","$QUEST1{question}","type","$QUEST1{select}","value","$QUEST1{value}","number","$QUEST1{number}","image_id","$QUEST1{image_number}","vlink","$QUEST1{vlink}","alink","$QUEST1{alink}","kolum","0","mode","$QUEST1{mode}","descrip","$QUEST1{descrip}","ans_mode","$QUEST1{ans_mode}","pdf","$QUEST1{pptx_number}","explanation","$QUEST1{explanation}");
+                                &update_quote_question("question","$QUEST1{question}","type","$QUEST1{select}","value","$QUEST1{value}","number","$QUEST1{number}","image_id","$QUEST1{image_number}","vlink","$QUEST1{vlink}","alink","$QUEST1{alink}","kolum","0","mode","$QUEST1{mode}","descrip","$QUEST1{descrip}","ans_mode","$QUEST1{ans_mode}","pdf","$QUEST1{pptx_number}","explanation","$QUEST1{explanation}","memory","$QUEST1{memory}");
                                 
 				&generic_delete("query","DELETE from question_answers WHERE number=\"$QUEST1{number}\" AND u_id=\"$ids\"");
 				
@@ -7187,7 +7419,11 @@ sub change_bank_quest {
 
         &print_explan_editor();
 
+	&print_memory_editor();
+	
 	&print_javascript_begin();
+	
+	&print_show_memory();
 	
      	print"function load_handler\(quest_type\) \{
 	if\(quest_type == \"TF\"\)\{
@@ -7197,6 +7433,7 @@ sub change_bank_quest {
 	\}
 	if\(quest_type == \"YN\"\)\{
 	var yn_answer
+	
 	yn_answer = document.question_form.YNans.value
 	document.y_n.answer.value = yn_answer
 	show_yn\(\)
@@ -7352,6 +7589,7 @@ sub change_bank_quest1{
 	$QUEST1{mode} =~ s/\D//g;
 	$QUEST1{ans_mode} =~ s/\D//g;
 	$QUEST1{MCans} =~ s/\D//g;
+	$QUEST1{pptx_number} =~ s/\D//g;
 	
 	my $error = 0; #
 	$error = &check_many_length_return("$QUEST1{number}","10","$QUEST1{type}","5","$QUEST1{value}","3","$QUEST1{question}","1550","$QUEST1{sub_type}","1","$QUEST1{select}","10");
@@ -7371,6 +7609,20 @@ sub change_bank_quest1{
 		if(!keys %RETURN_QUESTION_IMAGE) {
 			++$image_error;
 			}
+		}
+		
+	# check they own the pdf
+	my $pdf_error = 0;
+
+	if (defined $QUEST1{pptx_number} && $QUEST1{pptx_number} > 0) {
+		my %RETURN_PDF = &select4("query","select number,file_name from qst_files where number=\"$QUEST1{pptx_number}\" and u_id =\"$ids\"");
+		if(!keys %RETURN_PDF) {
+			++$pdf_error;
+			}
+		}
+	
+	if (!defined $QUEST1{pptx_number}) {
+		$QUEST1{pptx_number} = 0;
 		}
 		
 	if(!defined $QUEST1{image_number}) {
@@ -7393,15 +7645,22 @@ sub change_bank_quest1{
 		$QUEST1{ans_mode} = "0";
 		}
 		
-	if (($empty ne "" || $image_error == 0 || $QUEST1{vlink} ne"0") && $count == 1 && $error != 1 && $QUEST1{descrip} ne "") {
-	
+	if($QUEST1{explanation} eq "<p><br></p>") {
+		$QUEST1{explanation} = "";
+		}
+
+	if($QUEST1{memory} eq "<p><br></p>") {
+		$QUEST1{memory} = "";
+		}
+		
+	if (($empty ne "" || $image_error == 0 || $QUEST1{vlink} ne"0") && $count == 1 && $error != 1 && $QUEST1{descrip} ne "" && $pdf_error == 0) {
 		if ($QUEST1{select} eq"TF") {
 		
 			if($QUEST1{sub_type} != 2) { #quiz/test questions
 				$QUEST1{TFans} =~ s/[^T,F]//g;
 				
 				if($QUEST1{TFans} ne"") {
-                                        &update_quote_question("question","$QUEST1{question}","type","$QUEST1{select}","value","$QUEST1{value}","number","$QUEST1{number}","image_id","$QUEST1{image_number}","vlink","$QUEST1{vlink}","alink","$QUEST1{alink}","kolum","$QUEST1{kolum}","mode","$QUEST1{mode}","descrip","$QUEST1{descrip}","ans_mode","$QUEST1{ans_mode}","explanation","$QUEST1{explanation}");
+                                        &update_quote_question("question","$QUEST1{question}","type","$QUEST1{select}","value","$QUEST1{value}","number","$QUEST1{number}","image_id","$QUEST1{image_number}","vlink","$QUEST1{vlink}","alink","$QUEST1{alink}","kolum","$QUEST1{kolum}","mode","$QUEST1{mode}","descrip","$QUEST1{descrip}","ans_mode","$QUEST1{ans_mode}","explanation","$QUEST1{explanation}","memory","$QUEST1{memory}");
                                         
 					&generic_delete("query","DELETE from question_answers WHERE number=\"$QUEST1{number}\" AND u_id=\"0\" AND org_id=\"$org_id\"");
 					
@@ -7414,7 +7673,7 @@ sub change_bank_quest1{
 			if($QUEST1{sub_type} != 2) { #quiz/test questions
 				$QUEST1{YNans} =~ s/[^Y,N]//g;
 				if($QUEST1{YNans} ne"") {
-                                        &update_quote_question("question","$QUEST1{question}","type","$QUEST1{select}","value","$QUEST1{value}","number","$QUEST1{number}","image_id","$QUEST1{image_number}","vlink","$QUEST1{vlink}","alink","$QUEST1{alink}","kolum","0","mode","$QUEST1{mode}","descrip","$QUEST1{descrip}","ans_mode","$QUEST1{ans_mode}","explanation","$QUEST1{explanation}");
+                                        &update_quote_question("question","$QUEST1{question}","type","$QUEST1{select}","value","$QUEST1{value}","number","$QUEST1{number}","image_id","$QUEST1{image_number}","vlink","$QUEST1{vlink}","alink","$QUEST1{alink}","kolum","0","mode","$QUEST1{mode}","descrip","$QUEST1{descrip}","ans_mode","$QUEST1{ans_mode}","explanation","$QUEST1{explanation}","memory","$QUEST1{memory}");
                                         
 					&generic_delete("query","DELETE from question_answers WHERE number=\"$QUEST1{number}\" AND u_id=\"$ids\"");
 					
@@ -7463,7 +7722,7 @@ sub change_bank_quest1{
 				}
 
 			if($enough_answers > 1 && $image_error == 0 && $QUEST1{MCans} > 0) {
-                                &update_quote_question("question","$QUEST1{question}","type","$QUEST1{select}","value","$QUEST1{value}","number","$QUEST1{number}","image_id","$QUEST1{image_number}","vlink","$QUEST1{vlink}","alink","$QUEST1{alink}","kolum","$QUEST1{kolum}","kolum","$QUEST1{kolum}","mode","$QUEST1{mode}","descrip","$QUEST1{descrip}","ans_mode","$QUEST1{ans_mode}","explanation","$QUEST1{explanation}");
+                                &update_quote_question("question","$QUEST1{question}","type","$QUEST1{select}","value","$QUEST1{value}","number","$QUEST1{number}","image_id","$QUEST1{image_number}","vlink","$QUEST1{vlink}","alink","$QUEST1{alink}","kolum","$QUEST1{kolum}","kolum","$QUEST1{kolum}","mode","$QUEST1{mode}","descrip","$QUEST1{descrip}","ans_mode","$QUEST1{ans_mode}","explanation","$QUEST1{explanation}","memory","$QUEST1{memory}");
                                 
 				&generic_delete("query","DELETE from question_answers WHERE number=\"$QUEST1{number}\" AND org_id=\"$org_id\" AND u_id=\"0\"");
 				my $i =1 ;
@@ -7533,7 +7792,7 @@ sub change_bank_quest1{
 				}
 
 			if($not_enough_answers == 0 && $image_error == 0) { # add the question
-                                update_quote_question("question","$QUEST1{question}","type","$QUEST1{select}","value","$QUEST1{value}","number","$QUEST1{number}","image_id","$QUEST1{image_number}","vlink","$QUEST1{vlink}","alink","$QUEST1{alink}","kolum","$QUEST1{kolum}","kolum","$QUEST1{kolum}","mode","$QUEST1{mode}","descrip","$QUEST1{descrip}","ans_mode","$QUEST1{ans_mode}","explanation","$QUEST1{explanation}");
+                                update_quote_question("question","$QUEST1{question}","type","$QUEST1{select}","value","$QUEST1{value}","number","$QUEST1{number}","image_id","$QUEST1{image_number}","vlink","$QUEST1{vlink}","alink","$QUEST1{alink}","kolum","$QUEST1{kolum}","kolum","$QUEST1{kolum}","mode","$QUEST1{mode}","descrip","$QUEST1{descrip}","ans_mode","$QUEST1{ans_mode}","explanation","$QUEST1{explanation}","memory","$QUEST1{memory}");
                                 
 				&generic_delete("query","DELETE from question_answers WHERE number=\"$QUEST1{number}\" AND org_id=\"$org_id\" AND u_id=\"0\"");
                 
@@ -7595,7 +7854,7 @@ sub change_bank_quest1{
 				if($QUEST1{sub_type} == 2) { # survey questions
 					}
 				else { # quiz/test questions
-                                        update_quote_question("question","$QUEST1{question}","type","$QUEST1{select}","value","$QUEST1{value}","number","$QUEST1{number}","image_id","$QUEST1{image_number}","vlink","$QUEST1{vlink}","alink","$QUEST1{alink}","kolum","$QUEST1{kolum}","mode","$QUEST1{mode}","descrip","$QUEST1{descrip}","ans_mode","$QUEST1{ans_mode}","explanation","$QUEST1{explanation}");
+                                        update_quote_question("question","$QUEST1{question}","type","$QUEST1{select}","value","$QUEST1{value}","number","$QUEST1{number}","image_id","$QUEST1{image_number}","vlink","$QUEST1{vlink}","alink","$QUEST1{alink}","kolum","$QUEST1{kolum}","mode","$QUEST1{mode}","descrip","$QUEST1{descrip}","ans_mode","$QUEST1{ans_mode}","explanation","$QUEST1{explanation}","memory","$QUEST1{memory}");
 					}
 		
                                 # delete the question_answers already there
@@ -7634,7 +7893,7 @@ sub change_bank_quest1{
 			$sa_ans =~ s/\s//g;
 			if($QUEST1{sub_type} != 2) { #quiz/test questions
 				if($sa_ans ne"") {
-                                        &update_quote_question("question","$QUEST1{question}","type","$QUEST1{select}","value","$QUEST1{value}","number","$QUEST1{number}","image_id","$QUEST1{image_number}","vlink","$QUEST1{vlink}","alink","$QUEST1{alink}","kolum","$QUEST1{kolum}","mode","$QUEST1{mode}","descrip","$QUEST1{descrip}","ans_mode","$QUEST1{ans_mode}","explanation","$QUEST1{explanation}");
+                                        &update_quote_question("question","$QUEST1{question}","type","$QUEST1{select}","value","$QUEST1{value}","number","$QUEST1{number}","image_id","$QUEST1{image_number}","vlink","$QUEST1{vlink}","alink","$QUEST1{alink}","kolum","$QUEST1{kolum}","mode","$QUEST1{mode}","descrip","$QUEST1{descrip}","ans_mode","$QUEST1{ans_mode}","explanation","$QUEST1{explanation}","memory","$QUEST1{memory}");
 					
 					&generic_delete("query","DELETE from question_answers WHERE number=\"$QUEST1{number}\" AND org_id=\"$org_id\" AND u_id=\"0\"");
 					
@@ -7650,7 +7909,7 @@ sub change_bank_quest1{
 			my $p_ans = $QUEST1{Pans};
 			$p_ans =~ s/\s//g;
 			if($p_ans ne"") {
-                                &update_quote_question("question","$QUEST1{question}","type","$QUEST1{select}","value","$QUEST1{value}","number","$QUEST1{number}","image_id","$QUEST1{image_number}","vlink","$QUEST1{vlink}","alink","$QUEST1{alink}","kolum","$QUEST1{kolum}","mode","$QUEST1{mode}","descrip","$QUEST1{descrip}","ans_mode","$QUEST1{ans_mode}","explanation","$QUEST1{explanation}");
+                                &update_quote_question("question","$QUEST1{question}","type","$QUEST1{select}","value","$QUEST1{value}","number","$QUEST1{number}","image_id","$QUEST1{image_number}","vlink","$QUEST1{vlink}","alink","$QUEST1{alink}","kolum","$QUEST1{kolum}","mode","$QUEST1{mode}","descrip","$QUEST1{descrip}","ans_mode","$QUEST1{ans_mode}","explanation","$QUEST1{explanation}","memory","$QUEST1{memory}");
                                 
 				&generic_delete("query","DELETE from question_answers WHERE number=\"$QUEST1{number}\" AND org_id=\"$org_id\" AND u_id=\"0\"");
 				
@@ -8140,7 +8399,8 @@ sub create_assign {
 	$name = &l_spaces("$name","0");
 	$name = &tr_spaces("$name","0");
 	$name = &x_spaces("$name","0");
-	$name = &spec_char("$name","0");
+#	$name = &spec_char("$name","0");
+	$name = &funny_char2("$name","0");
 	
 	if($CA{marks} > 0) {
                 }
@@ -8170,7 +8430,7 @@ sub create_assign_page {
 	$error = &check_many_length_return("$CAP{expand}","50");
 
 	if($error != 1 ) {
-		&javascript_check_input_not_empty("form","form1","error_message","A name was not entered.","fields","name");
+		&javascript_check_input_not_empty("form","form1","error_message","$LANGUAGE{$set_language}{Anamewasnotentered}","fields","name");
 		&javascript_cancel_handler();
 
 		&print_form_wo_end_tag("form_name","form1","form_target","theright","input","create_assign","expand","$CAP{expand}","u_id","$CAP{u_id}","session_id","$CAP{session_id}");
@@ -8355,7 +8615,7 @@ sub copy_quest {
                         if($RETURN{$CQ{number}}{type} ne"MX") {
                                 my %RETURN1 = &select6("query","SELECT q_order,answer,c_answer,image_id from question_answers WHERE number=\"$CQ{number}\" AND org_id=\"$org_id\" AND (u_id=\"$ids\" OR u_id=\"0\")");
                                 
-                                my $return = &insert_question_quote_return("query","$RETURN{$CQ{number}}{question}","query1","$RETURN{$CQ{number}}{type}","query2","$RETURN{$CQ{number}}{value}","sub_type","$RETURN{$CQ{number}}{sub_type}","image_id","$RETURN{$CQ{number}}{image_id}","vlink","$RETURN{$CQ{number}}{vlink}","alink","$RETURN{$CQ{number}}{alink}","kolum","$RETURN{$CQ{number}}{kolum}","mode","$RETURN{$CQ{number}}{mode}","descrip","$RETURN{$CQ{number}}{descrip}","ans_mode","$RETURN{$CQ{number}}{ans_mode}","pdf","$RETURN{$CQ{number}}{pdf}","explanation","$RETURN{$CQ{number}}{explanation}");
+                                my $return = &insert_question_quote_return("query","$RETURN{$CQ{number}}{question}","query1","$RETURN{$CQ{number}}{type}","query2","$RETURN{$CQ{number}}{value}","sub_type","$RETURN{$CQ{number}}{sub_type}","image_id","$RETURN{$CQ{number}}{image_id}","vlink","$RETURN{$CQ{number}}{vlink}","alink","$RETURN{$CQ{number}}{alink}","kolum","$RETURN{$CQ{number}}{kolum}","mode","$RETURN{$CQ{number}}{mode}","descrip","$RETURN{$CQ{number}}{descrip}","ans_mode","$RETURN{$CQ{number}}{ans_mode}","pdf","$RETURN{$CQ{number}}{pdf}","explanation","$RETURN{$CQ{number}}{explanation}","memory","$RETURN{$CQ{number}}{memory}");
                                 
                                 foreach my $key(keys %RETURN1) {
                                         &insert_generic_question_answers_quote("number","$return","num","$key","quote","$RETURN1{$key}{answer}","c_answer","$RETURN1{$key}{c_answer}","ids","$ids","image_id","$RETURN1{$key}{image_id}");
@@ -8366,7 +8626,7 @@ sub copy_quest {
                                 
                         else {# Matching
                                 # insert question
-                                my $return = &insert_question_quote_return("query","$RETURN{$CQ{number}}{question}","query1","$RETURN{$CQ{number}}{type}","query2","$RETURN{$CQ{number}}{value}","sub_type","$RETURN{$CQ{number}}{sub_type}","image_id","$RETURN{$CQ{number}}{image_id}","vlink","$RETURN{$CQ{number}}{vlink}","alink","$RETURN{$CQ{number}}{alink}","kolum","$RETURN{$CQ{number}}{kolum}","mode","$RETURN{$CQ{number}}{mode}","descrip","$RETURN{$CQ{number}}{descrip}","ans_mode","$RETURN{$CQ{number}}{ans_mode}","pdf","$RETURN{$CQ{number}}{pdf}","explanation","$RETURN{$CQ{number}}{explanation}");
+                                my $return = &insert_question_quote_return("query","$RETURN{$CQ{number}}{question}","query1","$RETURN{$CQ{number}}{type}","query2","$RETURN{$CQ{number}}{value}","sub_type","$RETURN{$CQ{number}}{sub_type}","image_id","$RETURN{$CQ{number}}{image_id}","vlink","$RETURN{$CQ{number}}{vlink}","alink","$RETURN{$CQ{number}}{alink}","kolum","$RETURN{$CQ{number}}{kolum}","mode","$RETURN{$CQ{number}}{mode}","descrip","$RETURN{$CQ{number}}{descrip}","ans_mode","$RETURN{$CQ{number}}{ans_mode}","pdf","$RETURN{$CQ{number}}{pdf}","explanation","$RETURN{$CQ{number}}{explanation}","memory","$RETURN{$CQ{number}}{memory}");
                                 
                                 my %RETURN_MX_TEXT = &selectmxtext("query","SELECT q_order,answer from question_answers WHERE number=\"$CQ{number}\" AND (u_id=\"$ids\" OR u_id=\"0\") AND c_answer = 0");
                                 
@@ -8436,7 +8696,7 @@ sub copy_bank_quest {
                         if($RETURN{$CQ{number}}{type} ne"MX") {
                                 my %RETURN1 = &select6("query","SELECT q_order,answer,c_answer,image_id from question_answers WHERE number=\"$CQ{number}\" AND org_id=\"$org_id\" AND u_id=\"0\"");
                                 
-                                my $return = &insert_bank_question_quote_return("query","$RETURN{$CQ{number}}{question}","query1","$RETURN{$CQ{number}}{type}","query2","$RETURN{$CQ{number}}{value}","sub_type","$RETURN{$CQ{number}}{sub_type}","image_id","$RETURN{$CQ{number}}{image_id}","vlink","$RETURN{$CQ{number}}{vlink}","alink","$RETURN{$CQ{number}}{alink}","kolum","$RETURN{$CQ{number}}{kolum}","mode","$RETURN{$CQ{number}}{mode}","descrip","$RETURN{$CQ{number}}{descrip}","ans_mode","$RETURN{$CQ{number}}{ans_mode}","explanation","$RETURN{$CQ{number}}{explanation}");
+                                my $return = &insert_bank_question_quote_return("query","$RETURN{$CQ{number}}{question}","query1","$RETURN{$CQ{number}}{type}","query2","$RETURN{$CQ{number}}{value}","sub_type","$RETURN{$CQ{number}}{sub_type}","image_id","$RETURN{$CQ{number}}{image_id}","vlink","$RETURN{$CQ{number}}{vlink}","alink","$RETURN{$CQ{number}}{alink}","kolum","$RETURN{$CQ{number}}{kolum}","mode","$RETURN{$CQ{number}}{mode}","descrip","$RETURN{$CQ{number}}{descrip}","ans_mode","$RETURN{$CQ{number}}{ans_mode}","explanation","$RETURN{$CQ{number}}{explanation}","memory","$RETURN{$CQ{number}}{memory}");
                                 
                                 foreach my $key(keys %RETURN1) {
                                         &insert_generic_question_answers_quote("number","$return","num","$key","quote","$RETURN1{$key}{answer}","c_answer","$RETURN1{$key}{c_answer}","ids","0","image_id","$RETURN1{$key}{image_id}");
@@ -8447,7 +8707,7 @@ sub copy_bank_quest {
                                 
                         else {# Matching
                                 # insert question
-                                my $return = &insert_bank_question_quote_return("query","$RETURN{$CQ{number}}{question}","query1","$RETURN{$CQ{number}}{type}","query2","$RETURN{$CQ{number}}{value}","sub_type","$RETURN{$CQ{number}}{sub_type}","image_id","$RETURN{$CQ{number}}{image_id}","vlink","$RETURN{$CQ{number}}{vlink}","alink","$RETURN{$CQ{number}}{alink}","kolum","$RETURN{$CQ{number}}{kolum}","mode","$RETURN{$CQ{number}}{mode}","descrip","$RETURN{$CQ{number}}{descrip}","ans_mode","$RETURN{$CQ{number}}{ans_mode}","explanation","$RETURN{$CQ{number}}{explanation}");
+                                my $return = &insert_bank_question_quote_return("query","$RETURN{$CQ{number}}{question}","query1","$RETURN{$CQ{number}}{type}","query2","$RETURN{$CQ{number}}{value}","sub_type","$RETURN{$CQ{number}}{sub_type}","image_id","$RETURN{$CQ{number}}{image_id}","vlink","$RETURN{$CQ{number}}{vlink}","alink","$RETURN{$CQ{number}}{alink}","kolum","$RETURN{$CQ{number}}{kolum}","mode","$RETURN{$CQ{number}}{mode}","descrip","$RETURN{$CQ{number}}{descrip}","ans_mode","$RETURN{$CQ{number}}{ans_mode}","explanation","$RETURN{$CQ{number}}{explanation}","memory","$RETURN{$CQ{number}}{memory}");
                                 
                                 my %RETURN_MX_TEXT = &selectmxtext("query","SELECT q_order,answer from question_answers WHERE number=\"$CQ{number}\" AND u_id=\"0\" AND c_answer = 0");
                                 
@@ -11044,7 +11304,7 @@ sub do_type{
 					print"var this_in
 					var when
 					var frame_url = self.parent.qst_left.location.href\n";
-					
+						
             				print"function activated_this\(quest_no,real_quest_no,type,checked_ans,select\) \{
 					var this_in = quest_no
 					var real_quest_ans
@@ -11135,8 +11395,11 @@ sub do_type{
 					self.parent.qst_left.location = frame_url + \"#\" + this_link
 		      			\}\n";
 		      			
+		      			&print_clear_memory_many();
+		      			
+		      			&print_stop_F12();
+		      			
 		      			&print_javascript_end();
-
 
 		      			print"<TABLE bgcolor=\"#00000\" width=\"100%\"><TR><TD><center><B><i><font style=\"font-size:18pt\; font-family:Arial\;\" color=\"white\"> $name </font></i></b></center></TD>";
 		      			
@@ -11172,19 +11435,37 @@ sub do_type{
                                                 my @number_of_newlines = split(/\n/,$content);
                                                 my $new_lines = @number_of_newlines;
                                                 $question_rows = $question_rows + $new_lines;
-                                                                        
-                                                print"<TABLE><TR><TD valign=\"top\"><B><A NAME=\"$index\">$index\.</b></TD>\n";	
-                                                
+                                                                                                                        
+						if($QUESTIONS{$quest}{memory} ne "") { # MEMORY
+							$QUESTIONS{$quest}{memory} =~ s/&quot;/"/g;
+							
+							print"<DIV ID=\"MEMORY$quest\" style=\"display: block\;\">\n";
+							print"<TABLE><TR><TD valign=\"top\"><B><A NAME=\"$index\">$index\.</b></TD><TD NOWRAP valign=\"top\"><font size=\"-2\">($QUESTIONS{$quest}{value})</font></td><TD valign=\"top\">\n";
+							print"<TABLE><TR><TD width=\"15\"></TD><TD style=\"border: 1px solid #660616\; padding-left: 7px\; padding-right: 7px\; padding-top: 7px\; padding-bottom: 7px\">$QUESTIONS{$quest}{memory}</TD></TR></TABLE><BR><center><B onClick=\"clear_memory_many\(\'$quest\'\)\" style=\"cursor\:pointer\;\">Continue</B></center><P><HR width=\"90%\">\n";
+							print"</TD></TR></TABLE>\n";
+
+							print"</DIV>\n";
+							print"<DIV ID=\"QUESTION$quest\" style=\"display: none\">\n";
+							print"<TABLE><TR><TD valign=\"top\"><B>$index\.</b></TD>\n";				
+							}
+								
+						else {
+							print"<TABLE><TR><TD valign=\"top\"><B><A NAME=\"$index\">$index\.</b></TD>\n";				
+							}
+
                                                 &print_out_question("question","$QUESTIONS{$quest}{question}","value","$QST_QUESTIONS{$quest}{value}","image_id","$QUESTIONS{$quest}{image_id}","pdf","$QUESTIONS{$quest}{pdf}","vlink","$QUESTIONS{$quest}{vlink}","alink","$QUESTIONS{$quest}{alink}","type","$QUESTIONS{$quest}{type}","question_rows","$question_rows","mode","$QUESTIONS{$quest}{mode}");
 										
                                                 &print_out_question_answers("quest","$quest","index","$index","type","$QUESTIONS{$quest}{type}","key","$key","kolum","$QUESTIONS{$quest}{kolum}","ans_mode","$QUESTIONS{$quest}{ans_mode}","hr","1","shuffle_ans","$POSTED_QST{$qst}{shuffle_ans}");
                                                 ++$index;
+                                                
+                                                print"</DIV>\n";
                                                 }
 						
                   			print "<center></FORM></center> \n";
 
   					&print_form("form_name","form2","form_target","right_bot","input","qst_side","class_id","$class_id","class_name","$DT{class_name}","type","$type","qst","$qst","questions","$QST_INFO{$qst}{questions}","index_to_quest_no","$index_to_quest_no","u_id","$DT{u_id}","session_id","$DT{session_id}","qst_time","$POSTED_QST{$qst}{qtime}","delivery","$POSTED_QST{$qst}{delivery}","lquests","$list_of_questions","qst_name","$name","attempt","$current_attempt");
   					&print_form("form_name","form4","form_target","right_top","input","question_done","class_id","$class_id","qst","$qst","real_quest_no","","quest_no","","answer","","saanswer","","panswer","","mxselect","","answertype","","type","$type","u_id","$DT{u_id}","session_id","$DT{session_id}");
+					&print_form("form_name","form5","form_target","right_top","input","viewed","qst","$DT{qst}","quest_no","","u_id","$DT{u_id}","session_id","$DT{session_id}","attempt","current_attempt");
                                         &print_form("form_name","next_quest","input","next_question","order","","quest_no","","real_quest_no","","qst","$qst","class_id","$class_id","qtype","$DT{type}","type","","lquests","","u_id","$DT{u_id}","session_id","$DT{session_id}","attempt","$current_attempt");
                                         
 					print"<img src=\"/schools/blank.gif\" onLoad=\"load_handler\(\)\">\n";
@@ -11194,6 +11475,7 @@ sub do_type{
                                         &print_eq();
                                         }
                                             
+                                
 				++$attempt;
                                 my $end_time = time;
 				my $cal_time = $POSTED_QST{$qst}{qtime} * 60;
@@ -11210,10 +11492,10 @@ sub do_type{
 				#add to qsts all the questions for the qst for that attempt for the user
 				foreach my $keyyy(keys %QUESTIONS_IN_QUIZ) {
 					if($QUESTIONS{$QUESTIONS_IN_QUIZ{$keyyy}}{type} =~ /SA/ ||  $QUESTIONS{$QUESTIONS_IN_QUIZ{$keyyy}}{type} =~ /P/) {
-						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\")");
+						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\",\"0\")");
 						}
 					else {
-						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\")");
+						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\",\"0\")");
 						}
 					}
 				}
@@ -11435,7 +11717,6 @@ sub modal_do_type{
 
                                         $list_of_questions =~ s/^\,//;
 
-                                
 					%QUESTIONS = &select_questions("query","$query");
 					
 					
@@ -11539,8 +11820,13 @@ sub modal_do_type{
 					self.parent.m1qst_left.location = frame_url + \"#\" + this_link
 		      			\}\n";
 		      			
+					&print_clear_memory_many();
+
+					&print_stop_F12();
+
 		      			&print_javascript_end();
 
+                  			print"<TABLE bgcolor=\"#00000\" width=\"100%\"><TR><TD><center><B><i><font style=\"font-size:18pt\; font-family:Arial\;\" color=\"white\"> $name </font></i></b></center></TD></TR></TABLE><P>";
 
                                         &print_form_wo_end_tag("form_name","q_form","input","modal_mark_type","class_id","$class_id","type","$type","qst","$qst","qst_name","$name","u_id","$DT{u_id}","session_id","$DT{session_id}");
                                         
@@ -11564,21 +11850,39 @@ sub modal_do_type{
                                                 my @number_of_newlines = split(/\n/,$content);
                                                 my $new_lines = @number_of_newlines;
                                                 $question_rows = $question_rows + $new_lines;
-                                                                        
-                                                print"<TABLE><TR><TD valign=\"top\"><B><A NAME=\"$index\">$index\.</b></TD>\n";	
-                                                
+                                                                                                                        
+						if($QUESTIONS{$quest}{memory} ne "") { # MEMORY
+							$QUESTIONS{$quest}{memory} =~ s/&quot;/"/g;
+							
+							print"<DIV ID=\"MEMORY$quest\" style=\"display: block\; \" >\n";
+							print"<TABLE><TR><TD valign=\"top\"><B><A NAME=\"$index\">$index\.</b></TD><TD NOWRAP valign=\"top\"><font size=\"-2\">($QUESTIONS{$quest}{value})</font></td><TD valign=\"top\">\n";
+							print"<TABLE><TR><TD width=\"15\"></TD><TD style=\"border: 1px solid #660616\; padding-left: 7px\; padding-right: 7px\; padding-top: 7px\; padding-bottom: 7px\">$QUESTIONS{$quest}{memory}</TD></TR></TABLE><BR><center><B onClick=\"clear_memory_many\(\'$quest\'\)\" style=\"cursor\:pointer\;\">Continue</B></center><P>\n";
+							print"</TD></TR></TABLE>\n";
+
+							print"</DIV>\n";
+							print"<DIV ID=\"QUESTION$quest\" style=\"display: none\">\n";
+							print"<TABLE><TR><TD valign=\"top\"><B>$index\.</b></TD>\n";				
+							}
+								
+						else {
+							print"<TABLE><TR><TD valign=\"top\"><B><A NAME=\"$index\">$index\.</b></TD>\n";				
+							}
+									
                                                 &print_out_question("question","$QUESTIONS{$quest}{question}","value","$QST_QUESTIONS{$quest}{value}","image_id","$QUESTIONS{$quest}{image_id}","pdf","$QUESTIONS{$quest}{pdf}","vlink","$QUESTIONS{$quest}{vlink}","alink","$QUESTIONS{$quest}{alink}","type","$QUESTIONS{$quest}{type}","question_rows","$question_rows","mode","$QUESTIONS{$quest}{mode}");
 										
-                                                &print_out_question_answers("quest","$quest","index","$index","type","$QUESTIONS{$quest}{type}","key","$key","kolum","$QUESTIONS{$quest}{kolum}","ans_mode","$QUESTIONS{$quest}{ans_mode}","hr","1","shuffle_ans","$POSTED_QST{$qst}{shuffle_ans}");
+                                                &print_out_question_answers("quest","$quest","index","$index","type","$QUESTIONS{$quest}{type}","key","$key","kolum","$QUESTIONS{$quest}{kolum}","ans_mode","$QUESTIONS{$quest}{ans_mode}","shuffle_ans","$POSTED_QST{$qst}{shuffle_ans}");
+							
                                                 ++$index;
+						print"</DIV>\n";
+						print"<HR width=\"90%\">\n";
                                                 }
 						
                   			print "<center></FORM></center> \n";
 
   					&print_form("form_name","form2","form_target","m1right_bot","input","modal_qst_side","class_id","$class_id","type","$type","qst","$qst","questions","$QST_INFO{$qst}{questions}","index_to_quest_no","$index_to_quest_no","u_id","$DT{u_id}","session_id","$DT{session_id}","qst_time","$POSTED_QST{$qst}{qtime}","delivery","$POSTED_QST{$qst}{delivery}","lquests","$list_of_questions","qst_name","$name","attempt","$current_attempt");
-  					&print_form("form_name","form3","form_target","","input","modal_show_qsts_for_students","class_id","$class_id","name","$DT{class_name}","u_id","$DT{u_id}","session_id","$DT{session_id}");
+#  					&print_form("form_name","form3","form_target","","input","modal_show_qsts_for_students","class_id","$class_id","name","$DT{class_name}","u_id","$DT{u_id}","session_id","$DT{session_id}");
   					&print_form("form_name","form4","form_target","m1right_top","input","question_done","class_id","$class_id","qst","$qst","real_quest_no","","quest_no","","answer","","saanswer","","panswer","","mxselect","","answertype","","type","$type","u_id","$DT{u_id}","session_id","$DT{session_id}");
-						
+  					&print_form("form_name","form5","form_target","m1right_top","input","viewed","qst","$qst","quest_no","","u_id","$DT{u_id}","session_id","$DT{session_id}","attempt","$current_attempt");
                                         &print_form("form_name","next_quest","input","next_question","order","","quest_no","","real_quest_no","","qst","$qst","class_id","$class_id","qtype","$DT{type}","type","","lquests","","u_id","$DT{u_id}","session_id","$DT{session_id}","attempt","$current_attempt");
                                         
 					print"<img src=\"/schools/blank.gif\" onLoad=\"load_handler\(\)\">\n";
@@ -11604,10 +11908,10 @@ sub modal_do_type{
 				#add to qsts all the questions for the qst for that attempt for the user
 				foreach my $keyyy(keys %QUESTIONS_IN_QUIZ) {
 					if($QUESTIONS{$QUESTIONS_IN_QUIZ{$keyyy}}{type} =~ /SA/ ||  $QUESTIONS{$QUESTIONS_IN_QUIZ{$keyyy}}{type} =~ /P/) {
-						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\")");
+						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\",\"0\")");
 						}
 					else {
-						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\")");
+						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\",\"0\")");
 						}
 					}
 				}
@@ -11834,7 +12138,7 @@ sub do_type2{
 					&print_javascript_enterMX();
 					
 					&print_javascript_activated_this();
-
+					
 					print"function load_handler() \{
 					document.form2.submit()
 					\}\n";
@@ -11854,6 +12158,10 @@ sub do_type2{
 						}
 		   	   		print"\}\n";
 
+					&print_clear_memory_viewed();
+					
+					&print_stop_F12();
+					
 		      			&print_javascript_end();
 
 		      			print"<TABLE bgcolor=\"#00000\" width=\"100%\"><TR><TD><center><B><i><font style=\"font-size:18pt\; font-family:Arial\;\" color=\"white\"> $name </font></i></b></center></TD>";
@@ -11893,9 +12201,24 @@ sub do_type2{
                                                         my $next_quest = shift(@quest);
                                                                         
                                                         print"<center><B STYLE=\"cursor:pointer\; font-family\:Arial\; font-size\:28pt\;\" OnClick=\"Show_Next('$next_quest','1','$list_of_questions')\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{Next}\">\></B></center>\n";
-                                                                        
-                                                        print"<TABLE><TR><TD valign=\"top\"><B>$index\.</b></TD>\n";
-										
+                                                                        							
+							if($QUESTIONS{$quest}{memory} ne "") { # MEMORY
+								$QUESTIONS{$quest}{memory} =~ s/&quot;/"/g;
+								
+								print"<DIV ID=\"MEMORY\" style=\"display: block\;\">\n";
+								print"<TABLE><TR><TD valign=\"top\"><B>$index\.</b></TD><TD NOWRAP valign=\"top\"><font size=\"-2\">($QUESTIONS{$quest}{value})</font></td><TD valign=\"top\">\n";
+								print"<TABLE><TR><TD width=\"15\"></TD><TD style=\"border: 1px solid #660616\; padding-left: 7px\; padding-right: 7px\; padding-top: 7px\; padding-bottom: 7px\">$QUESTIONS{$quest}{memory}</TD></TR></TABLE><BR><center><B onClick=\"clear_memory_viewed\(\'$quest\'\)\" style=\"cursor\:pointer\;\">Continue</B></center><BR>\n";
+								print"</TD></TR></TABLE>\n";
+
+								print"</DIV>\n";
+								print"<DIV ID=\"QUESTION\" style=\"display: none\">\n";
+								print"<TABLE><TR><TD valign=\"top\"><B>$index\.</b></TD>\n";				
+								}
+								
+							else {
+								print"<TABLE><TR><TD valign=\"top\"><B>$index \.</b></TD>\n";				
+								}
+							
                                                         &print_out_question("question","$QUESTIONS{$quest}{question}","value","$QST_QUESTIONS{$quest}{value}","image_id","$QUESTIONS{$quest}{image_id}","pdf","$QUESTIONS{$quest}{pdf}","vlink","$QUESTIONS{$quest}{vlink}","alink","$QUESTIONS{$quest}{alink}","type","$QUESTIONS{$quest}{type}","question_rows","$question_rows","mode","$QUESTIONS{$quest}{mode}");
 										
                                                         &print_out_question_answers("quest","$quest","index","$index","type","$QUESTIONS{$quest}{type}","key","$key","kolum","$QUESTIONS{$quest}{kolum}","ans_mode","$QUESTIONS{$quest}{ans_mode}","shuffle_ans","$POSTED_QST{$qst}{shuffle_ans}");
@@ -11915,9 +12238,9 @@ sub do_type2{
 
   					&print_form("form_name","form2","form_target","right_bot","input","qst_side2","class_name","$DT{class_name}","class_id","$class_id","type","$type","qst","$qst","questions","$QST_INFO{$qst}{questions}","index_to_quest_no","$index_to_quest_no","u_id","$DT{u_id}","session_id","$DT{session_id}","qst_time","$POSTED_QST{$qst}{qtime}","delivery","$POSTED_QST{$qst}{delivery}","lquests","$list_of_questions","qst_name","$name","attempt","$current_attempt");
   					&print_form("form_name","form4","form_target","right_top","input","question_done","class_id","$class_id","qst","$qst","real_quest_no","","quest_no","","answer","","saanswer","","panswer","","mxselect","","answertype","","type","$type","u_id","$DT{u_id}","session_id","$DT{session_id}");
-						
                                         &print_form("form_name","next_quest","input","next_question2","order","","quest_no","","real_quest_no","","qst","$qst","class_id","$class_id","class_name","$DT{class_name}","qtype","$DT{type}","type","","lquests","","u_id","$DT{u_id}","session_id","$DT{session_id}","attempt","$current_attempt");
-                                        
+  					&print_form("form_name","form5","form_target","right_top","input","viewed","qst","$qst","quest_no","","u_id","$DT{u_id}","session_id","$DT{session_id}","attempt","$current_attempt");
+
 					print"<img src=\"/schools/blank.gif\" onLoad=\"load_handler\(\)\">\n";
 	                  		}
 	                  		
@@ -11938,10 +12261,10 @@ sub do_type2{
 				foreach my $keyyy(keys %QUESTIONS_IN_QUIZ) {
 
 					if($QUESTIONS{$QUESTIONS_IN_QUIZ{$keyyy}}{type} =~ /SA/ ||  $QUESTIONS{$QUESTIONS_IN_QUIZ{$keyyy}}{type} =~ /P/) {
-						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\")");
+						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\",\"0\")");
 						}
 					else {
-						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\")");
+						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\",\"0\")");
 						}
 					}
 				}
@@ -11965,6 +12288,7 @@ sub do_type2{
             print "<center><P><img src=\"/schools/x.gif\"><B> Invalid input.</b></center><P> \n";
             }
 	}
+	
 	
 ##################
 #
@@ -12595,8 +12919,14 @@ sub modal2_do_type2{
 						}
 		   	   		print"\}\n";
 
+					&print_clear_memory_viewed3();
+					
+					&print_stop_F12();
+
 		      			&print_javascript_end();
                                         
+                                        print"<TABLE bgcolor=\"#00000\" width=\"100%\"><TR><TD><center><B><i><font style=\"font-size:18pt\; font-family:Arial\;\" color=\"white\"> $name </font></i></b></center></TD></TR></TABLE><P>";
+
                                         &print_form_wo_end_tag("form_name","q_form","input","modal2_mark_type2","class_name","$DT{class_name}","class_id","$class_id","type","$type","qst","$qst","qst_name","$name","u_id","$DT{u_id}","session_id","$DT{session_id}");
                                         
 					my $index = 1;
@@ -12622,14 +12952,27 @@ sub modal2_do_type2{
                                                         my $next_quest = shift(@quest);
                                                                         
                                                         print"<center><B STYLE=\"cursor:pointer\; font-family\:Arial\; font-size\:28pt\;\" OnClick=\"Show_Next('$next_quest','1','$list_of_questions')\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{Next}\">\></B></center>\n";
-                                                                        
-                                                        print"<TABLE><TR><TD valign=\"top\"><B>$index\.</b></TD>\n";
-										
-                                                        &print_out_question("question","$QUESTIONS{$quest}{question}","value","$QST_QUESTIONS{$quest}{value}","image_id","$QUESTIONS{$quest}{image_id}","pdf","$QUESTIONS{$quest}{pdf}","vlink","$QUESTIONS{$quest}{vlink}","alink","$QUESTIONS{$quest}{alink}","type","$QUESTIONS{$quest}{type}","question_rows","$question_rows","mode","$QUESTIONS{$quest}{mode}");
-										
-                                                        &print_out_question_answers("quest","$quest","index","$index","type","$QUESTIONS{$quest}{type}","key","$key","kolum","$QUESTIONS{$quest}{kolum}","ans_mode","$QUESTIONS{$quest}{ans_mode}","shuffle_ans","$POSTED_QST{$qst}{shuffle_ans}");
+ 
+ 							if($QUESTIONS{$quest}{memory} ne "" && $QUESTIONS{$quest}{viewed}==0 ) { # MEMORY SHOW
+ 								$QUESTIONS{$quest}{memory} =~ s/&quot;/"/g;
+ 								
+ 								print"<DIV ID=\"MEMORY\" style=\"display: block\;\" oncontextmenu =\"return false\">\n";
+ 								print"<TABLE><TR><TD valign=\"top\"><B>$index\.</b></TD><TD NOWRAP valign=\"top\"><font size=\"-2\">($QUESTIONS{$quest}{value})</td><TD valign=\"top\">\n";
+ 								print"<TABLE><TR><TD width=\"15\"></TD><TD style=\"border: 1px solid #660616\; padding-left: 7px\; padding-right: 7px\; padding-top: 7px\; padding-bottom: 7px\">$QUESTIONS{$quest}{memory}</TD></TR></TABLE><BR><center><B onClick=\"clear_memory_viewed3\(\'$quest\'\)\" style=\"cursor\:pointer\;\">Continue</B></center><BR>\n";
+ 								print"</TD></TR></TABLE>\n";
+ 								}
+ 								
+ 							else {  #QUESTION SHOW
+ 								print"<TABLE><TR><TD valign=\"top\"><B>$index\.</b></TD>\n";
+ 									
+                                                         	&print_out_question("question","$QUESTIONS{$quest}{question}","value","$QST_QUESTIONS{$quest}{value}","image_id","$QUESTIONS{$quest}{image_id}","pdf","$QUESTIONS{$quest}{pdf}","vlink","$QUESTIONS{$quest}{vlink}","alink","$QUESTIONS{$quest}{alink}","type","$QUESTIONS{$quest}{type}","question_rows","$question_rows","mode","$QUESTIONS{$quest}{mode}");
+ 										
+                                                         	&print_out_question_answers("quest","$quest","index","$index","type","$QUESTIONS{$quest}{type}","key","$key","kolum","$QUESTIONS{$quest}{kolum}","ans_mode","$QUESTIONS{$quest}{ans_mode}","shuffle_ans","$POSTED_QST{$qst}{shuffle_ans}");
+ 								}
+
                                                         ++$index;
                                                         $printed = 1;
+                                                        print"</DIV>\n";
                                                         
                                                         if($QUESTIONS{$quest}{mode} == 2) {
                                                                 &print_eq();
@@ -12642,10 +12985,11 @@ sub modal2_do_type2{
 						
                   			print "<center></FORM></center> \n";
 
+                                        &print_form("form_name","memquest","input","modal_mem_quest2","order","1","quest_no","","real_quest_no","","prev_quest_no","0","qst","$qst","class_name","","class_id","$class_id","qtype","$DT{type}","type","$type","lquests","$list_of_questions","u_id","$DT{u_id}","session_id","$DT{session_id}","attempt","$current_attempt");
   					&print_form("form_name","form2","form_target","m2right_bot","input","modal2_qst_side2","class_id","$class_id","type","$type","qst","$qst","questions","$QST_INFO{$qst}{questions}","index_to_quest_no","$index_to_quest_no","u_id","$DT{u_id}","session_id","$DT{session_id}","qst_time","$POSTED_QST{$qst}{qtime}","delivery","$POSTED_QST{$qst}{delivery}","lquests","$list_of_questions","qst_name","$name","attempt","$current_attempt");
   					&print_form("form_name","form3","form_target","_top","input","show_modal_qsts_for_students","class_id","$class_id","name","$DT{class_name}","u_id","$DT{u_id}","session_id","$DT{session_id}");
   					&print_form("form_name","form4","form_target","m2right_top","input","question_done","class_id","$class_id","qst","$qst","real_quest_no","","quest_no","","answer","","saanswer","","panswer","","mxselect","","answertype","","type","$type","u_id","$DT{u_id}","session_id","$DT{session_id}");
-						
+  					&print_form("form_name","form5","form_target","m2right_top","input","viewed","qst","$qst","quest_no","","u_id","$DT{u_id}","session_id","$DT{session_id}","attempt","$current_attempt");
                                         &print_form("form_name","next_quest","input","modal_next_question2","order","","quest_no","","real_quest_no","","qst","$qst","class_id","$class_id","qtype","$DT{type}","type","","lquests","","u_id","$DT{u_id}","session_id","$DT{session_id}","attempt","$current_attempt");
                                         
 					print"<img src=\"/schools/blank.gif\" onLoad=\"load_handler\(\)\">\n";
@@ -12662,10 +13006,10 @@ sub modal2_do_type2{
 				foreach my $keyyy(keys %QUESTIONS_IN_QUIZ) {
 
 					if($QUESTIONS{$QUESTIONS_IN_QUIZ{$keyyy}}{type} =~ /SA/ ||  $QUESTIONS{$QUESTIONS_IN_QUIZ{$keyyy}}{type} =~ /P/) {
-						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\")");
+						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\",\"0\")");
 						}
 					else {
-						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\")");
+						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\",\"0\")");
 						}
 					}
 				}
@@ -12916,6 +13260,10 @@ sub do_type3{
 						}
 		   	   		print"\}\n";
 
+					&print_clear_memory_viewed3();
+
+					&print_stop_F12();
+					
 		      			&print_javascript_end();
 		      			
                   			print"<TABLE bgcolor=\"#00000\" width=\"100%\"><TR><TD><center><B><i><font style=\"font-size:18pt\; font-family:Arial\;\" color=\"white\"> $name </font></i></b></center></TD>";
@@ -12957,23 +13305,35 @@ sub do_type3{
 								}
 							else {	
 								
-                                                        # fix display to show new lines in text of question
-                                                        my $content = $QUESTIONS{$quest}{question};
-                                                        $content =~ s/\r[\n]*/\n/gm;
-                                                        my @number_of_newlines = split(/\n/,$content);
-                                                        my $new_lines = @number_of_newlines;
-                                                        $question_rows = $question_rows + $new_lines;
+                                                        	# fix display to show new lines in text of question
+                                                        	my $content = $QUESTIONS{$quest}{question};
+                                                        	$content =~ s/\r[\n]*/\n/gm;
+                                                        	my @number_of_newlines = split(/\n/,$content);
+                                                        	my $new_lines = @number_of_newlines;
+                                                        	$question_rows = $question_rows + $new_lines;
                                                                         
-                                                        my $next_quest = $RE_ORDERED_QUESTIONS{2};;
+                                                        	my $next_quest = $RE_ORDERED_QUESTIONS{2};;
                                                                         
-                                                        print"<center><B STYLE=\"cursor:pointer\; font-family\:Arial\; font-size\:28pt\;\" OnClick=\"Show_Next('$next_quest','1','$list_of_questions')\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{Next}\">\></B></center>\n";
-                                                        
-                                                        print"<TABLE oncontextmenu = \"return false\"><TR><TD valign=\"top\"><B>$index\.</b></TD>\n";
+                                                        	print"<center><B STYLE=\"cursor:pointer\; font-family\:Arial\; font-size\:28pt\;\" OnClick=\"Show_Next('$next_quest','1','$list_of_questions')\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{Next}\">\></B></center>\n";
+                                                        										
+								if($QUESTIONS{$quest}{memory} ne "" && $QUESTIONS{$quest}{viewed}==0 ) { # MEMORY SHOW
+									$QUESTIONS{$quest}{memory} =~ s/&quot;/"/g;
+									
+									print"<DIV ID=\"MEMORY\" style=\"display: block\;\">\n";
+									print"<TABLE><TR><TD valign=\"top\"><B>$index\.</b></TD><TD NOWRAP valign=\"top\"><font size=\"-2\">($QUESTIONS{$quest}{value})</td><TD valign=\"top\">\n";
+									print"<TABLE><TR><TD width=\"15\"></TD><TD style=\"border: 1px solid #660616\; padding-left: 7px\; padding-right: 7px\; padding-top: 7px\; padding-bottom: 7px\">$QUESTIONS{$quest}{memory}</TD></TR></TABLE><BR><center><B onClick=\"clear_memory_viewed3\(\'$quest\'\)\" style=\"cursor\:pointer\;\">Continue</B></center><BR>\n";
+									print"</TD></TR></TABLE>\n";
+									}
+								
+								else {  #QUESTION SHOW
+									print"<TABLE><TR><TD valign=\"top\"><B>$index\.</b></TD>\n";
+									
+                                                        		&print_out_question("question","$QUESTIONS{$quest}{question}","value","$QST_QUESTIONS{$quest}{value}","image_id","$QUESTIONS{$quest}{image_id}","pdf","$QUESTIONS{$quest}{pdf}","vlink","$QUESTIONS{$quest}{vlink}","alink","$QUESTIONS{$quest}{alink}","type","$QUESTIONS{$quest}{type}","question_rows","$question_rows","mode","$QUESTIONS{$quest}{mode}");
 										
-                                                        &print_out_question("question","$QUESTIONS{$quest}{question}","value","$QST_QUESTIONS{$quest}{value}","image_id","$QUESTIONS{$quest}{image_id}","pdf","$QUESTIONS{$quest}{pdf}","vlink","$QUESTIONS{$quest}{vlink}","alink","$QUESTIONS{$quest}{alink}","type","$QUESTIONS{$quest}{type}","question_rows","$question_rows","mode","$QUESTIONS{$quest}{mode}");
-										
-                                                        &print_out_question_answers("quest","$quest","index","$index","type","$QUESTIONS{$quest}{type}","key","$key","kolum","$QUESTIONS{$quest}{kolum}","ans_mode","$QUESTIONS{$quest}{ans_mode}","shuffle_ans","$POSTED_QST{$qst}{shuffle_ans}");
+                                                        		&print_out_question_answers("quest","$quest","index","$index","type","$QUESTIONS{$quest}{type}","key","$key","kolum","$QUESTIONS{$quest}{kolum}","ans_mode","$QUESTIONS{$quest}{ans_mode}","shuffle_ans","$POSTED_QST{$qst}{shuffle_ans}");
+									}
                                                         	}
+                                                        
                                                         ++$index;
                                                         $printed = 1;
                                                         }
@@ -12987,14 +13347,19 @@ sub do_type3{
                                                 }
                   			print "<center></FORM></center> \n";
 
-                      #                  &print_form("form_name","form2","form_target","right_bot","input","qst_side3","class_id","$class_id","type","$type","qst","$qst","questions","$QST_INFO{$qst}{questions}","index_to_quest_no","$index_to_quest_no","u_id","$DT{u_id}","session_id","$DT{session_id}","qst_time","$POSTED_QST{$qst}{qtime}","delivery","$POSTED_QST{$qst}{delivery}","lquests","$list_of_questions","qst_name","$name","attempt","$current_attempt");
+                                        &print_form("form_name","memquest","input","mem_quest3","order","1","quest_no","","real_quest_no","","prev_quest_no","0","qst","$qst","class_name","$class_name","class_id","$class_id","qtype","$DT{type}","type","$type","lquests","$list_of_questions","u_id","$DT{u_id}","session_id","$DT{session_id}","attempt","$current_attempt");
+
   					&print_form("form_name","form2","form_target","right_bot","input","qst_side3","class_id","$class_id","type","$type","qst","$qst","questions","$QST_INFO{$qst}{questions}","u_id","$DT{u_id}","session_id","$DT{session_id}","qst_time","$POSTED_QST{$qst}{qtime}","delivery","$POSTED_QST{$qst}{delivery}","qst_name","$name","attempt","$current_attempt");
   					
   					&print_form("form_name","form4","form_target","right_top","input","question_done","class_id","$class_id","qst","$qst","real_quest_no","","quest_no","","answer","","saanswer","","panswer","","mxselect","","answertype","","type","$type","u_id","$DT{u_id}","session_id","$DT{session_id}");
 						
                                         &print_form("form_name","next_quest","input","next_question3","order","","quest_no","","real_quest_no","","prev_quest_no","$ORDER_QUEST{1}","qst","$qst","class_name","$class_name","class_id","$class_id","qtype","$DT{type}","type","","lquests","","u_id","$DT{u_id}","session_id","$DT{session_id}","attempt","$current_attempt");
                                         
+  					&print_form("form_name","form5","form_target","right_top","input","viewed","qst","$qst","quest_no","","u_id","$DT{u_id}","session_id","$DT{session_id}","attempt","$current_attempt");
+
 					print"<img src=\"/schools/blank.gif\" onLoad=\"load_handler\(\)\">\n";
+					
+					print"</DIV>\n";
 	                  		}
 	                  		
 				++$attempt;
@@ -13014,10 +13379,10 @@ sub do_type3{
 				foreach my $keyyy(keys %QUESTIONS_IN_QUIZ) {
 
 					if($QUESTIONS{$QUESTIONS_IN_QUIZ{$keyyy}}{type} =~ /SA/ ||  $QUESTIONS{$QUESTIONS_IN_QUIZ{$keyyy}}{type} =~ /P/) {
-						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\")");
+						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\",\"0\")");
 						}
 					else {
-						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\")");
+						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\",\"0\")");
 						}
 					}
 				}
@@ -13032,6 +13397,349 @@ sub do_type3{
 				}
 			else {
 				print"<center><B>$LANGUAGE{$set_language}{YoucannotaccessthisQST}</B></center>\n";
+				}
+			}
+		}
+      else {
+            print "<center><P><img src=\"/schools/x.gif\"><B> Invalid input.</b></center><P> \n";
+            }
+	}
+
+
+###############
+#
+# MODAL3_DO_TYPE3
+#
+###############
+sub modal3_do_type3{
+	my %DT = @_;
+	$DT{qst} =~ s/\D//g;
+	$DT{class_id} =~ s/\D//g;
+	$DT{org_id} =~ s/\D//g;
+	my $qst = $DT{qst};
+	my $class_id = $DT{class_id};
+	my $name = $DT{name};
+	my $type;
+	my $submissions;
+	my $results; 
+	my $questions;
+	my $marks;
+	my $attempts;
+	my $attempt;
+	my $forall;
+	my $name;
+	my %QUESTIONS = ();
+	my $index_to_quest_no;
+	my $show_eq = 1;
+
+	&print_style_sheet();
+        
+        print"<style>table.table1\{ border-radius:6px\; font-size:10pt\; font-family:Arial\;\}</style>\n";
+        
+	# check whether in class, if posted, attempts, if qst is for class
+	if(exists $USER{$ids}{$class_id}) {
+		my %POSTED_QST = &select_posted_qst("query","select * from posted_qst WHERE qst=\"$qst\" AND org_id=\"$org_id\"");
+		                
+		if(keys %POSTED_QST && $POSTED_QST{$qst}{posted} == 1) {
+			my %ACCESS = ();
+			$attempts = "$POSTED_QST{$qst}{attempts}";
+			$forall = "$POSTED_QST{$qst}{forall}";
+			$submissions = "$POSTED_QST{$qst}{submissions}";
+			my $rhm = "$POSTED_QST{$qst}{rhm}";
+			
+			if($forall == 0) {
+				%ACCESS = &select4("query","SELECT qst_no,u_id from access_to_qst WHERE qst_no=\"$qst\" AND u_id=\"$ids\"");
+				}
+				
+			my %QST_INFO = &select_qst("query","SELECT number,name,questions,marks,random_q,random_order,type from qst WHERE number=\"$qst\"");
+			$type = "$POSTED_QST{type}";
+
+			#check attempts, in progress
+			my %ATTEMPTS = &select4("query","SELECT u_id,attempts from qst_attempts WHERE qst_no=\"$qst\" AND u_id=\"$ids\"");
+			$attempt = "$ATTEMPTS{$ids}";
+			
+			my $current_attempt = $attempt + 1;
+
+			my %QST_TYPE = &select4("query","SELECT qst,type from qst_to_classes WHERE qst=\"$qst\" AND class_id=\"$class_id\"");
+			$type = "$QST_TYPE{$qst}";
+
+			if(keys %QST_INFO && $attempt < $attempts) {
+				if($POSTED_QST{$qst}{rhm} == 1) { # record mark
+				
+					}
+				else { 
+					# clean out previous attempts
+					&generic_delete("query","DELETE from qsts WHERE qst=\"$qst\" AND u_id=\"$ids\"");
+					&generic_delete("query","DELETE from qst_scores WHERE qst=\"$qst\" AND u_id=\"$ids\"");
+					}
+
+				my $query = "SELECT * from questions WHERE ";
+				$questions = "$QST_INFO{$qst}{questions}";
+				$marks = "$QST_INFO{$qst}{marks}";
+				$name = "$QST_INFO{$qst}{name}";
+								
+				my %QST_QUESTIONS = &select8("query","select quest_no,q_order,value,q_select,branching from qst_questions WHERE qst_no=\"$qst\" AND org_id=\"$DT{org_id}\"");
+                                        
+				my $i = 1;
+				my %QUESTIONS_IN_QUIZ = ();
+				
+                                my %TIMEZONE = ();
+                                my $org_time1;
+                                my $adjusted_time;
+                                my $queryt = qq{SELECT org_id,time_zone FROM organization WHERE org_id=\"$DT{org_id}\"};
+                                my $sth = $dbh->prepare($queryt);
+                                $sth->execute();
+                                while(my @row = $sth->fetchrow_array()) {
+                                        $TIMEZONE{$row[0]}= "$row[1]";
+                                        $adjusted_time = "$row[1]";
+                                        }
+
+                                if($adjusted_time != 0) {
+                                        $org_time1 = "$adjusted_time" * 3600;
+                                        }
+                                else {
+                                        $org_time1 = 0; 
+                                        }
+                
+
+                                #time with time zone included
+                                my $time1 = time + "$org_time1";
+                                my %TIME = &get_time_to_display("time","$time1");
+                                my $student_start_time;
+                                
+                                if( $TIME{time}{hour} < 13) {
+                                        $student_start_time = "$TIME{time}{hour}".":"."$TIME{time}{minute}"." "."am";
+                                        }
+                                else {
+                                        $student_start_time = "$TIME_SHOW{$TIME{time}{hour}}".":"."$TIME{time}{minute}"." "."pm";
+                                        }
+
+                                 
+                                 my @order;
+
+                                 if(keys %QST_QUESTIONS) {
+                                        my %RE_ORDERED_QUESTIONS = ();
+                                        my @quest;
+                                        
+                                        if($POSTED_QST{$qst}{shuffle} == 1) { # shuffle the questions
+                                                my %OLD_ORDER = ();
+                                                my %SHUFFLE_ORDER = ();
+                                                my %REV_ORDER = ();
+                                                my $i = 1;
+                                                my $w = 0;
+                                                foreach my $ke(keys %QST_QUESTIONS) {
+                                                        $OLD_ORDER{$QST_QUESTIONS{$ke}{order}} = $ke;
+                                                        $REV_ORDER{$ke} = $QST_QUESTIONS{$ke}{order};
+                                                        ++$w;
+                                                        }
+
+                                                for(my $ii = 1; $ii <= $w; $ii++) { 
+                                                        my $random_value = $OLD_ORDER{(keys %OLD_ORDER)[rand keys %OLD_ORDER]};
+                                                        $RE_ORDERED_QUESTIONS{$i} = $random_value;
+                                                        delete $OLD_ORDER{"$REV_ORDER{$random_value}"};
+                                                        ++$i;
+                                                        }
+                                                }
+				
+                                        else { # No Question Shuffle
+                                                my %Q_ORDER = ();
+                                                
+                                                #See if random question group
+                                                foreach my $kwest_no(keys %QST_QUESTIONS) {
+                                                        if($QST_QUESTIONS{$kwest_no}{q_select} > 0) { #Random question
+                                                                my $start_num = $QST_QUESTIONS{$kwest_no}{order};
+                                                                $Q_ORDER{$start_num}{quest}{$kwest_no} = $kwest_no;
+                                                                $Q_ORDER{$start_num}{how_many} = $QST_QUESTIONS{$kwest_no}{q_select};
+                                                                }
+                                                        else { # normal question
+                                                                $Q_ORDER{$QST_QUESTIONS{$kwest_no}{order}}{quest} = $kwest_no;
+                                                                }
+                                                        }
+                                                
+                                                # RE-ORDER the questions with randomly selected questions included
+                                                if(keys %Q_ORDER) {
+                                                        my $new_index = 1;
+                                                        foreach my $ord(sort {$a<=>$b} keys %Q_ORDER) {
+                                                                if($Q_ORDER{$ord}{how_many} > 0) {
+                                                                        my %RAND_QUESTIONS = ();
+    
+                                                                        foreach my $nom(keys %{$Q_ORDER{$ord}{quest}}) {
+                                                                                $RAND_QUESTIONS{$nom} = $nom;
+                                                                                }
+                                                                                
+                                                                        for (my $i = 1; $i <= $Q_ORDER{$ord}{how_many}; $i++){ # randomly choose the questions
+                                                                                my $chosen_question = &get_random_hash(%RAND_QUESTIONS);
+                                        
+                                                                                delete($RAND_QUESTIONS{$chosen_question});
+                                                                                $RE_ORDERED_QUESTIONS{$new_index} = $chosen_question;
+                                                                                ++$new_index;
+                                                                                }
+                                                                        }
+                                                                else {
+                                                                        $RE_ORDERED_QUESTIONS{$new_index} = $Q_ORDER{$ord}{quest};
+                                                                        ++$new_index;
+                                                                        }
+                                                                }
+                                                
+                                                        }
+                                                
+                                                }
+                                                
+                                                
+                                        # to get the list of question to query for;
+                                        my $list_of_questions;
+                                        
+     					foreach my $kkey(sort {$a<=>$b} keys %RE_ORDERED_QUESTIONS) {
+                                                $list_of_questions= "$list_of_questions".","."$RE_ORDERED_QUESTIONS{$kkey}";
+                                                
+						if($i == 1) {
+							$query = "$query"." "."number=\"$RE_ORDERED_QUESTIONS{$kkey}\"";
+							++$i;
+							}
+						else {
+							$query = "$query"." "." OR number=\"$RE_ORDERED_QUESTIONS{$kkey}\"";
+							}
+						}
+
+                                        $list_of_questions =~ s/^\,//;
+
+					%QUESTIONS = &select_questions("query","$query");
+					
+					
+                                ######## Print the page
+                                
+					&print_javascript_begin();
+					
+					&modal3_print_javascript_enterMX();
+					
+					&modal3_print_javascript_activated_this();
+
+					print"function load_handler() \{
+					document.form2.submit() \}\n";
+
+                                        print"function Show_Next\(quest,order,quests\) \{
+                                        document.next_quest.quest_no.value=quest
+                                        document.next_quest.order.value=order
+                                        document.next_quest.lquests.value=quests
+					document.next_quest.submit\(\)
+			  	      	\}\n";
+			  	      	
+       		   	  		print"function sub_mit\(\) \{\n";
+					print"document.q_form.submit\(\)\n";
+		      			if ($type == 2) {
+						print"self.parent.m3right_top.location.replace\(\"\/schools/empty.htm\"\)\n";
+						print"self.parent.m3right_bot.location.replace\(\"\/schools/empty.htm\"\)\n";
+						}
+		   	   		print"\}\n";
+
+					&print_clear_memory_viewed3();
+
+					&print_stop_F12();
+
+		      			&print_javascript_end();
+                                        
+                                        print"<DIV oncontextmenu =\"return false\">\n";
+                                        
+                                        &print_form_wo_end_tag("form_name","q_form","input","modal3_mark_type3","class_id","$class_id","type","$type","qst","$qst","qst_name","$name","u_id","$DT{u_id}","session_id","$DT{session_id}");
+                                        
+					my $index = 1;
+					my $printed = 0;
+					my $questions = keys(%QUESTIONS);
+					
+                  			print"<TABLE bgcolor=\"#00000\" width=\"100%\"><TR><TD><center><B><i><font style=\"font-size:18pt\; font-family:Arial\;\" color=\"white\"> $name </font></i></b></center></TD>";
+		      			
+                  			if ($type == 2) { #survey
+                  				print"<TD>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<font style=\"font-size:11pt\; font-family:Arial\;\"  color=\"white\">$LANGUAGE{$set_language}{Questions}\: $questions </font></TD></TR>\n";
+						}
+						
+					else { # quizzes/tests
+                                                print"<TD>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<font style=\"font-size:11pt\; font-family:Arial\;\"    color=\"white\">$LANGUAGE{$set_language}{Questions}\: $questions  &nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Marks}\: $marks </TD></TR>\n";
+						} 
+                                        
+                                        print"</TABLE><BR>\n";
+ 
+					
+     					foreach my $key(sort {$a<=>$b} keys %RE_ORDERED_QUESTIONS) {
+                                                my $quest = $RE_ORDERED_QUESTIONS{$key};
+                                                $QUESTIONS_IN_QUIZ{$index} = "$quest";
+
+                                                $index_to_quest_no = "$index_to_quest_no"."$index"."="."$quest"."-"."$QUESTIONS{$quest}{type}"."-"."$QUESTIONS{$quest}{value}".",";
+                                                
+                                                if($QUESTIONS{$quest}{mode} == 2  || $QUESTIONS{$quest}{ans_mode} == 2) {
+                                                        $show_eq = 2;
+                                                        }
+                                                                
+                                                if($index == 1 && $printed == 0) {
+                                                        my $question_rows = 1;
+ 		
+                                                        # fix display to show new lines in text of question
+                                                        my $content = $QUESTIONS{$quest}{question};
+                                                        $content =~ s/\r[\n]*/\n/gm;
+                                                        my @number_of_newlines = split(/\n/,$content);
+                                                        my $new_lines = @number_of_newlines;
+                                                        $question_rows = $question_rows + $new_lines;
+                                                                        
+                                                        my $next_quest = $RE_ORDERED_QUESTIONS{2};;
+                                                                        
+                                                        print"<center><B STYLE=\"cursor:pointer\; font-family\:Arial\; font-size\:28pt\;\" OnClick=\"Show_Next('$next_quest','1','$list_of_questions')\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{Next}\">\></B></center>\n";
+                                                        
+							if($QUESTIONS{$quest}{memory} ne "" && $QUESTIONS{$quest}{viewed}==0 ) { # MEMORY SHOW
+								$QUESTIONS{$quest}{memory} =~ s/&quot\;/\"/g;
+								print"<DIV ID=\"MEMORY\" style=\"display: block\;\" oncontextmenu =\"return false\">\n";
+								print"<TABLE><TR><TD valign=\"top\"><B>$index\.</b></TD><TD NOWRAP valign=\"top\"><font size=\"-2\">($QUESTIONS{$quest}{value})</td><TD valign=\"top\">\n";
+								print"<TABLE><TR><TD width=\"15\"></TD><TD style=\"border: 1px solid #660616\; padding-left: 7px\; padding-right: 7px\; padding-top: 7px\; padding-bottom: 7px\">$QUESTIONS{$quest}{memory}</TD></TR></TABLE><BR><center><B onClick=\"clear_memory_viewed3\(\'$quest\'\)\" style=\"cursor\:pointer\;\">Continue</B></center><BR>\n";
+								print"</TD></TR></TABLE>\n";
+								}
+								
+							else {  #QUESTION SHOW
+								print"<TABLE><TR><TD valign=\"top\"><B>$index\.</b></TD>\n";
+									
+                                                        	&print_out_question("question","$QUESTIONS{$quest}{question}","value","$QST_QUESTIONS{$quest}{value}","image_id","$QUESTIONS{$quest}{image_id}","pdf","$QUESTIONS{$quest}{pdf}","vlink","$QUESTIONS{$quest}{vlink}","alink","$QUESTIONS{$quest}{alink}","type","$QUESTIONS{$quest}{type}","question_rows","$question_rows","mode","$QUESTIONS{$quest}{mode}");
+										
+                                                        	&print_out_question_answers("quest","$quest","index","$index","type","$QUESTIONS{$quest}{type}","key","$key","kolum","$QUESTIONS{$quest}{kolum}","ans_mode","$QUESTIONS{$quest}{ans_mode}","shuffle_ans","$POSTED_QST{$qst}{shuffle_ans}");
+								}
+
+                                                        ++$index;
+                                                        $printed = 1;
+                                                        }
+                                                else {
+                                                        ++$index;
+                                                        }
+						}
+						
+                                        if($show_eq == 2) {
+                                                &print_eq();
+                                                }
+                                                
+                  			print"<center></FORM></center> \n";
+
+                                        &print_form("form_name","memquest","input","modal_mem_quest3","order","1","quest_no","","real_quest_no","","prev_quest_no","0","qst","$qst","class_name","","class_id","$class_id","qtype","$DT{type}","type","$type","lquests","$list_of_questions","u_id","$DT{u_id}","session_id","$DT{session_id}","attempt","$current_attempt");
+                                        &print_form("form_name","form2","form_target","m3right_bot","input","modal3_qst_side3","class_id","$class_id","type","$type","qst","$qst","questions","$QST_INFO{$qst}{questions}","index_to_quest_no","$index_to_quest_no","u_id","$DT{u_id}","session_id","$DT{session_id}","qst_time","$POSTED_QST{$qst}{qtime}","delivery","$POSTED_QST{$qst}{delivery}","lquests","$list_of_questions","qst_name","$name","attempt","$current_attempt");
+  					&print_form("form_name","form4","form_target","m3right_top","input","question_done","class_id","$class_id","qst","$qst","real_quest_no","","quest_no","","answer","","saanswer","","panswer","","mxselect","","answertype","","type","$type","u_id","$DT{u_id}","session_id","$DT{session_id}");
+                                        &print_form("form_name","next_quest","input","modal_next_question3","order","","quest_no","","real_quest_no","","qst","$qst","class_id","$class_id","qtype","$DT{type}","type","","lquests","","u_id","$DT{u_id}","session_id","$DT{session_id}","attempt","$current_attempt");
+  					&print_form("form_name","form5","form_target","m3right_top","input","viewed","qst","$qst","quest_no","","u_id","$DT{u_id}","session_id","$DT{session_id}","attempt","$current_attempt");
+
+					print"<img src=\"/schools/blank.gif\" onLoad=\"load_handler\(\)\">\n";
+					print"</DIV>\n";
+	                  		}
+	                  		
+				++$attempt;
+                                my $end_time = time;
+				my $cal_time = $POSTED_QST{$qst}{qtime} * 60;
+				$end_time = $end_time + $cal_time;
+				
+				&update_general("query","UPDATE qst_attempts SET attempts=\"$attempt\",start_time=\"$TIME{time}{hour_minute}\",start_day=\"$TIME{time}{day}\",start_month=\"$TIME{time}{month}\",finish_time=\"0\",finish_day=\"0\",finish_month=\"0\",end=\"$end_time\" WHERE qst_no=\"$qst\" AND u_id=\"$ids\"");
+
+				#add to qsts all the questions for the qst for that attempt for the user
+				foreach my $keyyy(keys %QUESTIONS_IN_QUIZ) {
+
+					if($QUESTIONS{$QUESTIONS_IN_QUIZ{$keyyy}}{type} =~ /SA/ ||  $QUESTIONS{$QUESTIONS_IN_QUIZ{$keyyy}}{type} =~ /P/) {
+						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\",\"0\")");
+						}
+					else {
+						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\",\"0\")");
+						}
+					}
 				}
 			}
 		}
@@ -13393,9 +14101,7 @@ sub print_do_type3_resume_qst{
 				my $minutes_remaining = &get_minutes_remaining("last_time","$last_time","end","$ATTEMPTS{$qst}{end}","last_day","$last_day");
 
                                 &print_form("form_name","form2","form_target","right_bot","input","resume_qst_side3","class_id","$class_id","type","$type","qst","$qst","questions","$QST_INFO{$qst}{questions}","index_to_quest_no","$index_to_quest_no","u_id","$ids","session_id","$DT{session_id}","qst_time","$minutes_remaining","delivery","$POSTED_QST{$qst}{delivery}","lquests","$list_of_questions","qst_name","$name");
-
   				&print_form("form_name","form4","form_target","right_top","input","question_done","class_id","$class_id","qst","$qst","real_quest_no","","quest_no","","answer","","saanswer","","panswer","","mxselect","","answertype","","type","$type","u_id","$ids}","session_id","$DT{session_id}");
-						
                                 &print_form("form_name","next_quest","input","resume_next_question3","order","","quest_no","","real_quest_no","","qst","$qst","class_name","$class_name","class_id","$class_id","qtype","$DT{type}","type","","lquests","","u_id","$ids","session_id","$DT{session_id}","attempt","$current_attempt");
                                         
 				print"<img src=\"/schools/blank.gif\" onLoad=\"load_handler\(\)\">\n";
@@ -13408,313 +14114,6 @@ sub print_do_type3_resume_qst{
 	else {
             	print "<center><P><img src=\"/schools/x.gif\"><B> Invalid input.</b></center><P> \n";
            	}
-	}
-
-###############
-#
-# MODAL3_DO_TYPE3
-#
-###############
-sub modal3_do_type3{
-	my %DT = @_;
-	$DT{qst} =~ s/\D//g;
-	$DT{class_id} =~ s/\D//g;
-	$DT{org_id} =~ s/\D//g;
-	my $qst = $DT{qst};
-	my $class_id = $DT{class_id};
-	my $type;
-	my $submissions;
-	my $results; 
-	my $questions;
-	my $marks;
-	my $attempts;
-	my $attempt;
-	my $forall;
-	my $name;
-	my %QUESTIONS = ();
-	my $index_to_quest_no;
-	my $show_eq = 1;
-
-	&print_style_sheet();
-        
-        print"<style>table.table1\{ border-radius:6px\; font-size:10pt\; font-family:Arial\;\}</style>\n";
-        
-	# check whether in class, if posted, attempts, if qst is for class
-	if(exists $USER{$ids}{$class_id}) {
-		my %POSTED_QST = &select_posted_qst("query","select * from posted_qst WHERE qst=\"$qst\" AND org_id=\"$org_id\"");
-		                
-		if(keys %POSTED_QST && $POSTED_QST{$qst}{posted} == 1) {
-			my %ACCESS = ();
-			$attempts = "$POSTED_QST{$qst}{attempts}";
-			$forall = "$POSTED_QST{$qst}{forall}";
-			$submissions = "$POSTED_QST{$qst}{submissions}";
-			my $rhm = "$POSTED_QST{$qst}{rhm}";
-			
-			if($forall == 0) {
-				%ACCESS = &select4("query","SELECT qst_no,u_id from access_to_qst WHERE qst_no=\"$qst\" AND u_id=\"$ids\"");
-				}
-				
-			my %QST_INFO = &select_qst("query","SELECT number,name,questions,marks,random_q,random_order,type from qst WHERE number=\"$qst\"");
-			$type = "$POSTED_QST{type}";
-
-			#check attempts, in progress
-			my %ATTEMPTS = &select4("query","SELECT u_id,attempts from qst_attempts WHERE qst_no=\"$qst\" AND u_id=\"$ids\"");
-			$attempt = "$ATTEMPTS{$ids}";
-			
-			my $current_attempt = $attempt + 1;
-
-			my %QST_TYPE = &select4("query","SELECT qst,type from qst_to_classes WHERE qst=\"$qst\" AND class_id=\"$class_id\"");
-			$type = "$QST_TYPE{$qst}";
-
-			if(keys %QST_INFO && $attempt < $attempts) {
-				if($POSTED_QST{$qst}{rhm} == 1) { # record mark
-				
-					}
-				else { 
-					# clean out previous attempts
-					&generic_delete("query","DELETE from qsts WHERE qst=\"$qst\" AND u_id=\"$ids\"");
-					&generic_delete("query","DELETE from qst_scores WHERE qst=\"$qst\" AND u_id=\"$ids\"");
-					}
-
-				my $query = "SELECT * from questions WHERE ";
-				$questions = "$QST_INFO{$qst}{questions}";
-				$marks = "$QST_INFO{$qst}{marks}";
-				$name = "$QST_INFO{$qst}{name}";
-								
-				my %QST_QUESTIONS = &select8("query","select quest_no,q_order,value,q_select,branching from qst_questions WHERE qst_no=\"$qst\" AND org_id=\"$DT{org_id}\"");
-                                        
-				my $i = 1;
-				my %QUESTIONS_IN_QUIZ = ();
-				
-                                my %TIMEZONE = ();
-                                my $org_time1;
-                                my $adjusted_time;
-                                my $queryt = qq{SELECT org_id,time_zone FROM organization WHERE org_id=\"$DT{org_id}\"};
-                                my $sth = $dbh->prepare($queryt);
-                                $sth->execute();
-                                while(my @row = $sth->fetchrow_array()) {
-                                        $TIMEZONE{$row[0]}= "$row[1]";
-                                        $adjusted_time = "$row[1]";
-                                        }
-
-                                if($adjusted_time != 0) {
-                                        $org_time1 = "$adjusted_time" * 3600;
-                                        }
-                                else {
-                                        $org_time1 = 0; 
-                                        }
-                
-
-                                #time with time zone included
-                                my $time1 = time + "$org_time1";
-                                my %TIME = &get_time_to_display("time","$time1");
-                                my $student_start_time;
-                                
-                                if( $TIME{time}{hour} < 13) {
-                                        $student_start_time = "$TIME{time}{hour}".":"."$TIME{time}{minute}"." "."am";
-                                        }
-                                else {
-                                        $student_start_time = "$TIME_SHOW{$TIME{time}{hour}}".":"."$TIME{time}{minute}"." "."pm";
-                                        }
-
-                                 
-                                 my @order;
-
-                                 if(keys %QST_QUESTIONS) {
-                                        my %RE_ORDERED_QUESTIONS = ();
-                                        my @quest;
-                                        
-                                        if($POSTED_QST{$qst}{shuffle} == 1) { # shuffle the questions
-                                                my %OLD_ORDER = ();
-                                                my %SHUFFLE_ORDER = ();
-                                                my %REV_ORDER = ();
-                                                my $i = 1;
-                                                my $w = 0;
-                                                foreach my $ke(keys %QST_QUESTIONS) {
-                                                        $OLD_ORDER{$QST_QUESTIONS{$ke}{order}} = $ke;
-                                                        $REV_ORDER{$ke} = $QST_QUESTIONS{$ke}{order};
-                                                        ++$w;
-                                                        }
-
-                                                for(my $ii = 1; $ii <= $w; $ii++) { 
-                                                        my $random_value = $OLD_ORDER{(keys %OLD_ORDER)[rand keys %OLD_ORDER]};
-                                                        $RE_ORDERED_QUESTIONS{$i} = $random_value;
-                                                        delete $OLD_ORDER{"$REV_ORDER{$random_value}"};
-                                                        ++$i;
-                                                        }
-                                                }
-				
-                                        else { # No Question Shuffle
-                                                my %Q_ORDER = ();
-                                                
-                                                #See if random question group
-                                                foreach my $kwest_no(keys %QST_QUESTIONS) {
-                                                        if($QST_QUESTIONS{$kwest_no}{q_select} > 0) { #Random question
-                                                                my $start_num = $QST_QUESTIONS{$kwest_no}{order};
-                                                                $Q_ORDER{$start_num}{quest}{$kwest_no} = $kwest_no;
-                                                                $Q_ORDER{$start_num}{how_many} = $QST_QUESTIONS{$kwest_no}{q_select};
-                                                                }
-                                                        else { # normal question
-                                                                $Q_ORDER{$QST_QUESTIONS{$kwest_no}{order}}{quest} = $kwest_no;
-                                                                }
-                                                        }
-                                                
-                                                # RE-ORDER the questions with randomly selected questions included
-                                                if(keys %Q_ORDER) {
-                                                        my $new_index = 1;
-                                                        foreach my $ord(sort {$a<=>$b} keys %Q_ORDER) {
-                                                                if($Q_ORDER{$ord}{how_many} > 0) {
-                                                                        my %RAND_QUESTIONS = ();
-    
-                                                                        foreach my $nom(keys %{$Q_ORDER{$ord}{quest}}) {
-                                                                                $RAND_QUESTIONS{$nom} = $nom;
-                                                                                }
-                                                                                
-                                                                        for (my $i = 1; $i <= $Q_ORDER{$ord}{how_many}; $i++){ # randomly choose the questions
-                                                                                my $chosen_question = &get_random_hash(%RAND_QUESTIONS);
-                                        
-                                                                                delete($RAND_QUESTIONS{$chosen_question});
-                                                                                $RE_ORDERED_QUESTIONS{$new_index} = $chosen_question;
-                                                                                ++$new_index;
-                                                                                }
-                                                                        }
-                                                                else {
-                                                                        $RE_ORDERED_QUESTIONS{$new_index} = $Q_ORDER{$ord}{quest};
-                                                                        ++$new_index;
-                                                                        }
-                                                                }
-                                                
-                                                        }
-                                                
-                                                }
-                                                
-                                                
-                                        # to get the list of question to query for;
-                                        my $list_of_questions;
-                                        
-     					foreach my $kkey(sort {$a<=>$b} keys %RE_ORDERED_QUESTIONS) {
-                                                $list_of_questions= "$list_of_questions".","."$RE_ORDERED_QUESTIONS{$kkey}";
-                                                
-						if($i == 1) {
-							$query = "$query"." "."number=\"$RE_ORDERED_QUESTIONS{$kkey}\"";
-							++$i;
-							}
-						else {
-							$query = "$query"." "." OR number=\"$RE_ORDERED_QUESTIONS{$kkey}\"";
-							}
-						}
-
-                                        $list_of_questions =~ s/^\,//;
-
-					%QUESTIONS = &select_questions("query","$query");
-					
-					
-                                ######## Print the page
-                                
-					&print_javascript_begin();
-					
-					&modal3_print_javascript_enterMX();
-					
-					&modal3_print_javascript_activated_this();
-
-					print"function load_handler() \{
-					document.form2.submit() \}\n";
-
-                                        print"function Show_Next\(quest,order,quests\) \{
-                                        document.next_quest.quest_no.value=quest
-                                        document.next_quest.order.value=order
-                                        document.next_quest.lquests.value=quests
-					document.next_quest.submit\(\)
-			  	      	\}\n";
-			  	      	
-       		   	  		print"function sub_mit\(\) \{\n";
-					print"document.q_form.submit\(\)\n";
-		      			if ($type == 2) {
-						print"self.parent.m3right_top.location.replace\(\"\/schools/empty.htm\"\)\n";
-						print"self.parent.m3right_bot.location.replace\(\"\/schools/empty.htm\"\)\n";
-						}
-		   	   		print"\}\n";
-
-		      			&print_javascript_end();
-                                        
-                                        &print_form_wo_end_tag("form_name","q_form","input","modal3_mark_type3","class_id","$class_id","type","$type","qst","$qst","qst_name","$name","u_id","$DT{u_id}","session_id","$DT{session_id}");
-                                        
-					my $index = 1;
-					my $printed = 0;
-     					foreach my $key(sort {$a<=>$b} keys %RE_ORDERED_QUESTIONS) {
-                                                my $quest = $RE_ORDERED_QUESTIONS{$key};
-                                                $QUESTIONS_IN_QUIZ{$index} = "$quest";
-
-                                                $index_to_quest_no = "$index_to_quest_no"."$index"."="."$quest"."-"."$QUESTIONS{$quest}{type}"."-"."$QUESTIONS{$quest}{value}".",";
-                                                
-                                                if($QUESTIONS{$quest}{mode} == 2  || $QUESTIONS{$quest}{ans_mode} == 2) {
-                                                        $show_eq = 2;
-                                                        }
-                                                                
-                                                if($index == 1 && $printed == 0) {
-                                                        my $question_rows = 1;
- 		
-                                                        # fix display to show new lines in text of question
-                                                        my $content = $QUESTIONS{$quest}{question};
-                                                        $content =~ s/\r[\n]*/\n/gm;
-                                                        my @number_of_newlines = split(/\n/,$content);
-                                                        my $new_lines = @number_of_newlines;
-                                                        $question_rows = $question_rows + $new_lines;
-                                                                        
-                                                        my $next_quest = $RE_ORDERED_QUESTIONS{2};;
-                                                                        
-                                                        print"<center><B STYLE=\"cursor:pointer\; font-family\:Arial\; font-size\:28pt\;\" OnClick=\"Show_Next('$next_quest','1','$list_of_questions')\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{Next}\">\></B></center>\n";
-                                                        
-                                                        print"<TABLE><TR><TD valign=\"top\"><B>$index\.</b></TD>\n";
-										
-                                                        &print_out_question("question","$QUESTIONS{$quest}{question}","value","$QST_QUESTIONS{$quest}{value}","image_id","$QUESTIONS{$quest}{image_id}","pdf","$QUESTIONS{$quest}{pdf}","vlink","$QUESTIONS{$quest}{vlink}","alink","$QUESTIONS{$quest}{alink}","type","$QUESTIONS{$quest}{type}","question_rows","$question_rows","mode","$QUESTIONS{$quest}{mode}");
-										
-                                                        &print_out_question_answers("quest","$quest","index","$index","type","$QUESTIONS{$quest}{type}","key","$key","kolum","$QUESTIONS{$quest}{kolum}","ans_mode","$QUESTIONS{$quest}{ans_mode}","shuffle_ans","$POSTED_QST{$qst}{shuffle_ans}");
-                                                        ++$index;
-                                                        $printed = 1;
-                                                        }
-                                                else {
-                                                        ++$index;
-                                                        }
-						}
-						
-                                        if($show_eq == 2) {
-                                                &print_eq();
-                                                }
-                                                
-                  			print"<center></FORM></center> \n";
-
-                                        &print_form("form_name","form2","form_target","m3right_bot","input","modal3_qst_side3","class_id","$class_id","type","$type","qst","$qst","questions","$QST_INFO{$qst}{questions}","index_to_quest_no","$index_to_quest_no","u_id","$DT{u_id}","session_id","$DT{session_id}","qst_time","$POSTED_QST{$qst}{qtime}","delivery","$POSTED_QST{$qst}{delivery}","lquests","$list_of_questions","qst_name","$name","attempt","$current_attempt");
-  					&print_form("form_name","form4","form_target","m3right_top","input","question_done","class_id","$class_id","qst","$qst","real_quest_no","","quest_no","","answer","","saanswer","","panswer","","mxselect","","answertype","","type","$type","u_id","$DT{u_id}","session_id","$DT{session_id}");
-						
-                                        &print_form("form_name","next_quest","input","modal_next_question3","order","","quest_no","","real_quest_no","","qst","$qst","class_id","$class_id","qtype","$DT{type}","type","","lquests","","u_id","$DT{u_id}","session_id","$DT{session_id}","attempt","$current_attempt");
-                                        
-					print"<img src=\"/schools/blank.gif\" onLoad=\"load_handler\(\)\">\n";
-	                  		}
-	                  		
-				++$attempt;
-                                my $end_time = time;
-				my $cal_time = $POSTED_QST{$qst}{qtime} * 60;
-				$end_time = $end_time + $cal_time;
-				
-				&update_general("query","UPDATE qst_attempts SET attempts=\"$attempt\",start_time=\"$TIME{time}{hour_minute}\",start_day=\"$TIME{time}{day}\",start_month=\"$TIME{time}{month}\",finish_time=\"0\",finish_day=\"0\",finish_month=\"0\",end=\"$end_time\" WHERE qst_no=\"$qst\" AND u_id=\"$ids\"");
-
-				#add to qsts all the questions for the qst for that attempt for the user
-				foreach my $keyyy(keys %QUESTIONS_IN_QUIZ) {
-
-					if($QUESTIONS{$QUESTIONS_IN_QUIZ{$keyyy}}{type} =~ /SA/ ||  $QUESTIONS{$QUESTIONS_IN_QUIZ{$keyyy}}{type} =~ /P/) {
-						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\")");
-						}
-					else {
-						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\")");
-						}
-					}
-				}
-			}
-		}
-      else {
-            print "<center><P><img src=\"/schools/x.gif\"><B> Invalid input.</b></center><P> \n";
-            }
 	}
 
 ###############
@@ -13955,6 +14354,10 @@ sub do_type4{
 						}
 		   	   		print"\}\n";
 
+					&print_clear_memory_viewed();
+
+					&print_stop_F12();
+					
 		      			&print_javascript_end();
 
 		      			print"<TABLE bgcolor=\"#00000\" width=\"100%\"><TR><TD><center><B><i><font style=\"font-size:18pt\; font-family:Arial\;\" color=\"white\"> $name </font></i></b></center></TD>";
@@ -13997,7 +14400,24 @@ sub do_type4{
                                                                         
                                                         print"<center><B STYLE=\"cursor:pointer\; font-family\:Arial\; font-size\:28pt\;\" OnClick=\"Show_Next('$quest','1','$list_of_questions')\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{Next}\">\></B></center>\n";
                                                         
-                                                        print"<TABLE><TR><TD valign=\"top\"><B>$index\.</b></TD>\n";
+#                                                        print"<TABLE><TR><TD valign=\"top\"><B>$index\.</b></TD>\n";
+                                                        
+                                                        if($QUESTIONS{$quest}{memory} ne "") { # MEMORY
+                                                        	$QUESTIONS{$quest}{memory} =~ s/&quot;/"/g;
+								print"<DIV ID=\"MEMORY\" style=\"display: block\;\">\n";
+								print"<TABLE><TR><TD valign=\"top\"><B>$index\.</b></TD><TD NOWRAP valign=\"top\"><font size=\"-2\">($QUESTIONS{$quest}{value})</font></td><TD valign=\"top\">\n";
+								print"<TABLE><TR><TD width=\"15\"></TD><TD style=\"border: 1px solid #660616\; padding-left: 7px\; padding-right: 7px\; padding-top: 7px\; padding-bottom: 7px\">$QUESTIONS{$quest}{memory}</TD></TR></TABLE><BR><center><B onClick=\"clear_memory_viewed\(\'$quest\'\)\" style=\"cursor\:pointer\;\">Continue</B></center><BR>\n";
+								print"</TD></TR></TABLE>\n";
+							
+								print"</DIV>\n";
+								print"<DIV ID=\"QUESTION\" style=\"display: none\">\n";
+								print"<TABLE><TR><TD valign=\"top\"><B>$index\.</b></TD>\n";				
+								}
+															
+							else {
+								print"<TABLE><TR><TD valign=\"top\"><B>$index\.</b></TD>\n";				
+								}
+
 										
                                                         &print_out_question("question","$QUESTIONS{$quest}{question}","value","$QST_QUESTIONS{$quest}{value}","image_id","$QUESTIONS{$quest}{image_id}","pdf","$QUESTIONS{$quest}{pdf}","vlink","$QUESTIONS{$quest}{vlink}","alink","$QUESTIONS{$quest}{alink}","type","$QUESTIONS{$quest}{type}","question_rows","$question_rows","mode","$QUESTIONS{$quest}{mode}");
 										
@@ -14018,9 +14438,12 @@ sub do_type4{
                   			&print_form("form_name","form2","form_target","right_bot","input","qst_side3","class_id","$class_id","type","$type","qst","$qst","questions","$QST_INFO{$qst}{questions}","index_to_quest_no","$index_to_quest_no","u_id","$DT{u_id}","session_id","$DT{session_id}","qst_time","$POSTED_QST{$qst}{qtime}","delivery","$POSTED_QST{$qst}{delivery}","lquests","$list_of_questions","qst_name","$name","attempt","$current_attempt");
   					&print_form("form_name","form4","form_target","right_top","input","question_done","class_id","$class_id","qst","$qst","real_quest_no","","quest_no","","answer","","saanswer","","panswer","","mxselect","","answertype","","type","$type","u_id","$DT{u_id}","session_id","$DT{session_id}");
 						
+			                &print_form("form_name","form5","form_target","right_top","input","viewed","qst","$qst","quest_no","","u_id","$DT{u_id}","session_id","$DT{session_id}","attempt","$current_attempt");
+
                                         &print_form("form_name","next_quest","input","next_question4","doo","1","order","1","quest_no","","real_quest_no","","qst","$qst","class_name","$class_name","class_id","$class_id","qtype","$type","type","","lquests","$list_of_questions","u_id","$DT{u_id}","session_id","$DT{session_id}","attempt","$current_attempt");
                                         
 					print"<img src=\"/schools/blank.gif\" onLoad=\"load_handler\(\)\">\n";
+					print"</DIV>\n";
 	                  		}
 	                  		
 				++$attempt;
@@ -14034,10 +14457,10 @@ sub do_type4{
 				foreach my $keyyy(keys %QUESTIONS_IN_QUIZ) {
 
 					if($QUESTIONS{$QUESTIONS_IN_QUIZ{$keyyy}}{type} =~ /SA/ ||  $QUESTIONS{$QUESTIONS_IN_QUIZ{$keyyy}}{type} =~ /P/) {
-						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\")");
+						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\",\"0\")");
 						}
 					else {
-						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\")");
+						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\",\"0\")");
 						}
 					}
 				}
@@ -14049,7 +14472,7 @@ sub do_type4{
 										
 				#UPDATE QST_ATTEMPTS SO IT CANNOT BE ATTEMPTED AGAIN WITHOUT A RESUME
 				&update_general("query","UPDATE qst_attempts SET resume=\"0\" WHERE qst_no=\"$qst\" AND u_id=\"$ids\"");
-					}
+				}
 			else {
 				print"<center><B>$LANGUAGE{$set_language}{YoucannotaccessthisQST}</B></center>\n";
 				}
@@ -14651,6 +15074,10 @@ sub modal4_do_type4{
 						}
 		   	   		print"\}\n";
 
+					&print_clear_memory_viewed3();
+
+					&print_stop_F12();
+
 		      			&print_javascript_end();
                                         
                                         &print_form_wo_end_tag("form_name","q_form","input","mark_type","class_id","$class_id","type","$type","qst","$qst","qst_name","$name","u_id","$DT{u_id}","session_id","$DT{session_id}");
@@ -14658,6 +15085,8 @@ sub modal4_do_type4{
 					my $index = 1;
 					my $next_quest;
 					
+					print"<TABLE bgcolor=\"#00000\" width=\"100%\"><TR><TD><center><B><i><font style=\"font-size:18pt\; font-family:Arial\;\" color=\"white\"> $name </font></i></b></center></TD>";
+
      					foreach my $key(sort {$a<=>$b} keys %RE_ORDERED_QUESTIONS) {
                                                 my $quest = $RE_ORDERED_QUESTIONS{$key};
                                                 $QUESTIONS_IN_QUIZ{$index} = "$quest";
@@ -14680,12 +15109,23 @@ sub modal4_do_type4{
                                                                         
                                                         print"<center><B STYLE=\"cursor:pointer\; font-family\:Arial\; font-size\:28pt\;\" OnClick=\"Show_Next('$quest','1','$list_of_questions')\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{Next}\">\></B></center>\n";
                                                         
-                                                        print"<TABLE><TR><TD valign=\"top\"><B>$index\.</b></TD>\n";
+							if($QUESTIONS{$quest}{memory} ne "" && $QUESTIONS{$quest}{viewed}==0 ) { # MEMORY SHOW
+								$QUESTIONS{$quest}{memory} =~ s/&quot\;/\"/g;
+								print"<DIV ID=\"MEMORY\" style=\"display: block\;\" oncontextmenu =\"return false\">\n";
+								print"<TABLE><TR><TD valign=\"top\"><B>$index\.</b></TD><TD NOWRAP valign=\"top\"><font size=\"-2\">($QUESTIONS{$quest}{value})</td><TD valign=\"top\">\n";
+								print"<TABLE><TR><TD width=\"15\"></TD><TD style=\"border: 1px solid #660616\; padding-left: 7px\; padding-right: 7px\; padding-top: 7px\; padding-bottom: 7px\">$QUESTIONS{$quest}{memory}</TD></TR></TABLE><BR><center><B onClick=\"clear_memory_viewed3\(\'$quest\'\)\" style=\"cursor\:pointer\;\">Continue</B></center><BR>\n";
+								print"</TD></TR></TABLE>\n";
+								}
+								
+							else {  #QUESTION SHOW
+								print"<TABLE><TR><TD valign=\"top\"><B>$index\.</b></TD>\n";
+					
+                                                        	&print_out_question("question","$QUESTIONS{$quest}{question}","value","$QST_QUESTIONS{$quest}{value}","image_id","$QUESTIONS{$quest}{image_id}","pdf","$QUESTIONS{$quest}{pdf}","vlink","$QUESTIONS{$quest}{vlink}","alink","$QUESTIONS{$quest}{alink}","type","$QUESTIONS{$quest}{type}","question_rows","$question_rows","mode","$QUESTIONS{$quest}{mode}");
 										
-                                                        &print_out_question("question","$QUESTIONS{$quest}{question}","value","$QST_QUESTIONS{$quest}{value}","image_id","$QUESTIONS{$quest}{image_id}","pdf","$QUESTIONS{$quest}{pdf}","vlink","$QUESTIONS{$quest}{vlink}","alink","$QUESTIONS{$quest}{alink}","type","$QUESTIONS{$quest}{type}","question_rows","$question_rows","mode","$QUESTIONS{$quest}{mode}");
-										
-                                                        &print_out_question_answers("quest","$quest","index","$index","type","$QUESTIONS{$quest}{type}","key","$key","kolum","$QUESTIONS{$quest}{kolum}","ans_mode","$QUESTIONS{$quest}{ans_mode}","shuffle_ans","$POSTED_QST{$qst}{shuffle_ans}");
+                                                        	&print_out_question_answers("quest","$quest","index","$index","type","$QUESTIONS{$quest}{type}","key","$key","kolum","$QUESTIONS{$quest}{kolum}","ans_mode","$QUESTIONS{$quest}{ans_mode}","shuffle_ans","$POSTED_QST{$qst}{shuffle_ans}");
+								}
                                                         ++$index;
+                                                        print"<DIV>\n";
                                                         }
                                                 else {
                                                         ++$index;
@@ -14698,9 +15138,10 @@ sub modal4_do_type4{
                                                 
                   			print "<center></FORM></center> \n";
 
+                                        &print_form("form_name","memquest","input","modal_mem_quest4","order","1","doo","0","quest_no","","real_quest_no","","prev_quest_no","0","qst","$qst","class_name","","class_id","$class_id","qtype","$DT{type}","type","$type","lquests","$list_of_questions","u_id","$DT{u_id}","session_id","$DT{session_id}","attempt","$current_attempt");
                   			&print_form("form_name","form2","form_target","m4right_bot","input","modal4_qst_side4","class_id","$class_id","type","$type","qst","$qst","questions","$QST_INFO{$qst}{questions}","index_to_quest_no","$index_to_quest_no","u_id","$DT{u_id}","session_id","$DT{session_id}","qst_time","$POSTED_QST{$qst}{qtime}","delivery","$POSTED_QST{$qst}{delivery}","lquests","$list_of_questions","qst_name","$name","attempt","$current_attempt");
   					&print_form("form_name","form4","form_target","m4right_top","input","question_done","class_id","$class_id","qst","$qst","real_quest_no","","quest_no","","answer","","saanswer","","panswer","","mxselect","","answertype","","type","$type","u_id","$DT{u_id}","session_id","$DT{session_id}");
-						
+  					&print_form("form_name","form5","form_target","m4right_top","input","viewed","qst","$qst","quest_no","","u_id","$DT{u_id}","session_id","$DT{session_id}","attempt","$current_attempt");
                                         &print_form("form_name","next_quest","input","modal_next_question4","doo","1","order","1","quest_no","","real_quest_no","","qst","$qst","class_id","$class_id","qtype","$type","type","","lquests","$list_of_questions","u_id","$DT{u_id}","session_id","$DT{session_id}","attempt","$current_attempt");
                                         
 					print"<img src=\"/schools/blank.gif\" onLoad=\"load_handler\(\)\">\n";
@@ -14717,10 +15158,10 @@ sub modal4_do_type4{
 				foreach my $keyyy(keys %QUESTIONS_IN_QUIZ) {
 
 					if($QUESTIONS{$QUESTIONS_IN_QUIZ{$keyyy}}{type} =~ /SA/ ||  $QUESTIONS{$QUESTIONS_IN_QUIZ{$keyyy}}{type} =~ /P/) {
-						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\")");
+						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\",\"0\")");
 						}
 					else {
-						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\")");
+						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\",\"0\")");
 						}
 					}
 				}
@@ -15175,7 +15616,7 @@ sub print_out_question {
 		        }
 
                 if($QUESTIONS{vlink} && $QUESTIONS{vlink} ne "0") {
-                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" controls><source src=\"$QUESTIONS{vlink}\" type=\"video/";
+                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" oncontextmenu=\"return false\" controlslist=\"nodownload\" controls=\"\" ><source src=\"$QUESTIONS{vlink}\" type=\"video/";
                         
                         if($QUESTIONS{vlink} =~ /.mp4/) {
                                 print"mp4";
@@ -15186,11 +15627,11 @@ sub print_out_question {
                         elsif($QUESTIONS{vlink} =~ /.webm/) {
                                 print"webm";
                                 }
-                        print"\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video</td></table><P>\n";
+                        print"\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video>></td></table><P>\n";
                         }
                                         
                 if($QUESTIONS{alink} && $QUESTIONS{alink} ne "0") {
-                        print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video</td></table><P>\n";
+                        print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video></td></table><P>\n";
                         }
                 }
                 
@@ -15218,7 +15659,7 @@ sub print_out_question {
 				}
 
                         if($QUESTIONS{vlink} && $QUESTIONS{vlink} ne "0") {
-                                print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" controls><source src=\"$QUESTIONS{vlink}\" type=\"video/";
+                                print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" oncontextmenu=\"return false\" controlslist=\"nodownload\" controls=\"\"><source src=\"$QUESTIONS{vlink}\" type=\"video/";
                         
                                 if($QUESTIONS{vlink} =~ /.mp4/) {
                                         print"mp4";
@@ -15229,11 +15670,11 @@ sub print_out_question {
                                 elsif($QUESTIONS{vlink} =~ /.webm/) {
                                         print"webm";
                                         }
-                                print"\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video</td></table><P>\n";
+                                print"\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video>></td></table><P>\n";
                                 }
                                         
                         if($QUESTIONS{alink} && $QUESTIONS{alink} ne "0") {
-                                print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video</td></table><P>\n";
+                                print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video></td></table><P>\n";
                                 }
                         }
                 }
@@ -16432,6 +16873,7 @@ sub get_class_qst {
 		my %QST = &select_qst("query","select number,name,questions,marks,random_q,random_order,type,weight,branching from qst WHERE $select AND u_id=\"$ids\"");
 		
 		my %RETURN1 = &select1("query","select qst from posted_qst WHERE class_id=\"$GQ{number}\" AND posted=\"1\"");
+		
 		foreach my $key(sort keys %QST) {
 			#see if anyone has started qst
 			my $good_to_change = &select10("query","SELECT qst from qsts WHERE qst=\"$key\" LIMIT 1");
@@ -16473,10 +16915,12 @@ sub get_class_qst {
                                         print"<font align=\"top\" size=\"-1\"><B>$QST{$key}{questions}<font color=\"#FF3300\">\?</font></B> </font><font STYLE=\"cursor: pointer\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\))\">&nbsp\; $QST{$key}{name}</font>\n";
                                         }
 				}
-				
+			
+			$QST{$key}{name} =~ s/\'/\\u0027/g;
+			
 			print"<span ID=\"display$dis\" style=\"display\:none\"><table>
-			<tr><TD width=\"$drop_down_spacing\"></TD><TD STYLE=\"cursor: pointer\;\" onClick=\"create_rename_handler\(\'2\',\'$key\',\'$QST{$key}{name}\',\'$good_to_change\',\'-$GQ{open_class}\'\)\"><font STYLE=\"text-decoration:none\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\))\" color=\"\#222222\" size=\"-1\"> $LANGUAGE{$set_language}{Change} </font></td>
-			<td width=\"3\"></TD><TD STYLE=\"cursor: pointer\;\" onClick=\"click_handler\(\'6\',\'$key\',\'$QST{$key}{name}\',\'$GQ{parent}\',\'\',\'$GQ{type}\',\'1\',\'$GQ{number}\'\)\"><font STYLE=\"text-decoration:none\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\))\" color=\"\#888888\" size=\"-1\"><center>$LANGUAGE{$set_language}{Rename} </center></font></td></TR>
+			<tr><TD width=\"$drop_down_spacing\"></TD><TD STYLE=\"cursor: pointer\;\" onClick=\"create_rename_handler\(\'2\',\'$key\',\'$QST{$key}{name}\',\'$good_to_change\',\'-$GQ{open_class}\'\)\"><font STYLE=\"text-decoration:none\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\))\" color=\"\#222222\" size=\"-1\"> $LANGUAGE{$set_language}{Change} </font></td>		
+		<td width=\"3\"></TD><TD STYLE=\"cursor: pointer\;\" onClick=\"click_handler\(\'6\',\'$key\',\'$QST{$key}{name}\',\'$GQ{parent}\',\'\',\'$GQ{type}\',\'1\',\'$GQ{number}\'\)\"><font STYLE=\"text-decoration:none\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\))\" color=\"\#888888\" size=\"-1\"><center>$LANGUAGE{$set_language}{Rename} </center></font></td></TR>
 			<tr><TD width=\"$drop_down_spacing\"></TD><TD STYLE=\"cursor: pointer\;\" onClick=\"click_handler\(\'5\',\'$key\',\'$QST{$key}{name}\',\'$GQ{parent}\',\'$GQ{expand}\',\'\',\'\',\'1\',\'$GQ{number}\'\)\"><font STYLE=\"text-decoration:none\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\))\" color=\"\#444444\" size=\"-1\"><center>$LANGUAGE{$set_language}{Delete}</font></td><TD width=\"3\"></TD>";
 			
 			if($QST{$key}{branching} == 1) {
@@ -16661,7 +17105,9 @@ sub get_other_question_categories {
 					print"<TABLE name=\"table1\" ><TR><TD width=\"$spacing\"></TD><TD><a href=\"javascript:sub_form\(\'$GOC{expanded}\'\)\">$image5</a> <B STYLE=\"cursor: pointer\; font-size: 11pt\; font-family:Arial\;\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\))\">$name</B></TD></TR></TABLE>\n";
 					
 					if($RETURN{$key}{type} != 0) { # can rename and delete question folders
-						print"<span ID=\"display$dis\" style=\"display\:none\;\"><table ><tr><TD width=\"$drop_down_spacing\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"click_handler\(\'4\',\'$key\',\'$RETURN{$key}{name}\',\'$parent\',\'$expanded\',\'$RETURN{$key}{type}\',\'$RETURN{$key}{sub_type}\'\)\"><font STYLE=\"text-decoration:none\;\" color=\"\#222222\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{Createquestion}</font></td><TR><TD width=\"20\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"click_handler\(\'2\',\'$key\',\'$RETURN{$key}{name}\',\'$GOC{parent}\',\'$expanded\',\'$RETURN{$key}{sub_type}\'\)\"><font STYLE=\"text-decoration:none\;\" color=\"\#444444\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{CreateFolder}</font></td></TR><tr><TD width=\"20\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"click_handler\(\'3\',\'$key\',\'$RETURN{$key}{name}\',\'$GOC{parent}\',\'$expanded\'\)\"><font STYLE=\"text-decoration:none\;\" color=\"\#666666\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">Delete</font></a></td></TR><tr><TD width=\"20\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"click_handler\(\'1\',\'$key\',\'$RETURN{$key}{name}\',\'$GOC{parent}\',\'$expanded\'\)\"><font STYLE=\"text-decoration:none\;\" color=\"\#888888\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{Rename}</font></td></TR><TR><TD width=\"20\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"copy_quest\(\'$key\',\'$expanded\'\)\"><font STYLE=\"text-decoration:none\;\" color=\"\#888888\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{Paste}</font></td></TR><TR><TD width=\"20\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"export_quest\(\'$key\',\'$expanded\'\)\"><font STYLE=\"text-decoration:none\;\" color=\"\#888888\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{Exportquestions}</font></td></TR><TR><TD width=\"20\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"import_quest\(\'$key\',\'$expanded\'\)\"><font STYLE=\"text-decoration:none\;\" color=\"\#888888\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{Importquestions}</font></td></TR></TABLE></span>\n";
+						print"<span ID=\"display$dis\" style=\"display\:none\;\"><table ><tr><TD width=\"$drop_down_spacing\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"click_handler\(\'4\',\'$key\',\'$RETURN{$key}{name}\',\'$parent\',\'$expanded\',\'$RETURN{$key}{type}\',\'$RETURN{$key}{sub_type}\'\)\"><font STYLE=\"text-decoration:none\;\" color=\"\#222222\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{Createquestion}</font></td><TR><TD width=\"20\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"click_handler\(\'2\',\'$key\',\'$RETURN{$key}{name}\',\'$GOC{parent}\',\'$expanded\',\'$RETURN{$key}{sub_type}\'\)\"><font STYLE=\"text-decoration:none\;\" color=\"\#444444\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{CreateFolder}</font></td></TR><tr><TD width=\"20\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"click_handler\(\'3\',\'$key\',\'$RETURN{$key}{name}\',\'$GOC{parent}\',\'$expanded\'\)\"><font STYLE=\"text-decoration:none\;\" color=\"\#666666\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">Delete</font></a></td></TR><tr><TD width=\"20\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"click_handler\(\'1\',\'$key\',\'$RETURN{$key}{name}\',\'$GOC{parent}\',\'$expanded\'\)\"><font STYLE=\"text-decoration:none\;\" color=\"\#888888\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{Rename}</font></td></TR><TR><TD width=\"20\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"copy_quest\(\'$key\',\'$expanded\'\)\"><font STYLE=\"text-decoration:none\;\" color=\"\#888888\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{Paste}</font></td></TR><TR><TD width=\"20\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"export_quest\(\'$key\',\'$expanded\'\)\"><font STYLE=\"text-decoration:none\;\" color=\"\#888888\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{Exportquestions}</font></td></TR>
+						<TR><TD width=\"20\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"import_quest\(\'$key\',\'$expanded\'\)\"><font STYLE=\"text-decoration:none\;\" color=\"\#888888\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{Importquestions}</font></td></TR>
+                              			<TR><TD width=\"20\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"import_ai\(\'1\',\'1\'\)\"><font STYLE=\"text-decoration:none\" color=\"\#888888\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{ImportAI}</font></td></TR></TABLE></span>\n";
 						}
 						
 					else { #cannot rename or delete Default and Survey Question folders
@@ -16689,7 +17135,9 @@ sub get_other_question_categories {
 						<TR><TD width=\"$drop_down_spacing\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"click_handler\(\'2\',\'$key\',\'$RETURN{$key}{name}\',\'$GOC{parent}\',\'$expanded\',\'$RETURN{$key}{sub_type}\'\)\"><font STYLE=\"text-decoration:none\;\" color=\"\#444444\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{CreateFolder}</font></td></TR>
 						<tr><TD width=\"$drop_down_spacing\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"click_handler\(\'3\',\'$key\',\'$RETURN{$key}{name}\',\'$GOC{parent}\',\'$expanded\'\)\"><font STYLE=\"text-decoration:none\;\" color=\"\#666666\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{Delete}</font></td></TR>
 						<tr><TD width=\"$drop_down_spacing\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"click_handler\(\'1\',\'$key\',\'$RETURN{$key}{name}\',\'$GOC{parent}\',\'$GOC{expanded}\'\)\"><font STYLE=\"text-decoration:none\;\" color=\"\#888888\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{Rename}</font></td></TR>
-						<TR><TD width=\"$drop_down_spacing\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"copy_quest\(\'$key\',\'$expanded\'\)\"><font STYLE=\"text-decoration:none\;\" color=\"\#888888\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{Paste}</font></td></TR><TR><TD width=\"20\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"export_quest\(\'$key\',\'$expanded\'\)\"><font STYLE=\"text-decoration:none\;\" color=\"\#888888\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{Exportquestions}</font></td></TR><TR><TD width=\"20\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"import_quest\(\'$key\',\'$expanded\'\)\"><font STYLE=\"text-decoration:none\;\" color=\"\#888888\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{Importquestions}</font></td></TR></TABLE></span>\n";
+						<TR><TD width=\"$drop_down_spacing\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"copy_quest\(\'$key\',\'$expanded\'\)\"><font STYLE=\"text-decoration:none\;\" color=\"\#888888\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{Paste}</font></td></TR><TR><TD width=\"20\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"export_quest\(\'$key\',\'$expanded\'\)\"><font STYLE=\"text-decoration:none\;\" color=\"\#888888\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{Exportquestions}</font></td></TR><TR><TD width=\"20\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"import_quest\(\'$key\',\'$expanded\'\)\"><font STYLE=\"text-decoration:none\;\" color=\"\#888888\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{Importquestions}</font></td></TR>
+						<TR><TD width=\"$drop_down_spacing\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"import_ai\(\'1\',\'1\'\)\"><font STYLE=\"text-decoration:none\" color=\"\#888888\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{ImportAI}</font></td></TR></TABLE></span>\n";
+
 						}
 						
 					else { # cannot rename and delete question folder
@@ -16756,7 +17204,9 @@ sub get_instructors_question_categories {
                         if($GIQC{from} == 1) { # questions page, show drop down menu
                                 print"<BR><a href=\"javascript:sub_form\(\'0\'\)\">$image5</a> <B STYLE=\"cursor: pointer\; font-size: 11pt\; font-family:Arial\;\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\))\"> $LANGUAGE{$set_language}{Questions}</B>\n";
                                 
-                                print"<span ID=\"display$dis\" style=\"display\:none\"><table ><tr><TD width=\"20\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"click_handler\(\'2\',\'1\',\' $LANGUAGE{$set_language}{Questions}\',\'1\',\'1\',\'1\',\'1\'\)\"><font STYLE=\"text-decoration:none\" color=\"\#666666\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{CreateFolder}</font></td></TR><tr><TD width=\"20\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"click_handler\(\'4\',\'1\',\' $LANGUAGE{$set_language}{Questions}\',\'1\',\'1\',\'1\',\'1\'\)\"><font STYLE=\"text-decoration:none\" color=\"\#888888\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{Createquestion}</td></TR><TR><TD width=\"20\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"copy_quest\(\'1\',\'1\'\)\"><font STYLE=\"text-decoration:none\" color=\"\#888888\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{Paste}</font></td></TR><TR><TD width=\"20\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"export_quest\(\'1\',\'1\'\)\"><font STYLE=\"text-decoration:none\" color=\"\#888888\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{Exportquestions}</font></td></TR><TR><TD width=\"20\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"import_quest\(\'1\',\'1\'\)\"><font STYLE=\"text-decoration:none\" color=\"\#888888\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{Importquestions}</font></td></TR></TABLE></span>\n";
+                                print"<span ID=\"display$dis\" style=\"display\:none\"><table ><tr><TD width=\"20\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"click_handler\(\'2\',\'1\',\' $LANGUAGE{$set_language}{Questions}\',\'1\',\'1\',\'1\',\'1\'\)\"><font STYLE=\"text-decoration:none\" color=\"\#666666\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{CreateFolder}</font></td></TR><tr><TD width=\"20\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"click_handler\(\'4\',\'1\',\' $LANGUAGE{$set_language}{Questions}\',\'1\',\'1\',\'1\',\'1\'\)\"><font STYLE=\"text-decoration:none\" color=\"\#888888\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{Createquestion}</td></TR><TR><TD width=\"20\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"copy_quest\(\'1\',\'1\'\)\"><font STYLE=\"text-decoration:none\" color=\"\#888888\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{Paste}</font></td></TR><TR><TD width=\"20\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"export_quest\(\'1\',\'1\'\)\"><font STYLE=\"text-decoration:none\" color=\"\#888888\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{Exportquestions}</font></td></TR>
+                                <TR><TD width=\"20\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"import_quest\(\'1\',\'1\'\)\"><font STYLE=\"text-decoration:none\" color=\"\#888888\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{Importquestions}</font></td></TR>
+                                <TR><TD width=\"20\"></TD><TD width=100 STYLE=\"cursor: pointer\;\" onClick=\"import_ai\(\'1\',\'1\'\)\"><font STYLE=\"text-decoration:none\" color=\"\#888888\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\">$LANGUAGE{$set_language}{ImportAI}</font></td></TR></TABLE></span>\n";
                                 ++$dis;
                                 
                                 &get_other_question_categories("expand","$GIQC{expand}","expanded","1","from","$GIQC{from}","name","$LANGUAGE{$set_language}{MyQuestions}","type","$GIQC{type}","sub_type","$GIQC{sub_type}","u_id","$GIQC{u_id}","session_id","$GIQC{session_id}","branch","$GIQC{branch}");
@@ -17126,7 +17576,23 @@ sub get_questions {
                                 my $col = length($descrip);
                                 $col = $col + 2;
                                     
-                                print"<TABLE><TR><TD width=\"$spacing\"></TD><TD><font size=\"-1\">$question_display_number\. &nbsp\;</font><font size=\"+1\"><B>?</B></font> <font size=\"-1\">$QUESTIONS{$key}{type}</font><font size=\"-1\"><sup> $QUESTIONS{$key}{value}</sup></font></TD><TD valign=\"bottom\"><font style=\"font-family\:Arial\; font-size\: 11pt\; cursor: pointer\;\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\))\"> $descrip</font></TD></TR>\n";
+                                print"<TABLE><TR><TD width=\"$spacing\"></TD><TD><font size=\"-1\">$question_display_number\. &nbsp\;</font><font size=\"+1\""; 
+                                
+                                if($QUESTIONS{$key}{memory} ne "" && $QUESTIONS{$key}{memory} ne "NULL") { # MEMORY QUESTION
+                                	print" color=\"#660616\"><B><i>?</i></B></font> <font size=\"-1\" color=\"#660616\">";
+                                	}
+                                else {
+                                	print"><B>?</B></font> <font size=\"-1\">";
+                                	}
+                                	
+                                if($QUESTIONS{$key}{explanation} ne "" && $QUESTIONS{$key}{explanation} ne "NULL" && $QUESTIONS{$key}{explanation} ne "<p><br></p>") { # EXPLANATION INCLUDED
+                                	print"<i>$QUESTIONS{$key}{type} </i>";
+                                	}
+                                else {
+                                	print"$QUESTIONS{$key}{type}";
+                                	}
+
+                                print"</font><font size=\"-1\"><sup> $QUESTIONS{$key}{value}</sup></font></TD><TD valign=\"bottom\"><font style=\"font-family\:Arial\; font-size\: 11pt\; cursor: pointer\;\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\))\">&nbsp\; $descrip</font></TD></TR>\n";
                                 
 				print"<table></table><span ID=\"display$dis\" style=\"display\:none\;\"><table>
 				<TR><TD width=\"$drop_down_spacing\"></TD><TD STYLE=\"cursor: pointer\;\" onClick=\"create_rename_handler\(\'2\',\'$key\',\'$GQ{name}\',\'$GQ{parent}\',\'$GQ{expand}\',\'$RETURN1{$GQ{number}}\',\'$QUESTIONS{$key}{sub_type}\',\'$GQ{from}\'\)\"><font STYLE=\"text-decoration:none\" color=\"\#222222\" size=\"-1\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\"> $LANGUAGE{$set_language}{Change} </font></td></TR>
@@ -17156,7 +17622,23 @@ sub get_questions {
                                         my $col = length($descrip);
                                         $col = $col +2;
                                                 
-                                        print"<TABLE><TR><TD width=\"$spacing\"></TD><TD><font size=\"-1\">$question_display_number </font> <input type=\"checkbox\" class=\"$GQ{number}\" onClick=\"check_box\(\'$key\',\'$descrip\'\)\" name=\"$key\" id=\"$key\" value=\"$key-$QUESTIONS{$key}{value}\"> &nbsp\;<font size=\"+1\"><B>?</B></font> <font size=\"-1\">$QUESTIONS{$key}{type} <sup>$QUESTIONS{$key}{value}</sup></font></TD><TD valign=\"bottom\"><font style=\" font-family\:Arial\; font-size\: 11pt\; cursor: pointer\;\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\))\">$descrip</font></TD></TR></TABLE>\n";
+                                        print"<TABLE><TR><TD width=\"$spacing\"></TD><TD><font size=\"-1\">$question_display_number </font> <input type=\"checkbox\" class=\"$GQ{number}\" onClick=\"check_box\(\'$key\',\'$descrip\'\)\" name=\"$key\" id=\"$key\" value=\"$key-$QUESTIONS{$key}{value}\"> &nbsp\;<font size=\"+1\"";
+                                        
+                                	if($QUESTIONS{$key}{memory} ne "") { # MEMORY QUESTION
+                                		print" color=\"#660616\"><B><i>?</i></B></font> <font size=\"-1\" color=\"#660616\">";
+                                		}
+                                	else {
+                                		print"><B>?</B></font> <font size=\"-1\">";
+                                		}
+
+                                	if($QUESTIONS{$key}{explanation} ne "" && $QUESTIONS{$key}{explanation} ne "NULL" && $QUESTIONS{$key}{explanation} ne "<p><br></p>") { # EXPLANATION INCLUDED
+                                		print"<i>$QUESTIONS{$key}{type}</i>";
+                                		}
+                                	else {
+                                		print"$QUESTIONS{$key}{type}";
+                                		}
+
+                                        print" <sup>$QUESTIONS{$key}{value}</sup></font></TD><TD valign=\"bottom\"><font style=\" font-family\:Arial\; font-size\: 11pt\; cursor: pointer\;\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\))\">$descrip</font></TD></TR></TABLE>\n";
 					++$question_display_number;
                                         }
 				}
@@ -17304,7 +17786,7 @@ sub get_bank_questions_show {
                                 my $col = length($descrip);
                                 $col = $col +2;
                                 
-				print"<TABLE><TR><TD width=\"$spacing\"></TD><TD><font size=\"-1\">$question_display_number</font> <input type=\"checkbox\" class=\"$GQ{number}\" onClick=\"check_box\(\'$key\',\'$descrip\'\)\" name=\"$key\" value=\"$key-$QUESTIONS{$key}{value}\"> &nbsp\;<font size=\"+1\"><B>?</B></font> <font size=\"-1\">$QUESTIONS{$key}{type} <sup>$QUESTIONS{$key}{value}</sup></font></TD><TD valign=\"bottom\"><font style=\" font-family\:Arial\; font-size\: 11pt\; cursor: pointer\;\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\))\">$descrip</font></TD></TR><TABLE>\n";
+				print"<TABLE><TR><TD width=\"$spacing\"></TD><TD><font size=\"-1\">$question_display_number</font> <input type=\"checkbox\" class=\"$GQ{number}\" onClick=\"check_box\(\'$key\',\'$descrip\'\)\" name=\"$key\" id=\"$key\" value=\"$key-$QUESTIONS{$key}{value}\"> &nbsp\;<font size=\"+1\"><B>?</B></font> <font size=\"-1\">$QUESTIONS{$key}{type} <sup>$QUESTIONS{$key}{value}</sup></font></TD><TD valign=\"bottom\"><font style=\" font-family\:Arial\; font-size\: 11pt\; cursor: pointer\;\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\))\">$descrip</font></TD></TR><TABLE>\n";
 				}
 			++$question_display_number;
 			}
@@ -17365,8 +17847,10 @@ sub get_qst {
                                 else {
                                         print"$QST{$key}{marks}$image15</B></font>\n";
                                         }
-                                        
+                                                                        
 				print"<font STYLE=\"cursor: pointer\; font-family:Arial\; font-size:11pt\;\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\))\">&nbsp\; $QST{$key}{name}</font></TD></TR></TABLE>";
+				
+				$QST{$key}{name} =~ s/\'/\\u0027/g;
 				
 				print"<span ID=\"display$dis\" style=\"display\:none\"><table >
 				<tr><TD width=\"$drop_down_spacing\"></TD><TD STYLE=\"cursor: pointer\;\"  onClick=\"create_rename_handler\(\'2\',\'$key\',\'$QST{$key}{name}\',\'$GQ{parent}\',\'$GQ{expand}\',\'$GQ{type}\',\'$GQ{sub_type}\'\)\"><font STYLE=\"text-decoration:none\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\" color=\"\#222222\" size=\"-1\"> $LANGUAGE{$set_language}{Change} </font></td></TR>
@@ -17384,6 +17868,8 @@ sub get_qst {
 				
 			else { #surveys
 				print"</B></font><font STYLE=\"cursor: pointer\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\))\">\ $QST{$key}{name}</font></TD></TR></TABLE>";
+				
+				$QST{$key}{name} =~ s/\'/\\u0027/g;
 				
 				print"<span ID=\"display$dis\" style=\"display\:none\"><table >
 				<tr><TD width=\"$drop_down_spacing\"></TD><TD STYLE=\"cursor: pointer\;\"  onClick=\"create_rename_handler\(\'2\',\'$key\',\'$QST{$key}{name}\',\'$GQ{parent}\',\'$GQ{expand}\',\'$GQ{type}\',\'$GQ{sub_type}\'\)\"><font STYLE=\"text-decoration:none\" onClick=\"Show_Stuff(document.getElementById\(\'display$dis\'\)\)\"  color=\"\#222222\" size=\"-1\"> $LANGUAGE{$set_language}{Change} </font></td></TR>
@@ -17409,7 +17895,6 @@ sub get_qst {
 ###############
 sub insert_quest{
 	my %IQ = @_;
-	print"QQQQQ $IQ{descrip} /n";
 	$IQ{expand} =~ s/[^0-9,]//g;
 	$IQ{type} =~ s/\D//g;
 	$IQ{sub_type} =~ s/\D//g;
@@ -17514,7 +17999,7 @@ sub insert_quest{
 		}
 
 	if (($empty ne "" || $IQ{image_number} > 0 || $IQ{vlink} ne "0" || $IQ{alink} ne "0") && $IQ{descrip} ne "" && $count == 1 && $error == 0 && $image_error == 0 && $pdf_error == 0) {
-
+			
 		if ($IQ{select} eq"TF") {
 			$IQ{TFans} =~ s/[^T,F]//g;
 			if($IQ{sub_type} == 2) { # survey questions
@@ -17525,7 +18010,7 @@ sub insert_quest{
 				&insert_generic("query","INSERT question_answers VALUES(\"$no\",\"1\",\"\",\"1\",\"$ids\",\"$org_id\",\"0\")");
 				}
 			elsif($IQ{TFans} ne"") { # quiz/test questions
-				$no = &insert_question_quote_return("query","$IQ{question}","query1","TF","query2","$value","sub_type","$IQ{sub_type}","image_id","$IQ{image_number}","vlink","$IQ{vlink}","alink","$IQ{alink}","kolum","0","mode","$IQ{mode}","descrip","$IQ{descrip}","ans_mode","$IQ{ans_mode}","pdf","$IQ{pptx_number}","explanation","$IQ{explanation}");
+				$no = &insert_question_quote_return("query","$IQ{question}","query1","TF","query2","$value","sub_type","$IQ{sub_type}","image_id","$IQ{image_number}","vlink","$IQ{vlink}","alink","$IQ{alink}","kolum","0","mode","$IQ{mode}","descrip","$IQ{descrip}","ans_mode","$IQ{ans_mode}","pdf","$IQ{pptx_number}","explanation","$IQ{explanation}","memory","$IQ{memory}");
 				
 				&insert_generic("query","INSERT categories_to_questions VALUES(\"$folder\",\"$no\",\"$ids\",\"$org_id\")");
 				&insert_generic("query","INSERT question_answers VALUES(\"$no\",\"1\",\"$IQ{TFans}\",\"1\",\"$ids\",\"$org_id\",\"0\")");
@@ -17542,7 +18027,7 @@ sub insert_quest{
 				&insert_generic("query","INSERT question_answers VALUES(\"$no\",\"1\",\"\",\"1\",\"$ids\",\"$org_id\",\"0\")");
 				}
 			elsif($IQ{YNans} ne"") { # quiz/test questions
-				$no = &insert_question_quote_return("query","$IQ{question}","query1","YN","query2","$value","sub_type","$IQ{sub_type}","image_id","$IQ{image_number}","vlink","$IQ{vlink}","alink","$IQ{alink}","kolum","0","mode","$IQ{mode}","descrip","$IQ{descrip}","ans_mode","$IQ{ans_mode}","pdf","$IQ{pptx_number}","explanation","$IQ{explanation}");
+				$no = &insert_question_quote_return("query","$IQ{question}","query1","YN","query2","$value","sub_type","$IQ{sub_type}","image_id","$IQ{image_number}","vlink","$IQ{vlink}","alink","$IQ{alink}","kolum","0","mode","$IQ{mode}","descrip","$IQ{descrip}","ans_mode","$IQ{ans_mode}","pdf","$IQ{pptx_number}","explanation","$IQ{explanation}","memory","$IQ{memory}");
 				
 				&insert_generic("query","INSERT categories_to_questions VALUES(\"$folder\",\"$no\",\"$ids\",\"$org_id\")");
 				
@@ -17575,7 +18060,7 @@ sub insert_quest{
 					$no = &insert_question_quote_return("query","$IQ{question}","query1","MC","query2","0","sub_type","$IQ{sub_type}","image_id","$IQ{image_number}","vlink","$IQ{vlink}","alink","$IQ{alink}","kolum","$IQ{kolum}","mode","$IQ{mode}","descrip","$IQ{descrip}","ans_mode","$IQ{ans_mode}");
 					}
 				else { # quiz/test questions
-					$no = &insert_question_quote_return("query","$IQ{question}","query1","MC","query2","$value","sub_type","$IQ{sub_type}","image_id","$IQ{image_number}","vlink","$IQ{vlink}","alink","$IQ{alink}","kolum","$IQ{kolum}","mode","$IQ{mode}","descrip","$IQ{descrip}","ans_mode","$IQ{ans_mode}","pdf","$IQ{pptx_number}","explanation","$IQ{explanation}");
+					$no = &insert_question_quote_return("query","$IQ{question}","query1","MC","query2","$value","sub_type","$IQ{sub_type}","image_id","$IQ{image_number}","vlink","$IQ{vlink}","alink","$IQ{alink}","kolum","$IQ{kolum}","mode","$IQ{mode}","descrip","$IQ{descrip}","ans_mode","$IQ{ans_mode}","pdf","$IQ{pptx_number}","explanation","$IQ{explanation}","memory","$IQ{memory}");
 					}
 					
 				&insert_generic("query","INSERT categories_to_questions VALUES(\"$folder\",\"$no\",\"$ids\",\"$org_id\")");
@@ -17635,7 +18120,7 @@ sub insert_quest{
 				if($IQ{sub_type} == 2) { # survey questions
 					}
 				else { # quiz/test questions
-					$no = &insert_question_quote_return("query","$IQ{question}","query1","MX","query2","$value","sub_type","$IQ{sub_type}","image_id","$IQ{image_number}","vlink","$IQ{vlink}","alink","$IQ{alink}","kolum","0","mode","$IQ{mode}","descrip","$IQ{descrip}","ans_mode","$IQ{ans_mode}","pdf","$IQ{pptx_number}","explanation","$IQ{explanation}");
+					$no = &insert_question_quote_return("query","$IQ{question}","query1","MX","query2","$value","sub_type","$IQ{sub_type}","image_id","$IQ{image_number}","vlink","$IQ{vlink}","alink","$IQ{alink}","kolum","0","mode","$IQ{mode}","descrip","$IQ{descrip}","ans_mode","$IQ{ans_mode}","pdf","$IQ{pptx_number}","explanation","$IQ{explanation}","memory","$IQ{memory}");
 					}
 					
 				&insert_generic("query","INSERT categories_to_questions VALUES(\"$folder\",\"$no\",\"$ids\",\"$org_id\")");
@@ -17689,7 +18174,7 @@ sub insert_quest{
 					$no = &insert_question_quote_return("query","$IQ{question}","query1","MA","query2","0","sub_type","$IQ{sub_type}","image_id","$IQ{image_number}","vlink","$IQ{vlink}","alink","$IQ{alink}","kolum","$IQ{kolum}","mode","$IQ{mode}","descrip","$IQ{descrip}","ans_mode","$IQ{ans_mode}");
 					}
 				else { # quiz/test questions
-					$no = &insert_question_quote_return("query","$IQ{question}","query1","MA","query2","$value","sub_type","$IQ{sub_type}","image_id","$IQ{image_number}","vlink","$IQ{vlink}","alink","$IQ{alink}","kolum","$IQ{kolum}","mode","$IQ{mode}","descrip","$IQ{descrip}","ans_mode","$IQ{ans_mode}","pdf","$IQ{pptx_number}","explanation","$IQ{explanation}");
+					$no = &insert_question_quote_return("query","$IQ{question}","query1","MA","query2","$value","sub_type","$IQ{sub_type}","image_id","$IQ{image_number}","vlink","$IQ{vlink}","alink","$IQ{alink}","kolum","$IQ{kolum}","mode","$IQ{mode}","descrip","$IQ{descrip}","ans_mode","$IQ{ans_mode}","pdf","$IQ{pptx_number}","explanation","$IQ{explanation}","memory","$IQ{memory}");
 					}
 					
 				&insert_generic("query","INSERT categories_to_questions VALUES(\"$folder\",\"$no\",\"$ids\",\"$org_id\")");
@@ -17735,7 +18220,7 @@ sub insert_quest{
 				my $empty_sans = $IQ{SAans};
 				$empty_sans =~ s/\s//g;
 				if($empty_sans ne"") {
-					$no = &insert_question_quote_return("query","$IQ{question}","query1","SA","query2","$value","sub_type","$IQ{sub_type}","image_id","$IQ{image_number}","vlink","$IQ{vlink}","alink","$IQ{alink}","kolum","0","mode","$IQ{mode}","descrip","$IQ{descrip}","ans_mode","$IQ{ans_mode}","pdf","$IQ{pptx_number}","explanation","$IQ{explanation}");
+					$no = &insert_question_quote_return("query","$IQ{question}","query1","SA","query2","$value","sub_type","$IQ{sub_type}","image_id","$IQ{image_number}","vlink","$IQ{vlink}","alink","$IQ{alink}","kolum","0","mode","$IQ{mode}","descrip","$IQ{descrip}","ans_mode","$IQ{ans_mode}","pdf","$IQ{pptx_number}","explanation","$IQ{explanation}","memory","$IQ{memory}");
 					
 					&insert_generic("query","INSERT categories_to_questions VALUES(\"$folder\",\"$no\",\"$ids\",\"$org_id\")");
 					&insert_question_answers_quote("number","$no","ids","$ids","quote","$IQ{SAans}","image_id","0");
@@ -17755,7 +18240,7 @@ sub insert_quest{
 				my $empty_pans = $IQ{Pans};
 				$empty_pans =~ s/\s//g;
 				if($empty_pans ne"") {
-					$no = &insert_question_quote_return("query","$IQ{question}","query1","P","query2","$value","sub_type","$IQ{sub_type}","image_id","$IQ{image_number}","vlink","$IQ{vlink}","alink","$IQ{alink}","kolum","0","mode","$IQ{mode}","descrip","$IQ{descrip}","ans_mode","$IQ{ans_mode}","pdf","$IQ{pptx_number}","explanation","$IQ{explanation}");
+					$no = &insert_question_quote_return("query","$IQ{question}","query1","P","query2","$value","sub_type","$IQ{sub_type}","image_id","$IQ{image_number}","vlink","$IQ{vlink}","alink","$IQ{alink}","kolum","0","mode","$IQ{mode}","descrip","$IQ{descrip}","ans_mode","$IQ{ans_mode}","pdf","$IQ{pptx_number}","explanation","$IQ{explanation}","memory","$IQ{memory}");
 					
 					&insert_generic("query","INSERT categories_to_questions VALUES(\"$folder\",\"$no\",\"$ids\",\"$org_id\")");
 					&insert_question_answers_quote("number","$no","ids","$ids","quote","$IQ{Pans}","image_id","0");
@@ -17891,7 +18376,7 @@ sub insert_bank_quest{
 				&insert_generic("query","INSERT question_answers VALUES(\"$no\",\"1\",\"\",\"1\",\"0\",\"$org_id\",\"0\")");
 				}
 			elsif($IQ{TFans} ne"") { # quiz/test questions
-				$no = &insert_bank_question_quote_return("query","$IQ{question}","query1","TF","query2","$value","sub_type","$IQ{sub_type}","image_id","$IQ{image_number}","vlink","$IQ{vlink}","alink","$IQ{alink}","kolum","0","mode","$IQ{mode}","descrip","$IQ{descrip}","ans_mode","$IQ{ans_mode}","pdf","$IQ{pptx_number}","explanation","$IQ{explanation}");
+				$no = &insert_bank_question_quote_return("query","$IQ{question}","query1","TF","query2","$value","sub_type","$IQ{sub_type}","image_id","$IQ{image_number}","vlink","$IQ{vlink}","alink","$IQ{alink}","kolum","0","mode","$IQ{mode}","descrip","$IQ{descrip}","ans_mode","$IQ{ans_mode}","pdf","$IQ{pptx_number}","explanation","$IQ{explanation}","memory","$IQ{memory}");
 				
 				&insert_generic("query","INSERT categories_to_questions VALUES(\"$folder\",\"$no\",\"0\",\"$org_id\")");
 				&insert_generic("query","INSERT question_answers VALUES(\"$no\",\"1\",\"$IQ{TFans}\",\"1\",\"0\",\"$org_id\",\"0\")");
@@ -17907,7 +18392,7 @@ sub insert_bank_quest{
 				&insert_generic("query","INSERT question_answers VALUES(\"$no\",\"1\",\"\",\"1\",\"0\",\"$org_id\",\"0\")");
 				}
 			elsif($IQ{YNans} ne"") { # quiz/test questions
-				$no = &insert_bank_question_quote_return("query","$IQ{question}","query1","YN","query2","$value","sub_type","$IQ{sub_type}","image_id","$IQ{image_number}","vlink","$IQ{vlink}","alink","$IQ{alink}","kolum","0","mode","$IQ{mode}","descrip","$IQ{descrip}","ans_mode","$IQ{ans_mode}","pdf","$IQ{pptx_number}","explanation","$IQ{explanation}");
+				$no = &insert_bank_question_quote_return("query","$IQ{question}","query1","YN","query2","$value","sub_type","$IQ{sub_type}","image_id","$IQ{image_number}","vlink","$IQ{vlink}","alink","$IQ{alink}","kolum","0","mode","$IQ{mode}","descrip","$IQ{descrip}","ans_mode","$IQ{ans_mode}","pdf","$IQ{pptx_number}","explanation","$IQ{explanation}","memory","$IQ{memory}");
 				
 				&insert_generic("query","INSERT categories_to_questions VALUES(\"$folder\",\"$no\",\"0\",\"$org_id\")");
 				&insert_generic("query","INSERT question_answers VALUES(\"$no\",\"1\",\"$IQ{YNans}\",\"1\",\"0\",\"$org_id\",\"0\")");
@@ -17939,7 +18424,7 @@ sub insert_bank_quest{
 					$no = &insert_bank_question_quote_return("query","$IQ{question}","query1","MC","query2","0","sub_type","$IQ{sub_type}","image_id","$IQ{image_number}","vlink","$IQ{vlink}","alink","$IQ{alink}","kolum","$IQ{kolum}","mode","$IQ{mode}","descrip","$IQ{descrip}","ans_mode","$IQ{ans_mode}");
 					}
 				else { # quiz/test questions
-					$no = &insert_bank_question_quote_return("query","$IQ{question}","query1","MC","query2","$value","sub_type","$IQ{sub_type}","image_id","$IQ{image_number}","vlink","$IQ{vlink}","alink","$IQ{alink}","kolum","$IQ{kolum}","mode","$IQ{mode}","descrip","$IQ{descrip}","ans_mode","$IQ{ans_mode}","pdf","$IQ{pptx_number}","explanation","$IQ{explanation}");
+					$no = &insert_bank_question_quote_return("query","$IQ{question}","query1","MC","query2","$value","sub_type","$IQ{sub_type}","image_id","$IQ{image_number}","vlink","$IQ{vlink}","alink","$IQ{alink}","kolum","$IQ{kolum}","mode","$IQ{mode}","descrip","$IQ{descrip}","ans_mode","$IQ{ans_mode}","pdf","$IQ{pptx_number}","explanation","$IQ{explanation}","memory","$IQ{memory}");
 					}
 					
 				&insert_generic("query","INSERT categories_to_questions VALUES(\"$folder\",\"$no\",\"0\",\"$org_id\")");
@@ -17991,7 +18476,7 @@ sub insert_bank_quest{
 					$no = &insert_bank_question_quote_return("query","$IQ{question}","query1","MA","query2","0","sub_type","$IQ{sub_type}","image_id","$IQ{image_number}","vlink","$IQ{vlink}","alink","$IQ{alink}","kolum","$IQ{kolum}","mode","$IQ{mode}","descrip","$IQ{descrip}","ans_mode","$IQ{ans_mode}");
 					}
 				else { # quiz/test questions
-					$no = &insert_bank_question_quote_return("query","$IQ{question}","query1","MA","query2","$value","sub_type","$IQ{sub_type}","image_id","$IQ{image_number}","vlink","$IQ{vlink}","alink","$IQ{alink}","kolum","$IQ{kolum}","mode","$IQ{mode}","descrip","$IQ{descrip}","ans_mode","$IQ{ans_mode}","pdf","$IQ{pptx_number}","explanation","$IQ{explanation}");
+					$no = &insert_bank_question_quote_return("query","$IQ{question}","query1","MA","query2","$value","sub_type","$IQ{sub_type}","image_id","$IQ{image_number}","vlink","$IQ{vlink}","alink","$IQ{alink}","kolum","$IQ{kolum}","mode","$IQ{mode}","descrip","$IQ{descrip}","ans_mode","$IQ{ans_mode}","pdf","$IQ{pptx_number}","explanation","$IQ{explanation}","memory","$IQ{memory}");
 					}
 					
 				&insert_generic("query","INSERT categories_to_questions VALUES(\"$folder\",\"$no\",\"0\",\"$org_id\")");
@@ -18058,7 +18543,7 @@ sub insert_bank_quest{
 				if($IQ{sub_type} == 2) { # survey questions
 					}
 				else { # quiz/test questions
-					$no = &insert_bank_question_quote_return("query","$IQ{question}","query1","MX","query2","0","sub_type","$IQ{sub_type}","image_id","$IQ{image_number}","vlink","$IQ{vlink}","alink","$IQ{alink}","kolum","0","mode","$IQ{mode}","descrip","$IQ{descrip}","ans_mode","$IQ{ans_mode}","pdf","$IQ{pptx_number}","explanation","$IQ{explanation}");
+					$no = &insert_bank_question_quote_return("query","$IQ{question}","query1","MX","query2","0","sub_type","$IQ{sub_type}","image_id","$IQ{image_number}","vlink","$IQ{vlink}","alink","$IQ{alink}","kolum","0","mode","$IQ{mode}","descrip","$IQ{descrip}","ans_mode","$IQ{ans_mode}","pdf","$IQ{pptx_number}","explanation","$IQ{explanation}","memory","$IQ{memory}");
 					}
 					
 				&insert_generic("query","INSERT categories_to_questions VALUES(\"$folder\",\"$no\",\"0\",\"$org_id\")");
@@ -18100,7 +18585,7 @@ sub insert_bank_quest{
 				my $empty_sans = $IQ{SAans};
 				$empty_sans =~ s/\s//g;
 				if($empty_sans ne"") {
-					$no = &insert_bank_question_quote_return("query","$IQ{question}","query1","SA","query2","$value","sub_type","$IQ{sub_type}","image_id","$IQ{image_number}","vlink","$IQ{vlink}","alink","$IQ{alink}","kolum","0","mode","$IQ{mode}","descrip","$IQ{descrip}","ans_mode","$IQ{ans_mode}","pdf","$IQ{pptx_number}","explanation","$IQ{explanation}");
+					$no = &insert_bank_question_quote_return("query","$IQ{question}","query1","SA","query2","$value","sub_type","$IQ{sub_type}","image_id","$IQ{image_number}","vlink","$IQ{vlink}","alink","$IQ{alink}","kolum","0","mode","$IQ{mode}","descrip","$IQ{descrip}","ans_mode","$IQ{ans_mode}","pdf","$IQ{pptx_number}","explanation","$IQ{explanation}","memory","$IQ{memory}");
 					
 					&insert_generic("query","INSERT categories_to_questions VALUES(\"$folder\",\"$no\",\"0\",\"$org_id\")");
 					&insert_question_answers_quote("number","$no","ids","0","quote","$IQ{SAans}","image_id","0");
@@ -18119,7 +18604,7 @@ sub insert_bank_quest{
 				my $empty_pans = $IQ{Pans};
 				$empty_pans =~ s/\s//g;
 				if($empty_pans ne"") {
-					$no = &insert_bank_question_quote_return("query","$IQ{question}","query1","P","query2","$value","sub_type","$IQ{sub_type}","image_id","$IQ{image_number}","vlink","$IQ{vlink}","alink","$IQ{alink}","kolum","0","mode","$IQ{mode}","descrip","$IQ{descrip}","ans_mode","$IQ{ans_mode}","pdf","$IQ{pptx_number}","explanation","$IQ{explanation}");
+					$no = &insert_bank_question_quote_return("query","$IQ{question}","query1","P","query2","$value","sub_type","$IQ{sub_type}","image_id","$IQ{image_number}","vlink","$IQ{vlink}","alink","$IQ{alink}","kolum","0","mode","$IQ{mode}","descrip","$IQ{descrip}","ans_mode","$IQ{ans_mode}","pdf","$IQ{pptx_number}","explanation","$IQ{explanation}","memory","$IQ{memory}");
 					
 					&insert_generic("query","INSERT categories_to_questions VALUES(\"$folder\",\"$no\",\"0\",\"$org_id\")");
 					&insert_question_answers_quote("number","$no","ids","0","quote","$IQ{Pans}","image_id","0");
@@ -18211,6 +18696,20 @@ sub insert_quest_to_current_qst{
 		$IQTCQ{image_number} = 0;
 		}
 
+	# check they own the pdf
+	my $pdf_error = 0;
+	
+	if (defined $IQTCQ{pptx_number} && $IQTCQ{pptx_number} > 0) {
+		my %RETURN_PDF = &select4("query","select number,file_name from qst_files where number=\"$IQTCQ{pptx_number}\" and u_id =\"$ids\"");
+		if(!keys %RETURN_PDF) {
+			++$pdf_error;
+			}
+		}
+	
+	if (!defined $IQTCQ{pptx_number}) {
+		$IQTCQ{pptx_number} = 0;
+		}
+		
         if (!defined $IQTCQ{vlink}) {
 		$IQTCQ{vlink} = 0;
 		}
@@ -18266,8 +18765,8 @@ sub insert_quest_to_current_qst{
 				&insert_generic("query","INSERT question_answers VALUES(\"$no\",\"1\",\"0\",\"1\",\"$ids\",\"$org_id\",\"0\")");
 				}
 			elsif($IQTCQ{TFans} ne"") { # quiz/test questions
-				$no = &insert_question_quote_return("query","$IQTCQ{question}","query1","TF","query2","$value","sub_type","1","image_id","$IQTCQ{image_number}","vlink","$IQTCQ{vlink}","alink","$IQTCQ{alink}","kolum","0","mode","$IQTCQ{mode}","descrip","$IQTCQ{descrip}","ans_mode","$IQTCQ{ans_mode}");
-				
+				$no = &insert_question_quote_return("query","$IQTCQ{question}","query1","TF","query2","$value","sub_type","1","image_id","$IQTCQ{image_number}","vlink","$IQTCQ{vlink}","alink","$IQTCQ{alink}","kolum","0","mode","$IQTCQ{mode}","descrip","$IQTCQ{descrip}","ans_mode","$IQTCQ{ans_mode}","pdf","$IQTCQ{pptx_number}","explanation","$IQTCQ{explanation}","memory","$IQTCQ{memory}");
+
 				&insert_generic("query","INSERT categories_to_questions VALUES(\"$folder\",\"$no\",\"$ids\",\"$org_id\")");
 				&insert_generic("query","INSERT question_answers VALUES(\"$no\",\"1\",\"$IQTCQ{TFans}\",\"1\",\"$ids\",\"$org_id\",\"0\")");
 				}
@@ -18283,7 +18782,7 @@ sub insert_quest_to_current_qst{
 				&insert_generic("query","INSERT question_answers VALUES(\"$no\",\"1\",\"0\",\"1\",\"$ids\",\"$org_id\",\"0\")");
 				}
 			elsif($IQTCQ{YNans} ne"") { # quiz/test questions
-				$no = &insert_question_quote_return("query","$IQTCQ{question}","query1","YN","query2","$value","sub_type","1","image_id","$IQTCQ{image_number}","vlink","$IQTCQ{vlink}","alink","$IQTCQ{alink}","kolum","0","mode","$IQTCQ{mode}","descrip","$IQTCQ{descrip}","ans_mode","$IQTCQ{ans_mode}");
+				$no = &insert_question_quote_return("query","$IQTCQ{question}","query1","YN","query2","$value","sub_type","1","image_id","$IQTCQ{image_number}","vlink","$IQTCQ{vlink}","alink","$IQTCQ{alink}","kolum","0","mode","$IQTCQ{mode}","descrip","$IQTCQ{descrip}","ans_mode","$IQTCQ{ans_mode}","pdf","$IQTCQ{pptx_number}","explanation","$IQTCQ{explanation}","memory","$IQTCQ{memory}");
 				
 				&insert_generic("query","INSERT categories_to_questions VALUES(\"$folder\",\"$no\",\"$ids\",\"$org_id\")");
 				&insert_generic("query","INSERT question_answers VALUES(\"$no\",\"1\",\"$IQTCQ{YNans}\",\"1\",\"$ids\",\"$org_id\",\"0\")");
@@ -18314,7 +18813,7 @@ sub insert_quest_to_current_qst{
 					$no = &insert_question_quote_return("query","$IQTCQ{question}","query1","MC","query2","0","sub_type","$IQTCQ{sub_type}","image_id","$IQTCQ{image_number}","vlink","$IQTCQ{vlink}","alink","$IQTCQ{alink}","kolum","$IQTCQ{kolum}","mode","$IQTCQ{mode}","descrip","$IQTCQ{descrip}","ans_mode","$IQTCQ{ans_mode}");
 					}
 				else { # quiz/test questions
-					$no = &insert_question_quote_return("query","$IQTCQ{question}","query1","MC","query2","$value","sub_type","$IQTCQ{sub_type}","image_id","$IQTCQ{image_number}","vlink","$IQTCQ{vlink}","alink","$IQTCQ{alink}","kolum","$IQTCQ{kolum}","mode","$IQTCQ{mode}","descrip","$IQTCQ{descrip}","ans_mode","$IQTCQ{ans_mode}");
+					$no = &insert_question_quote_return("query","$IQTCQ{question}","query1","MC","query2","$value","sub_type","$IQTCQ{sub_type}","image_id","$IQTCQ{image_number}","vlink","$IQTCQ{vlink}","alink","$IQTCQ{alink}","kolum","$IQTCQ{kolum}","mode","$IQTCQ{mode}","descrip","$IQTCQ{descrip}","ans_mode","$IQTCQ{ans_mode}","pdf","$IQTCQ{pptx_number}","explanation","$IQTCQ{explanation}","memory","$IQTCQ{memory}");
 					}
 					
 				&insert_generic("query","INSERT categories_to_questions VALUES(\"$folder\",\"$no\",\"$ids\",\"$org_id\")");
@@ -18366,7 +18865,7 @@ sub insert_quest_to_current_qst{
 					$no = &insert_question_quote_return("query","$IQTCQ{question}","query1","MA","query2","0","sub_type","$IQTCQ{sub_type}","image_id","$IQTCQ{image_number}","vlink","$IQTCQ{vlink}","alink","$IQTCQ{alink}","kolum","$IQTCQ{kolum}","mode","$IQTCQ{mode}","descrip","$IQTCQ{descrip}","ans_mode","$IQTCQ{ans_mode}");
 					}
 				else { # quiz/test questions
-					$no = &insert_question_quote_return("query","$IQTCQ{question}","query1","MA","query2","$value","sub_type","$IQTCQ{sub_type}","image_id","$IQTCQ{image_number}","vlink","$IQTCQ{vlink}","alink","$IQTCQ{alink}","kolum","$IQTCQ{kolum}","mode","$IQTCQ{mode}","descrip","$IQTCQ{descrip}","ans_mode","$IQTCQ{ans_mode}");
+					$no = &insert_question_quote_return("query","$IQTCQ{question}","query1","MA","query2","$value","sub_type","$IQTCQ{sub_type}","image_id","$IQTCQ{image_number}","vlink","$IQTCQ{vlink}","alink","$IQTCQ{alink}","kolum","$IQTCQ{kolum}","mode","$IQTCQ{mode}","descrip","$IQTCQ{descrip}","ans_mode","$IQTCQ{ans_mode}","pdf","$IQTCQ{pptx_number}","explanation","$IQTCQ{explanation}","memory","$IQTCQ{memory}");
 					}
 					
 				&insert_generic("query","INSERT categories_to_questions VALUES(\"$folder\",\"$no\",\"$ids\",\"$org_id\")");
@@ -18429,7 +18928,7 @@ sub insert_quest_to_current_qst{
 				if($IQTCQ{sub_type} == 2) { # survey questions
 					}
 				else { # quiz/test questions
-					$no = &insert_question_quote_return("query","$IQTCQ{question}","query1","MX","query2","$value","sub_type","$IQTCQ{sub_type}","image_id","$IQTCQ{image_number}","vlink","$IQTCQ{vlink}","alink","$IQTCQ{alink}","kolum","0","mode","$IQTCQ{mode}","descrip","$IQTCQ{descrip}","ans_mode","$IQTCQ{ans_mode}");
+					$no = &insert_question_quote_return("query","$IQTCQ{question}","query1","MX","query2","$value","sub_type","$IQTCQ{sub_type}","image_id","$IQTCQ{image_number}","vlink","$IQTCQ{vlink}","alink","$IQTCQ{alink}","kolum","0","mode","$IQTCQ{mode}","descrip","$IQTCQ{descrip}","ans_mode","$IQTCQ{ans_mode}","pdf","$IQTCQ{pptx_number}","explanation","$IQTCQ{explanation}","memory","$IQTCQ{memory}");
 					}
 
 				&insert_generic("query","INSERT categories_to_questions VALUES(\"$folder\",\"$no\",\"$ids\",\"$org_id\")");
@@ -18467,7 +18966,7 @@ sub insert_quest_to_current_qst{
 				$no = &insert_question_quote_return("query","$IQTCQ{question}","query1","SA","query2","0","sub_type","2","image_id","$IQTCQ{image_number}","vlink","$IQTCQ{vlink}","alink","$IQTCQ{alink}","kolum","0","mode","$IQTCQ{mode}","descrip","$IQTCQ{descrip}","ans_mode","$IQTCQ{ans_mode}");
 				}
 			else { # quiz/test questions
-				$no = &insert_question_quote_return("query","$IQTCQ{question}","query1","SA","query2","$value","sub_type","1","image_id","$IQTCQ{image_number}","vlink","$IQTCQ{vlink}","alink","$IQTCQ{alink}","kolum","0","mode","$IQTCQ{mode}","descrip","$IQTCQ{descrip}","ans_mode","$IQTCQ{ans_mode}");
+				$no = &insert_question_quote_return("query","$IQTCQ{question}","query1","SA","query2","$value","sub_type","1","image_id","$IQTCQ{image_number}","vlink","$IQTCQ{vlink}","alink","$IQTCQ{alink}","kolum","0","mode","$IQTCQ{mode}","descrip","$IQTCQ{descrip}","ans_mode","$IQTCQ{ans_mode}","pdf","$IQTCQ{pptx_number}","explanation","$IQTCQ{explanation}","memory","$IQTCQ{memory}");
 				}
 			&insert_generic("query","INSERT categories_to_questions VALUES(\"$folder\",\"$no\",\"$ids\",\"$org_id\")");
 			&insert_question_answers_quote("number","$no","ids","$ids","quote","$IQTCQ{SAans}","image_id","0");
@@ -18478,7 +18977,7 @@ sub insert_quest_to_current_qst{
 				$no = &insert_question_quote_return("query","$IQTCQ{question}","query1","P","query2","0","sub_type","2","image_id","$IQTCQ{image_number}","vlink","$IQTCQ{vlink}","alink","$IQTCQ{alink}","kolum","0","mode","$IQTCQ{mode}","descrip","$IQTCQ{descrip}","ans_mode","$IQTCQ{ans_mode}");
 				}
 			else { # quiz/test questions
-				$no = &insert_question_quote_return("query","$IQTCQ{question}","query1","P","query2","$value","sub_type","1","image_id","$IQTCQ{image_number}","vlink","$IQTCQ{vlink}","alink","$IQTCQ{alink}","kolum","0","mode","$IQTCQ{mode}","descrip","$IQTCQ{descrip}","ans_mode","$IQTCQ{ans_mode}");
+				$no = &insert_question_quote_return("query","$IQTCQ{question}","query1","P","query2","$value","sub_type","1","image_id","$IQTCQ{image_number}","vlink","$IQTCQ{vlink}","alink","$IQTCQ{alink}","kolum","0","mode","$IQTCQ{mode}","descrip","$IQTCQ{descrip}","ans_mode","$IQTCQ{ans_mode}","pdf","$IQTCQ{pptx_number}","explanation","$IQTCQ{explanation}","memory","$IQTCQ{memory}");
 				}
 			&insert_generic("query","INSERT categories_to_questions VALUES(\"$folder\",\"$no\",\"$ids\",\"$org_id\")");
 			&insert_question_answers_quote("number","$no","ids","$ids","quote","$IQTCQ{Pans}","image_id","0");
@@ -19203,6 +19702,9 @@ sub view_select_files {
                 print"if(summernt === \"1\") \{\n";
 		print"self.parent.opener.AddImgSrcToExplanationEditor(new_file,filedescrip)\n";
 		print"\}\n";
+		print"if(summernt === \"3\") \{\n";
+		print"self.parent.opener.AddImgSrcToMemoryEditor(new_file,filedescrip)\n";
+		print"\}\n";
 		print"\}\n";
 		}
 		
@@ -19563,12 +20065,27 @@ sub view_select_bank_files {
 	&print_javascript_sub_form("form","form2");
 
 	print"function select_file\(file,fname,e_xt,filedescrip\) \{\n";
-	if($MF{targit} eq"question" && $MF{mode} != 1) {
+	
+	if($MF{targit} eq"pptx") { # PDF file
+			print"var str = e_xt\;\n"; 
+			print"if(str.match(/pdf\$/)) \{\n";
+			print"self.parent.opener.document.question_form.pptx_number.value=file
+			self.parent.opener.document.question_form.insert_pptx_name.value=fname\n";
+			print"self.parent.opener.Show_PPTX_Image()\n";
+			print"self.parent.opener.Show_PPTX_File()\n";
+			print"\}\n";
+			print"else \{ \n";
+			print"alert\(\"$LANGUAGE{$set_language}{Notapdffile}\"\)\n";
+			print"\}\n";
+			}
+			
+	elsif($MF{targit} eq"question" && $MF{mode} != 1) { # QUESTION BASIC
 		print"self.parent.opener.document.question_form.image_number.value=file
 		self.parent.opener.document.question_form.insert_image_name.value=fname\n";
 		print"self.parent.opener.Show_Image()\n";
 		print"self.parent.opener.Show_File()\n";
 		}
+		
         elsif($MF{targit} eq"question" && $MF{mode} == 1) { # QUESTION ADVANCED EQUATION AND EXPLANATION IMAGE INSERT
         	print"var str = e_xt\;\n";
         	print"if(str.match(/pdf\$/)) \{\n";
@@ -19583,6 +20100,9 @@ sub view_select_bank_files {
 		print"\}\n";
                 print"if(summernt === \"1\") \{\n";
 		print"self.parent.opener.AddImgSrcToExplanationEditor(new_file,filedescrip)\n";
+		print"\}\n";
+		print"if(summernt === \"3\") \{\n";
+		print"self.parent.opener.AddImgSrcToMemoryEditor(new_file,filedescrip)\n";
 		print"\}\n";
 		print"\}\n";
 		}
@@ -19654,6 +20174,8 @@ sub make_quest {
 				                
                 &print_explan_editor();
                 
+                &print_memory_editor();
+                
 		if(!defined $MQUEST{sub_type}) {
 			$MQUEST{sub_type} = "$MQUEST{type}";
 			}
@@ -19682,8 +20204,9 @@ sub make_quest {
                         
                         &print_javascript_begin();
                         &print_show_explan();
-                        &print_javascript_end();
-                        
+			&print_show_memory();
+	                &print_javascript_end();
+	                
                         &write_quest("type","$MQUEST{type}","from","$MQUEST{from}","sub_type","$MQUEST{sub_type}","u_id","$MQUEST{u_id}","session_id","$MQUEST{session_id}","again","$MQUEST{again}");
                         
 			&show_tf();
@@ -19693,7 +20216,8 @@ sub make_quest {
 			&show_mc();
 			&show_ma();
 			&show_mx();
-
+			&show_cz();
+			&show_or();
 			
 			if ($MQUEST{from} != 1) { #second time in, refresh create/manage questions screen
                                 &print_form("form_name","load_right","form_target","theright","input","questions","expand","$MQUEST{expand}","sub_type","$MQUEST{sub_type}","u_id","$MQUEST{u_id}","session_id","$MQUEST{session_id}");
@@ -20218,14 +20742,8 @@ sub print_eq_quest_ans {
         </script>
     
 <form  id="form1">
-<div class="aspNetHidden">
-</div>
 
-    <div id="container">  
-        <div id="header" style="background-color:white">        
-            <div id="ADHead" style="background-color:white">
-            </div>
-        </div>
+    <div id="container">
 
     <div id="content">            
             
@@ -20234,7 +20752,7 @@ sub print_eq_quest_ans {
         <input type="hidden" name="QSTAsc" id="QSTAsc" value="0"/>
         <input type="hidden" name="QSTTeX" id="QSTTeX" value="1"/>
         <input type="hidden" name="poutput" id="poutput" value="\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}"/>
-        <TABLE><TR><TD>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<B  style="font-family:Arial; font-size:15pt;">QST <i>EQ</i></B></TD><TD>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD><TD><center style="font-family:Arial; font-size:11pt;">
+        <TABLE style="width: 100%;"><TR><TD style="background: #A0AECD; width: 25%; border-radius: 5px; padding-top: 5px; padding-bottom: 5px;"><center><B  style="font-family:Arial; font-size:15pt;">QST <i>EQ</i></B></center></TD><TD>&nbsp;&nbsp;&nbsp;</TD><TD><center style="font-family:Arial; font-size:11pt;">
         $LANGUAGE{$set_language}{SelectanitemorinputLaTeXTeXMathMLorAsciiMathnotation}
         </center></TD></TR></TABLE>
    
@@ -20244,12 +20762,11 @@ sub print_eq_quest_ans {
                 <div id="tabs">
                     <ul>
                         <li><a href="#tabs-Math">$LANGUAGE{$set_language}{Math}</a></li>
-                        <li title="$LANGUAGE{$set_language}{GreekandFunction}"><a href="#tabs-Function">GK/Func</a></li>                     
+                        <li><a href="#tabs-Function">$LANGUAGE{$set_language}{GKFunc}</a></li>                     
                         <li><a href="#tabs-Logic">$LANGUAGE{$set_language}{Logic}</a></li>
                         <li><a href="#tabs-Arrow">$LANGUAGE{$set_language}{Arrow}</a></li>
                         <li><a href="#tabs-Symbol">$LANGUAGE{$set_language}{Symbol}</a></li>
-                        <li><a href="#tabs-Format">$LANGUAGE{$set_language}{Format}
-</a></li>
+                        <li><a href="#tabs-Format">$LANGUAGE{$set_language}{Format}</a></li>
                     </ul>
                     <div id="tabs-Math" >
                         <div id="MyMath20" class="ForAllNormal">
@@ -20302,13 +20819,13 @@ sub print_eq_quest_ans {
 EOQ
                 
                 if($PEQA{eq} != 1) {
-                        print"<center style=\"font-family:Arial\; font-size:11pt\;\"><span ID=\"la_tex\" style=\"display:block\;\"><B>LaTeX/TeX Mode</B> <BR> $LANGUAGE{$set_language}{Copyandpasteintoanswerssurroundedby}<BR><center style=\"font-family:Arial\; font-size:11pt\;\">$LANGUAGE{$set_language}{RightclickyellowhighlightbelowforMathML}</center></span><span ID=\"as_cii\" style=\"display:none\;\"><B>AsciiMath Mode</B><BR> $LANGUAGE{$set_language}{Copyandpasteintoanswerssurroundedbycode}</span><span ID=\"math_ml\" style=\"display:none\;\"><B>MathML Mode</B><BR>$LANGUAGE{$set_language}{Copyandpasteintoanswers}</span></center></BR>
+                        print"<center style=\"font-family:Arial\; font-size:11pt\;\"><span ID=\"la_tex\" style=\"display:block\; padding-top: 3px\;\"><B>$LANGUAGE{$set_language}{LaTeXTeXMode}</B> <BR> $LANGUAGE{$set_language}{Copyandpasteintoanswerssurroundedby}<BR><center style=\"font-family:Arial\; font-size:11pt\;\">$LANGUAGE{$set_language}{RightclickyellowhighlightbelowforMathML}</center></span><span ID=\"as_cii\" style=\"display:none\; padding-top: 3px\;\"><B>$LANGUAGE{$set_language}{AsciiMathMode}</B><BR> $LANGUAGE{$set_language}{Copyandpasteintoanswerssurroundedbycode}</span><span ID=\"math_ml\" style=\"display:none\; padding-top: 3px\;\"><B>$LANGUAGE{$set_language}{MathMLMode}</B><BR>$LANGUAGE{$set_language}{Copyandpasteintoanswers}</span></center></BR>
                 <TABLE width=\"100%\" $action_bar><TR><TD><font color=\"white\"><center><B style=\"cursor: pointer\; font-family:Arial\; font-size:11pt\;\" onClick=\"self.close()\">$LANGUAGE{$set_language}{Cancel}</B></center></font></TD></TR></TABLE>\n";
                         }
                         
                 if($PEQA{eq} == 1) {
-                        print"<center style=\"font-family:Arial\; font-size:11pt\;\"><span ID=\"la_tex\" style=\"display:block\;\"><B>LaTeX/TeX Mode</B> <BR><center style=\"font-family:Arial\; font-size:11pt\;\">$LANGUAGE{$set_language}{RightclickyellowhighlightbelowforMathML}</center></span><span ID=\"as_cii\" style=\"display:none\;\"><B>AsciiMath Mode</B></span><span ID=\"math_ml\" style=\"display:none\;\"><B>MathML Mode</B></span></center><BR><TABLE width=\"100%\" $action_bar><TR><TD><font color=\"white\">
-                        <center>\n";
+                        print"<center style=\"font-family:Arial\; font-size:11pt\;\"><span ID=\"la_tex\" style=\"display:block\; padding-top: 3px\;\"><B>$LANGUAGE{$set_language}{LaTeXTeXMode}</B> <BR><center style=\"font-family:Arial\; font-size:11pt\; padding-top: 4px\;\">$LANGUAGE{$set_language}{RightclickyellowhighlightbelowforMathML}</center></span><span ID=\"as_cii\" style=\"display:none\; padding-top: 3px\;\"><B>$LANGUAGE{$set_language}{AsciiMathMode}</B></span><span ID=\"math_ml\" style=\"display:none\; padding-top: 3px\;\"><B>$LANGUAGE{$set_language}{MathMLMode}</B></span>
+                        </center><BR><TABLE width=\"100%\" $action_bar><TR><TD><font color=\"white\"><center>\n";
                 
                         print"<B style=\"cursor: pointer\; font-family:Arial\; font-size:11pt\;\" onClick=\"save_eq()\">$LANGUAGE{$set_language}{SaveandClose}</B>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<B style=\"cursor: pointer\; font-family:Arial\; font-size:11pt\;\" onClick=\"self.close()\">$LANGUAGE{$set_language}{Cancel}</B></center></font></TD></TR></TABLE>\n";
                         }
@@ -20316,7 +20833,7 @@ EOQ
                             
         print <<"EQQ";
                 
-                <div id="output" style="clear:both; text-align: center;">
+                <div id="output" style="clear:both; text-align: center; ">
                     <script>
                     MathJax = {
                         tex: {inlineMath: [['\$', '\$'], ['\\(', '\\)']]},
@@ -20575,10 +21092,11 @@ EOD
         ['para', ['ul', 'ol', 'paragraph']],
         ['table', ['table']],
         ['image', ['picture']],
+        ['view', ['codeview']],
         ],
         minHeight: 25,             // set minimum height of editor
         maxHeight: 125,             // set maximum height of editor
-        width: 570,
+        width: 630,
         codeviewIframeFilter: true,
         codeviewFilter: true,
         focus: true,
@@ -20620,10 +21138,12 @@ sub print_explan_editor {
         ['para', ['ul', 'ol', 'paragraph']],
         ['table', ['table']],
         ['image', ['picture']],
+        ['video', ['video']],
+        ['view', ['codeview']],
         ],
         minHeight: 25,             // set minimum height of editor
         maxHeight: 125,             // set maximum height of editor
-        width: 570,
+        width: 660,
         codeviewIframeFilter: true,
         codeviewFilter: true,
         focus: true,
@@ -20668,6 +21188,146 @@ sub print_show_explan {
         print" \}\n";
 	}
 	
+######################
+#
+# PRINT_MEMORY_EDITOR
+#
+#####################
+sub print_memory_editor {
+        #Summernote editor
+        my %PME =@_;  
+#FIX in summernote javascript
+
+  print"<script>
+        \$(document).ready(function() {
+        \$('.3summernote').summernote({\n";
+        
+        
+        print <<"EOA";
+        
+        toolbar: [['style', ['bold', 'italic', 'underline']],
+        ['font', ['superscript', 'subscript', 'fontname', 'fontsize']],
+        ['color', ['color']],
+        ['para', ['ul', 'ol', 'paragraph']],
+        ['table', ['table']],
+        ['image', ['picture']],
+        ['video', ['video']],
+        ],
+        minHeight: 25,             // set minimum height of editor
+        maxHeight: 125,             // set maximum height of editor
+        width: 660,
+        codeviewIframeFilter: true,
+        codeviewFilter: true,
+        focus: true,
+        disableDragAndDrop: true
+        });
+        \$('.3summernote').summernote('fontSize','16')
+        
+        });
+
+        </script>
+
+	<script>
+	        function AddImgSrcToMemoryEditor(uRL,filedescrip) {
+	            \$(document).ready(function() {
+	            \$('#3summernote').summernote('insertImage','/schools/qst_files/'+uRL,''+filedescrip)
+	            });
+	        }    
+	</script>
+
+                
+EOA
+
+            
+        # end of editor stuff
+        }
+
+######################
+#
+# PRINT_SHOW_MEMORY
+#
+#####################
+sub print_show_memory {
+	print"function show_Memory\(\) \{
+	var uu = document.getElementById(\"Memory\").style.display
+	var yy = document.getElementById(\"Memory\")\n";
+	print"if (uu === \"none\") \{
+	      yy.style.display = \"block\"\;
+	      \}
+	      else \{
+	      yy.style.display = \"none\"\;
+	      \}\n";
+        print" \}\n";
+	}
+
+######################
+#
+# PRINT_CLEAR_MEMORY
+#
+#####################
+sub print_clear_memory {
+	print"function clear_memory\(\) \{
+	MEMORY.style.display = \"none\"
+	QUESTION.style.display = \"block\"
+        \}\n";
+	}
+
+######################
+#
+# PRINT_CLEAR_MEMORY_MANY
+#
+#####################
+sub print_clear_memory_many {
+	print"function clear_memory_many\(inn\) \{
+	var aa = \"MEMORY\"+inn
+	var bb = document.getElementById(aa)
+	bb.style.display =\"none\"
+	var yy = \"QUESTION\"+inn
+	var zz = document.getElementById(yy)
+	zz.style.display =\"block\"
+	\}\n";
+	}
+
+######################
+#
+# PRINT_CLEAR_MEMORY_VIEWED
+#
+#####################
+sub print_clear_memory_viewed {
+	print"function clear_memory_viewed\(quest\) \{
+	MEMORY.style.display = \"none\"
+	QUESTION.style.display = \"block\"
+	document.form5.quest_no.value=quest
+	document.form5.submit();
+        \}\n";
+	}
+
+######################
+#
+# PRINT_CLEAR_MEMORY_VIEWED1
+#
+#####################
+sub print_clear_memory_viewed1 {
+	print"function clear_memory_viewed1\(quest\) \{
+	document.form5.quest_no.value=quest
+	document.form5.submit();
+        \}\n";
+	}
+
+######################
+#
+# PRINT_CLEAR_MEMORY_VIEWED3
+#
+#####################
+sub print_clear_memory_viewed3 {
+	print"function clear_memory_viewed3\(quest\) \{
+	document.form5.quest_no.value=quest
+	document.form5.submit();
+	document.memquest.quest_no.value=quest
+	document.memquest.submit();
+        \}\n";
+	}
+
 ######################
 #
 # PRINT_ACTIVE_SUMMERNOTE
@@ -20749,6 +21409,8 @@ sub make_bank_quest {
 
                 &print_explan_editor();
                 
+                &print_memory_editor();
+                
 		if(!defined $MQUEST{sub_type}) {
 			$MQUEST{sub_type} = "$MQUEST{type}";
 			}
@@ -20776,6 +21438,7 @@ sub make_bank_quest {
 		if ($MQUEST{sub_type} != 2) { # quiz/test questions
 	                &print_javascript_begin();
 	                &print_show_explan();
+	                &print_show_memory();
 	                &print_javascript_end();
 
                         &write_bank_quest("type","$MQUEST{type}","from","$MQUEST{from}","sub_type","$MQUEST{sub_type}","u_id","$MQUEST{u_id}","session_id","$MQUEST{session_id}","again","$MQUEST{again}");
@@ -20976,11 +21639,11 @@ sub mobile_mark_type {
 						        }
 						        
                                                 if($QUESTIONS{$quest_no}{vlink} && $QUESTIONS{$quest_no}{vlink} ne "0") {
-                                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" controls><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/webm\">Your browser does not support the video tag.</video</td></table><P>\n";
+                                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" oncontextmenu=\"return false\" controlslist=\"nodownload\" controls=\"\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/webm\">Your browser does not support the video tag.</video>></td></table><P>\n";
                                                         }
                                         
                                                 if($QUESTIONS{$quest_no}{alink} && $QUESTIONS{$quest_no}{alink} ne "0") {
-                                                        print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/wav\">Your browser does not support the audio tag.</video</td></table><P>\n";
+                                                        print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/wav\">Your browser does not support the audio tag.</video></td></table><P>\n";
                                                         }
                                                 }
                                                 
@@ -21005,11 +21668,11 @@ sub mobile_mark_type {
 						        }
 						        
                                                 if($QUESTIONS{$quest_no}{vlink} && $QUESTIONS{$quest_no}{vlink} ne "0") {
-                                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" controls><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/webm\">Your browser does not support the video tag.</video</td></table><P>\n";
+                                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" oncontextmenu=\"return false\" controlslist=\"nodownload\" controls=\"\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/webm\">Your browser does not support the video tag.</video>></td></table><P>\n";
                                                         }
                                         
                                                 if($QUESTIONS{$quest_no}{alink} && $QUESTIONS{$quest_no}{alink} ne "0") {
-                                                        print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/wav\">Your browser does not support the audio tag.</video</td></table><P>\n";
+                                                        print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/wav\">Your browser does not support the audio tag.</video></td></table><P>\n";
                                                         }
                                                 print"</TD></TR></TABLE>\n";
                                                 }
@@ -21379,7 +22042,7 @@ sub mobile_mark_type {
 				if ($POSTED_QST{$qst}{explanation} == 1) {
 					my $there = length($check);
 					if( $there > 0) {
-						print"<P><TABLE><TR><TD width=\"60\"></TD><TD><TABLE style=\"border:1px solid grey\; border-radius:.3em\;\"><TR style=\"padding-bottom: 4px\;\"><TD><i>&nbsp\;$LANGUAGE{$set_language}{Explanations}:</i><font style=\"font-family:Times New Roman\;\">$QUESTIONS{$quest_no}{explanation} </font><BR></TD></TR></TABLE></TD></TR></TABLE>\n";
+						print"<P><TABLE><TR><TD width=\"60\"></TD><TD><TABLE style=\"border:1px solid grey\; border-radius:.3em\;\"><TR style=\"padding-bottom: 4px\;\"><TD style=\"padding-bottom: 4px\;\"><i>&nbsp\;$LANGUAGE{$set_language}{Explanations}:</i><font style=\"font-family:Times New Roman\;\">$QUESTIONS{$quest_no}{explanation} </font></TD></TR></TABLE></TD></TR></TABLE>\n";
 						}
 					}
 					
@@ -21600,6 +22263,8 @@ sub mark_type {
 	print"function c_window\(\)\{
 	top.close\(\)\}\n";
 	
+	&print_stop_F12();
+	
 	&print_javascript_end();
 
 	my %ACCESS = ();
@@ -21648,8 +22313,8 @@ sub mark_type {
                 &print_javascript_end();
                 
                 &print_form("form_name","form_reload","form_target","orig_Window","input","print_modal_students_screen","class_name","$class_name","class_id","$class_id","u_id","$ids","session_id","$session_id");
-                
-		print"<center><font size=\"+2\"><B>  $qst_name </b></font></center><P> \n";
+                		
+		print"<TABLE bgcolor=\"#00000\" width=\"100%\"><TR><TD><center><B><i><font style=\"font-size:18pt\; font-family:Arial\;\" color=\"white\"> $qst_name </font></i></b></center></TD></TR></TABLE><P>";
 		
 		my @results;
 		my %ENTERED_QUESTIONS = ();
@@ -21717,6 +22382,13 @@ sub mark_type {
            		if ($POSTED_QST{$qst}{submissions} == 1) {
                   		print"<TABLE><TR><TD valign=\"top\"><B><A NAME=\"$index_pt2\">$index_pt2</a>\.</b></TD>
 	        		<TD NOWRAP valign=\"top\"><font size=\"-1\">\($QUESTIONS_IN_QST{$quest_no}{value}\)</font></TD><TD valign=\"top\" STYLE=\"border-radius:6px\;\">";
+	        		
+	        		 ### MEMORY SHOW
+				 if($POSTED_QST{$qst}{memori} == 1  && $QUESTIONS{$quest_no}{memory} ne "") {
+				 	$QUESTIONS{$quest_no}{memory} =~ s/&quot\;/\"/g;
+					print"<TABLE><TR><TD width=\"5\"></TD><TD style=\"border: 1px solid #660616; padding-left: 7px; padding-right: 7px; padding-top: 7px; padding-bottom: 7px\">$QUESTIONS{$quest_no}{memory}</TD></TR></TABLE><BR>\n";
+				 	}
+
              			my $question_rows = 1;
  				my $question_length = length($QUESTIONS{$quest_no}{question});
  		
@@ -21760,11 +22432,11 @@ sub mark_type {
 						        }
 						        
                                                 if($QUESTIONS{$quest_no}{vlink} && $QUESTIONS{$quest_no}{vlink} ne "0") {
-                                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" controls><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video</td></table><P>\n";
+                                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" oncontextmenu=\"return false\" controlslist=\"nodownload\" controls=\"\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video>></td></table><P>\n";
                                                         }
                                         
                                                 if($QUESTIONS{$quest_no}{alink} && $QUESTIONS{$quest_no}{alink} ne "0") {
-                                                        print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video</td></table><P>\n";
+                                                        print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video></td></table><P>\n";
                                                         }
                                                 }
                                         else {
@@ -21784,11 +22456,11 @@ sub mark_type {
 						        }
 						        
                                                 if($QUESTIONS{$quest_no}{vlink} && $QUESTIONS{$quest_no}{vlink} ne "0") {
-                                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" controls><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video</td></table><P>\n";
+                                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" oncontextmenu=\"return false\" controlslist=\"nodownload\" controls=\"\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video>></td></table><P>\n";
                                                         }
                                         
                                                 if($QUESTIONS{$quest_no}{alink} && $QUESTIONS{$quest_no}{alink} ne "0") {
-                                                        print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video</td></table><P>\n";
+                                                        print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video></td></table><P>\n";
                                                         }
                                                 }
 					} 
@@ -22223,7 +22895,7 @@ sub mark_type {
 				if ($POSTED_QST{$qst}{explanation} == 1) {
 					my $there = length($check);
 					if( $there > 0) {
-						print"<P><TABLE><TR><TD width=\"60\"></TD><TD><TABLE style=\"border:1px solid grey\; border-radius:.3em\;\"><TR style=\"padding-bottom: 4px\;\"><TD><i>&nbsp\;$LANGUAGE{$set_language}{Explanations}:</i><font style=\"font-family:Times New Roman\;\">$QUESTIONS{$quest_no}{explanation} </font><BR></TD></TR></TABLE></TD></TR></TABLE>\n";
+						print"<P><TABLE><TR><TD width=\"60\"></TD><TD><TABLE style=\"border:1px solid grey\; border-radius:.3em\;\"><TR style=\"padding-bottom: 4px\;\"><TD style=\"padding-bottom: 4px\;\"><i>&nbsp\;$LANGUAGE{$set_language}{Explanations}:</i><font style=\"font-family:Times New Roman\;\">$QUESTIONS{$quest_no}{explanation} </font></TD></TR></TABLE></TD></TR></TABLE>\n";
 						}
 					}
 					
@@ -22571,10 +23243,12 @@ sub modal_mark_type {
 	top.close\(\)\}\n";
 	
 	print"function close_modal\(\) \{
-        self.top.location=\"/qst/one#close\"
-        self.top.document.form_reload.submit()
+	self.top.opener.document.form_reload.submit()
+        self.top.close()
         \}\n";
-			  	      	
+
+	&print_stop_F12();
+
 	&print_javascript_end();
 
 	my %ACCESS = ();
@@ -22612,6 +23286,8 @@ sub modal_mark_type {
                         %MT = &select4("query","SELECT quest_no,answer from qsts WHERE qst=\"$qst\" AND u_id=\"$ids\" AND attempt=\"$attempt\"");
                         }
 		
+		print"<TABLE bgcolor=\"#00000\" width=\"100%\"><TR><TD><center><B><i><font style=\"font-size:18pt\; font-family:Arial\;\" color=\"white\"> $qst_name </font></i></b></center></TD></TR></TABLE><P>";
+
 		my @results;
 		my %ENTERED_QUESTIONS = ();
 		
@@ -22645,7 +23321,7 @@ sub modal_mark_type {
 			
 			if ($POSTED_QST{$qst}{source} == 1) {
 				# GET THE SOURCE FOLDER NAME
-				%SOURCE = &get_the_folder_name("questions","$questionsource","students","1");
+				%SOURCE = &get_the_folder_name("questions","$questionsource","student","1");
 				}
 			}
 			
@@ -22677,6 +23353,13 @@ sub modal_mark_type {
              			my $question_rows = 1;
  				my $question_length = length($QUESTIONS{$quest_no}{question});
  		
+ 				### MEMORY SHOW
+ 				if($POSTED_QST{$qst}{memori} == 1  && $QUESTIONS{$quest_no}{memory} ne "") {
+ 					$QUESTIONS{$quest_no}{memory} =~ s/&quot\;/\"/g;
+ 					
+					print"<TABLE><TR><TD width=\"10\"></TD><TD style=\"border: 1px solid #660616; padding-left: 7px; padding-right: 7px; padding-top: 7px; padding-bottom: 7px\">$QUESTIONS{$quest_no}{memory}</TD></TR></TABLE><BR>\n";
+ 					}
+ 					
  				# fix display to show new lines in text of question
                                 my $content = $QUESTIONS{$quest_no}{question};
                                 $content =~ s/\r[\n]*/\n/gm;
@@ -22717,11 +23400,11 @@ sub modal_mark_type {
 						        }
 
                                                 if($QUESTIONS{$quest_no}{vlink} && $QUESTIONS{$quest_no}{vlink} ne "0") {
-                                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" controls><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video</td></table><P>\n";
+                                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" oncontextmenu=\"return false\" controlslist=\"nodownload\" controls=\"\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video>></td></table><P>\n";
                                                         }
                                         
                                                 if($QUESTIONS{$quest_no}{alink} && $QUESTIONS{$quest_no}{alink} ne "0") {
-                                                        print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video</td></table><P>\n";
+                                                        print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video></td></table><P>\n";
                                                         }
                                                 }
                                         else {
@@ -22741,11 +23424,11 @@ sub modal_mark_type {
 						        }
 						        
                                                 if($QUESTIONS{$quest_no}{vlink} && $QUESTIONS{$quest_no}{vlink} ne "0") {
-                                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" controls><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video</td></table><P>\n";
+                                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" oncontextmenu=\"return false\" controlslist=\"nodownload\" controls=\"\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video>></td></table><P>\n";
                                                         }
                                         
                                                 if($QUESTIONS{$quest_no}{alink} && $QUESTIONS{$quest_no}{alink} ne "0") {
-                                                        print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video</td></table><P>\n";
+                                                        print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video></td></table><P>\n";
                                                         }
                                                 }
 					} 
@@ -22936,7 +23619,7 @@ sub modal_mark_type {
 					$fake_real_no = "m"."$quest_no"; #multiple choice question numbers have prefix of m
 					}
 
-                       		if (defined $MT{$fake_real_no}) {
+                       		if (defined $MT{$fake_real_no} && $MT{$fake_real_no} ne"" ) {
                              		if ($MT{$fake_real_no} == $correct_answer) {
            					if ($POSTED_QST{$qst}{submissions} == 1) {
                                                         &mark_mc("correct","1","correct_answer","$correct_answer","answers","$answers","users_answer","$MT{$fake_real_no}","pass_answers","$pass_answers","pass_images_mc","$pass_images_mc","kolum","$QUESTIONS{$quest_no}{kolum}","ans_mode","$QUESTIONS{$quest_no}{ans_mode}");
@@ -23172,7 +23855,7 @@ sub modal_mark_type {
 				if ($POSTED_QST{$qst}{explanation} == 1) {
 					my $there = length($check);
 					if( $there > 0) {
-						print"<P><TABLE><TR><TD width=\"60\"></TD><TD><TABLE style=\"border:1px solid grey\; border-radius:.3em\;\"><TR style=\"padding-bottom: 4px\;\"><TD><i>&nbsp\;$LANGUAGE{$set_language}{Explanations}:</i><font style=\"font-family:Times New Roman\;\">$QUESTIONS{$quest_no}{explanation} </font><BR></TD></TR></TABLE></TD></TR></TABLE>\n";
+						print"<P><TABLE><TR><TD width=\"60\"></TD><TD><TABLE style=\"border:1px solid grey\; border-radius:.3em\;\"><TR style=\"padding-bottom: 4px\;\"><TD style=\"padding-bottom: 4px\;\"><i>&nbsp\;$LANGUAGE{$set_language}{Explanations}:</i><font style=\"font-family:Times New Roman\;\">$QUESTIONS{$quest_no}{explanation} </font></TD></TR></TABLE></TD></TR></TABLE>\n";
 						}
 					}
 					
@@ -23217,7 +23900,6 @@ sub modal_mark_type {
                         print"</font></B></center><P>\n";
 			}
 			
-#                print"<center><TABLE STYLE=\"border-radius:6px\; font-size:10pt\; border: 1px solid black\; font-family:Arial\;\"><TD><B  onClick=\"close_modal\(\)\" STYLE=\"cursor: pointer\" ><font>&nbsp\;$LANGUAGE{$set_language}{Close}&nbsp\;</font></B></TD></TABLE></center><P>\n";
                 print"$modal_close_button\n";
                 
 		if ($POSTED_QST{$qst}{submissions}!= 1) {
@@ -23511,6 +24193,8 @@ sub mark_type2 {
         self.parent.close()
         \}\n";
 	
+	&print_stop_F12();
+	
 	&print_javascript_end();
 
 	my %ACCESS = ();
@@ -23532,7 +24216,7 @@ sub mark_type2 {
 	my %THEIR_ANSWERS = &select4("query","SELECT quest_no,answer from qsts WHERE qst=\"$qst\" AND u_id=\"$ids\" AND attempt=\"$attempt\"");
 	
 	#quizzes/tests below here
-	if (keys %POSTED_QST && $QST_INFO{$qst}{type} == 1 && ($POSTED_QST{$qst}{forall} == 1 || keys %ACCESS)) { #quizzes/tests
+	if (keys %POSTED_QST && $QST_INFO{$qst}{type} == 1 && ($POSTED_QST{$qst}{forall} == 1 || keys %ACCESS)) { # QUIZZES/TESTS
 		print"<center><font size=\"+2\"><B>  $qst_name </b></font></center><P> \n";
 		my @results;
 		my $questions_in_student_qst = 0;
@@ -23599,11 +24283,17 @@ sub mark_type2 {
 			$index_to_quest_no = "$index_to_quest_no"."$index_pt2"."="."$quest_no"."-"."$QUESTIONS{$quest_no}{type}"."-"."$QUESTIONS{$quest_no}{value}".",";
 
 			
-                    ### PRINT OUT QUESTION
+                    	### PRINT OUT QUESTION IF QST IS VIEWABLE
            		if ($POSTED_QST{$qst}{submissions} == 1) { # can view their qst
                   		print"<TABLE><TR><TD valign=\"top\"><B><A NAME=\"$index_pt2\">$index_pt2</a>\.</b></TD>
 	        		<TD NOWRAP valign=\"top\"><font size=\"-1\">\($QUESTIONS_IN_QST{$quest_no}{value}\)</font></TD><TD valign=\"top\">";
 	        		
+ 				### MEMORY SHOW
+ 				if($POSTED_QST{$qst}{memori} == 1  && $QUESTIONS{$quest_no}{memory} ne "") {
+ 					$QUESTIONS{$quest_no}{memory} =~ s/&quot\;/\"/g;
+					print"<TABLE><TR><TD width=\"5\"></TD><TD style=\"border: 1px solid #660616; padding-left: 7px; padding-right: 7px; padding-top: 7px; padding-bottom: 7px\">$QUESTIONS{$quest_no}{memory}</TD></TR></TABLE><BR>\n";
+ 					}
+
              			my $question_rows = 1;
  				my $question_length = length($QUESTIONS{$quest_no}{question});
  				
@@ -23633,7 +24323,6 @@ sub mark_type2 {
                                         
                                 else {
                                         if($empty_question eq "") { # no text in question
-	            		
                                                 if(defined $QUESTIONS{$quest_no}{image_id} && $QUESTIONS{$quest_no}{image_id} > 0) {
                                                         my %QUEST_IMAGE = &select4("query","select number,file_name from qst_files where number=\"$QUESTIONS{$quest_no}{image_id}\"");
                                                         my @extension = split(/\./, $QUEST_IMAGE{$QUESTIONS{$quest_no}{image_id}});
@@ -23647,13 +24336,14 @@ sub mark_type2 {
 						        }
 						        
                                                 if($QUESTIONS{$quest_no}{vlink} && $QUESTIONS{$quest_no}{vlink} ne "0") {
-                                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" controls><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video</td></table><P>\n";
+                                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" oncontextmenu=\"return false\" controlslist=\"nodownload\" controls=\"\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video></td></table><P>\n";
                                                         }
                                         
                                                 if($QUESTIONS{$quest_no}{alink} && $QUESTIONS{$quest_no}{alink} ne "0") {
-                                                        print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video</td></table><P>\n";
+                                                        print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video></td></table><P>\n";
                                                         }
                                                 }
+                                                
                                         else { # text in question
                                                 print"<textarea class=\"show_quest\" style=\"resize\:none\; font-weight:bold\" readonly rows=\"$question_rows\" cols=\"60\">$QUESTIONS{$quest_no}{question}</textarea></b></TD></TR></TABLE>\n";
                                                 
@@ -23670,11 +24360,11 @@ sub mark_type2 {
 						        }
 						        
                                                 if($QUESTIONS{$quest_no}{vlink} && $QUESTIONS{$quest_no}{vlink} ne "0") {
-                                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" controls><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video</td></table><P>\n";
+                                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" oncontextmenu=\"return false\" controlslist=\"nodownload\" controls=\"\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video></td></table><P>\n";
                                                         }
                                         
                                                 if($QUESTIONS{$quest_no}{alink} && $QUESTIONS{$quest_no}{alink} ne "0") {
-                                                        print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video</td></table><P>\n";
+                                                        print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video></td></table><P>\n";
                                                         }
                                                 }
 					} 
@@ -23682,7 +24372,7 @@ sub mark_type2 {
 			
                     
                     
-                ### PRINT ANSWERS
+                	### PRINT ANSWERS AND THEIR CHOICES
 			if ($QUESTIONS{$quest_no}{type} eq"TF") { # True False
 				my $correct_answer;
 				if($ANSWERS{$quest_no}{q_order}{1}{answers}{T} == 1) {
@@ -24035,7 +24725,7 @@ sub mark_type2 {
 				if ($POSTED_QST{$qst}{explanation} == 1) {
 					my $there = length($check);
 					if( $there > 0) {
-						print"<P><TABLE><TR><TD width=\"60\"></TD><TD><TABLE style=\"border:1px solid grey\; border-radius:.3em\;\"><TR style=\"padding-bottom: 4px\;\"><TD><i>&nbsp\;$LANGUAGE{$set_language}{Explanations}:</i><font style=\"font-family:Times New Roman\;\">$QUESTIONS{$quest_no}{explanation} </font><BR></TD></TR></TABLE></TD></TR></TABLE>\n";
+						print"<P><TABLE><TR><TD width=\"60\"></TD><TD><TABLE style=\"border:1px solid grey\; border-radius:.3em\;\"><TR style=\"padding-bottom: 4px\;\"><TD style=\"padding-bottom: 4px\;\"><i>&nbsp\;$LANGUAGE{$set_language}{Explanations}:</i><font style=\"font-family:Times New Roman\;\">$QUESTIONS{$quest_no}{explanation} </font></TD></TR></TABLE></TD></TR></TABLE>\n";
 						}
 					}
 					
@@ -24049,15 +24739,15 @@ sub mark_type2 {
 				}
 
                  	++$index_pt2;
-			}
+                 	
+			} # DONE WITH FOREACH for questions and answers
+			
 			
                 if($show_eq == 2) {
                         &print_eq();
                         }
-                        
-                # done with answers
-                
-		if ($POSTED_QST{$qst}{submissions} == 1) { # submitted qst is viewable
+                                        
+		if ($POSTED_QST{$qst}{submissions} == 1) { #  SUBMITTED QST IS VIEWBLE
 			my $pass;
 			foreach my $piece(@results) {
 				$pass = "$pass".","."$piece";
@@ -24071,7 +24761,7 @@ sub mark_type2 {
 		
 		print"$close_button\n";
 
-                if ($POSTED_QST{$qst}{result} == 1) { # result/mark is viewable
+                if ($POSTED_QST{$qst}{result} == 1) { #  RESULT/MARK IS VIEWABLE
                 	print "<center><B><font size=\"+1\"> $LANGUAGE{$set_language}{Mark}: $score/$QST_INFO{$qst}{marks} ";
                 	
                 	if($number_to_mark > 0) {
@@ -24081,11 +24771,11 @@ sub mark_type2 {
                         print"</font></B></center><P>\n";
 			}
 			
-		if ($POSTED_QST{$qst}{submissions}!= 1) {
+		if ($POSTED_QST{$qst}{submissions}!= 1) { #  QST NOT VIEWABLE
                 	print"<P><center><B>Submissions have not been released.</B></center><P>\n";
                 	}
                 	
-		if ($POSTED_QST{$qst}{result}!= 1) {
+		if ($POSTED_QST{$qst}{result}!= 1) { #  MARKS NOT SHOWN
                 	print"<center><B>Marks have not been released.</b></center><P>\n";
                 	}
                 	
@@ -24096,7 +24786,7 @@ sub mark_type2 {
                 &print_form("form_name","form_reload","form_target","orig_Window","input","print_modal_students_screen","class_name","$class_name","class_id","$class_id","u_id","$ids","session_id","$session_id");
 		
 		
-		# record mark, the highest mark if more than one try
+		# RECORD MARK - the highest mark if more than one try
 		if($POSTED_QST{$qst}{rhm} == 1) { 
 			my %RETURN6 = &select_qst_scores("query","SELECT u_id,qst,mark,marked from qst_scores WHERE qst=\"$qst\" AND u_id=\"$ids\"");
 			my %TIME = &get_org_time("org_id","$MT{org_id}");
@@ -24163,7 +24853,7 @@ sub mark_type2 {
 			&update_general("query","UPDATE qst_attempts SET finish_time=\"$TIME1{time}{hour_minute}\", finish_day=\"$TIME1{time}{day}\", finish_month=\"$TIME1{time}{month}\" WHERE qst_no=\"$qst\" AND u_id=\"$ids\"");
 			}
 			
-		else { #do not record mark
+		else { # DO NOT RECORD MARK
 			&generic_delete("query","DELETE from qsts WHERE qst=\"$qst\" AND u_id=\"$ids\"");
 			&generic_delete("query","DELETE from qst_scores WHERE qst=\"$qst\" AND u_id=\"$ids\"");
 			}
@@ -24171,7 +24861,7 @@ sub mark_type2 {
       		
       		
       		
-      	# surveys below here
+      	# SURVEYS BELOW HERE
 	elsif ((keys %POSTED_QST && $QST_INFO{$qst}{type} == 2 && $POSTED_QST{$qst}{forall} == 1 || keys %ACCESS)) { #surveys
 		my %QUESTIONS_IN_QST = &select4("query","select quest_no,q_order from qst_questions WHERE qst_no=\"$qst\"");
 		my %QUESTIONS_ALREADY_ANSWERED = &select_questions_already_answered("query","select answer,quest_no from qsts where u_id=\"$ids\"AND qst=\"$qst\" AND attempt=\"1\"");
@@ -24255,9 +24945,11 @@ sub modal2_mark_type2 {
 	top.close\(\)\}\n";
 	
 	print"function close_modal\(\) \{
-        self.top.location=\"/qst/one#close\"
-        self.top.document.form_reload.submit()
+	self.top.opener.document.form_reload.submit()
+        self.top.close()
         \}\n";
+        
+        &print_stop_F12();
         
 	&print_javascript_end();
 
@@ -24279,7 +24971,7 @@ sub modal2_mark_type2 {
 	my %THEIR_ANSWERS = &select4("query","SELECT quest_no,answer from qsts WHERE qst=\"$qst\" AND u_id=\"$ids\" AND attempt=\"$attempt\"");
 	
 	
-    #####quizzes/tests below here
+    	##### QUIZZES/TESTS HERE
 	if (keys %POSTED_QST && $QST_INFO{$qst}{type} == 1 && ($POSTED_QST{$qst}{forall} == 1 || keys %ACCESS)) { #quizzes/tests
 		my @results;
 		my $questions_in_student_qst = 0;
@@ -24321,7 +25013,7 @@ sub modal2_mark_type2 {
 			
 			if ($POSTED_QST{$qst}{source} == 1) {
 				# GET THE SOURCE FOLDER NAME
-				%SOURCE = &get_the_folder_name("questions","$questionsource","students","1");
+				%SOURCE = &get_the_folder_name("questions","$questionsource","student","1");
 				}
 			}
 			
@@ -24341,6 +25033,10 @@ sub modal2_mark_type2 {
 		   	&print_javascript_end();
 			}
 
+           	if ($POSTED_QST{$qst}{submissions} == 1) { # can view their qst
+           		print"<TABLE bgcolor=\"#00000\" width=\"100%\"><TR><TD><center><B><i><font style=\"font-size:18pt\; font-family:Arial\;\" color=\"white\"> $name </font></i></b></center></TD></TR></TABLE><P>";
+			}
+			
 		foreach my $quest(sort {$a<=>$b} keys %THEIR_QUESTIONS) {
 			my $quest_no = "$THEIR_QUESTIONS{$quest}";
 			$index_to_quest_no = "$index_to_quest_no"."$index_pt2=$quest_no"."-"."$QUESTIONS{$quest_no}{type}"."-"."$QUESTIONS_IN_QST{$quest_no}{value}".",";
@@ -24352,6 +25048,12 @@ sub modal2_mark_type2 {
                   		print"<TABLE><TR><TD valign=\"top\"><B><A NAME=\"$index_pt2\">$index_pt2</a>\.</b></TD>
 	        		<TD NOWRAP valign=\"top\"><font size=\"-1\">\($QUESTIONS_IN_QST{$quest_no}{value}\)</font></TD><TD valign=\"top\">";
 	        		
+ 				### MEMORY SHOW
+ 				if($POSTED_QST{$qst}{memori} == 1  && $QUESTIONS{$quest_no}{memory} ne "") {
+ 					$QUESTIONS{$quest_no}{memory} =~ s/&quot\;/\"/g;
+					print"<TABLE><TR><TD width=\"5\"></TD><TD style=\"border: 1px solid #660616; padding-left: 7px; padding-right: 7px; padding-top: 7px; padding-bottom: 7px\">$QUESTIONS{$quest_no}{memory}</TD></TR></TABLE><BR>\n";
+ 					}
+
              			my $question_rows = 1;
  				my $question_length = length($QUESTIONS{$quest_no}{question});
  				
@@ -24395,11 +25097,11 @@ sub modal2_mark_type2 {
 						        }
 						        
                                                 if($QUESTIONS{$quest_no}{vlink} && $QUESTIONS{$quest_no}{vlink} ne "0") {
-                                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" controls><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video</td></table><P>\n";
+                                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" oncontextmenu=\"return false\" controlslist=\"nodownload\" controls=\"\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video></td></table><P>\n";
                                                         }
                                         
                                                 if($QUESTIONS{$quest_no}{alink} && $QUESTIONS{$quest_no}{alink} ne "0") {
-                                                        print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video</td></table><P>\n";
+                                                        print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video></td></table><P>\n";
                                                         }
                                                 }
                                         else { # text in question
@@ -24418,11 +25120,11 @@ sub modal2_mark_type2 {
 						        }
 						        
                                                 if($QUESTIONS{$quest_no}{vlink} && $QUESTIONS{$quest_no}{vlink} ne "0") {
-                                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" controls><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video</td></table><P>\n";
+                                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" oncontextmenu=\"return false\" controlslist=\"nodownload\" controls=\"\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video></td></table><P>\n";
                                                         }
                                         
                                                 if($QUESTIONS{$quest_no}{alink} && $QUESTIONS{$quest_no}{alink} ne "0") {
-                                                        print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video</td></table><P>\n";
+                                                        print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video></td></table><P>\n";
                                                         }
                                                 }
 					} 
@@ -24799,13 +25501,13 @@ sub modal2_mark_type2 {
   				}
 
                  	++$index_pt2;
-			}
+                 	
+			} # DONE WITH QUESTIONS AND ANSWERS
 			
                 if($show_eq == 2) {
                         &print_eq();
                         }
                         
-            ##done with answers
                 
 		if ($POSTED_QST{$qst}{submissions} == 1) { # submitted qst is viewable
 			my $pass;
@@ -25000,10 +25702,12 @@ sub modal3_mark_type3 {
 	top.close\(\)\}\n";
 	
 	print"function close_modal\(\) \{
-        self.top.location=\"/qst/one#close\"
-        self.top.document.form_reload.submit()
+	self.top.opener.document.form_reload.submit()
+        self.top.close()
         \}\n";
         
+        &print_stop_F12();
+
 	&print_javascript_end();
 
 	my %ACCESS = ();
@@ -25017,12 +25721,12 @@ sub modal3_mark_type3 {
 	my %QST_INFO = &select_qst("query","SELECT number,name,questions,marks,random_q,random_order,type from qst WHERE number=\"$qst\"");
 	my $attempt = &select10("query","SELECT attempts from qst_attempts WHERE qst_no=\"$qst\" AND u_id=\"$ids\"");
 
-	#find which questions are associated with their qst
+	#find which questions are associated with their qst	
 	my %THEIR_QUESTIONS = &select4("query","SELECT quest_order,quest_no from qsts WHERE qst=\"$qst\" AND u_id=\"$ids\" AND attempt=\"$attempt\"");
 
 	#get their answers to the qst questions
 	my %THEIR_ANSWERS = &select4("query","SELECT quest_no,answer from qsts WHERE qst=\"$qst\" AND u_id=\"$ids\" AND attempt=\"$attempt\"");
-	
+		
 	#quizzes/tests below here
 	if (keys %POSTED_QST && $QST_INFO{$qst}{type} == 1 && ($POSTED_QST{$qst}{forall} == 1 || keys %ACCESS)) { #quizzes/tests
 		my @results;
@@ -25045,7 +25749,7 @@ sub modal3_mark_type3 {
 		my $questions = "$QST_INFO{$qst}{questions}";
 		my $marks = "$QST_INFO{$qst}{marks}";
 		my $name = "$QST_INFO{$qst}{name}";
-		
+
 		if(keys %QUESTIONS_IN_QST) {
      			foreach my $key(keys %QUESTIONS_IN_QST) {
      				$questionsource = "$questionsource".","."$key";
@@ -25085,17 +25789,24 @@ sub modal3_mark_type3 {
 		   	&print_javascript_end();
 			}
 
+		print"<DIV >\n";
+		print"<TABLE bgcolor=\"#00000\" width=\"100%\"><TR><TD><center><B><i><font style=\"font-size:18pt\; font-family:Arial\;\" color=\"white\"> $qst_name </font></i></b></center></TD></TR></TABLE><P>";
+		
 		foreach my $quest(sort {$a<=>$b} keys %THEIR_QUESTIONS) {
 			my $quest_no = "$THEIR_QUESTIONS{$quest}";
-			$index_to_quest_no = "$index_to_quest_no"."$index_pt2=$quest_no"."-"."$QUESTIONS{$quest_no}{type}"."-"."$QUESTIONS_IN_QST{$quest_no}{value}".",";
-
-			
+			$index_to_quest_no = "$index_to_quest_no"."$index_pt2=$quest_no"."-"."$QUESTIONS{$quest_no}{type}"."-"."$QUESTIONS_IN_QST{$quest_no}{value}".",";			
 			
                     ### PRINT OUT QUESTION
            		if ($POSTED_QST{$qst}{submissions} == 1) { # can view their qst
                   		print"<TABLE><TR><TD valign=\"top\"><B><A NAME=\"$index_pt2\">$index_pt2</a>\.</b></TD>
 	        		<TD NOWRAP valign=\"top\"><font size=\"-1\">\($QUESTIONS_IN_QST{$quest_no}{value}\)</font></TD><TD valign=\"top\">";
 	        		
+ 				### MEMORY SHOW
+ 				if($POSTED_QST{$qst}{memori} == 1  && $QUESTIONS{$quest_no}{memory} ne "") {
+ 					$QUESTIONS{$quest_no}{memory} =~ s/&quot\;/\"/g;
+					print"<TABLE><TR><TD width=\"5\"></TD><TD style=\"border: 1px solid #660616; padding-left: 7px; padding-right: 7px; padding-top: 7px; padding-bottom: 7px\">$QUESTIONS{$quest_no}{memory}</TD></TR></TABLE><BR>\n";
+ 					}
+
              			my $question_rows = 1;
  				my $question_length = length($QUESTIONS{$quest_no}{question});
  				
@@ -25139,11 +25850,11 @@ sub modal3_mark_type3 {
 						        }
 						        
                                                 if($QUESTIONS{$quest_no}{vlink} && $QUESTIONS{$quest_no}{vlink} ne "0") {
-                                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" controls><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video</td></table><P>\n";
+                                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" oncontextmenu=\"return false\" controlslist=\"nodownload\" controls=\"\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video></td></table><P>\n";
                                                         }
                                         
                                                 if($QUESTIONS{$quest_no}{alink} && $QUESTIONS{$quest_no}{alink} ne "0") {
-                                                        print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video</td></table><P>\n";
+                                                        print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video></td></table><P>\n";
                                                         }
                                                 }
                                         else { # text in question
@@ -25162,11 +25873,11 @@ sub modal3_mark_type3 {
 						        }
 						        
                                                 if($QUESTIONS{$quest_no}{vlink} && $QUESTIONS{$quest_no}{vlink} ne "0") {
-                                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" controls><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video</td></table><P>\n";
+                                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" oncontextmenu=\"return false\" controlslist=\"nodownload\" controls=\"\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video></td></table><P>\n";
                                                         }
                                         
                                                 if($QUESTIONS{$quest_no}{alink} && $QUESTIONS{$quest_no}{alink} ne "0") {
-                                                        print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video</td></table><P>\n";
+                                                        print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video></td></table><P>\n";
                                                         }
                                                 }
 					} 
@@ -25675,6 +26386,8 @@ sub modal3_mark_type3 {
 			&update_general("query","UPDATE qst_attempts SET attempts=\"1\",finish_time=\"$TIME{time}{hour_minute}\", finish_day=\"$TIME{time}{day}\", finish_month=\"$TIME{time}{month}\" WHERE qst_no=\"$qst\" AND u_id=\"$ids\"");
 			}
 
+		print"<DIV oncontextmenu =\"return false\">\n";
+
 		if(keys %QUESTIONS_IN_QST) {
 			#see if already submitted by instructor
 			my $submitted = &select10("query","SELECT qst from qst_scores WHERE qst=\"$qst\" AND u_id=\"$ids\"");
@@ -25684,6 +26397,7 @@ sub modal3_mark_type3 {
 				}
 				
 			&insert_generic("query","INSERT qst_scores VALUES(\"$ids\",\"$qst\",\"0\",\"0\",\"0\",\"$org_id\")");
+			
 			
        	    		print "<center><BR><P><B>$LANGUAGE{$set_language}{Thankyoufortakingthetimetocompletethesurvey}</b></center><P> \n";
 			print"<center><input type=\"BUTTON\" style=\"cursor: pointer\" name=\"del\" value=\"$LANGUAGE{$set_language}{Close}\" onClick=\"close_modal\(\)\"></center>\n";
@@ -25697,6 +26411,8 @@ sub modal3_mark_type3 {
 	else {
 		print "<center><P><img src=\"/schools/x.gif\"><B> Invalid input.</b></center><P> \n";
 		}
+			
+	print"</DIV>";
 	}
 
 	
@@ -25745,10 +26461,12 @@ sub modal4_mark_type4 {
 	top.close\(\)\}\n";
 	
 	print"function close_modal\(\) \{
-        self.top.location=\"/qst/one#close\"
-        self.top.document.form_reload.submit()
+	self.top.opener.document.form_reload.submit()
+        self.top.close()
         \}\n";
         
+        &print_stop_F12();
+
 	&print_javascript_end();
 
 	my %ACCESS = ();
@@ -25831,6 +26549,8 @@ sub modal4_mark_type4 {
 		   	&print_javascript_end();
 			}
 
+		print"<TABLE bgcolor=\"#00000\" width=\"100%\"><TR><TD><center><B><i><font style=\"font-size:18pt\; font-family:Arial\;\" color=\"white\"> $name </font></i></b></center></TD></TR></TABLE><P>";
+
 		foreach my $quest(sort {$a<=>$b} keys %THEIR_QUESTIONS) {
 			my $quest_no = "$THEIR_QUESTIONS{$quest}";
 			$index_to_quest_no = "$index_to_quest_no"."$index_pt2=$quest_no"."-"."$QUESTIONS{$quest_no}{type}"."-"."$QUESTIONS_IN_QST{$quest_no}{value}".",";
@@ -25842,6 +26562,12 @@ sub modal4_mark_type4 {
                   		print"<TABLE><TR><TD valign=\"top\"><B><A NAME=\"$index_pt2\">$index_pt2</a>\.</b></TD>
 	        		<TD NOWRAP valign=\"top\"><font size=\"-1\">\($QUESTIONS_IN_QST{$quest_no}{value}\)</font></TD><TD valign=\"top\">";
 	        		
+ 				### MEMORY SHOW
+ 				if($POSTED_QST{$qst}{memori} == 1  && $QUESTIONS{$quest_no}{memory} ne "") {
+ 					$QUESTIONS{$quest_no}{memory} =~ s/&quot\;/\"/g;
+					print"<TABLE><TR><TD width=\"5\"></TD><TD style=\"border: 1px solid #660616; padding-left: 7px; padding-right: 7px; padding-top: 7px; padding-bottom: 7px\">$QUESTIONS{$quest_no}{memory}</TD></TR></TABLE><BR>\n";
+ 					}
+
              			my $question_rows = 1;
  				my $question_length = length($QUESTIONS{$quest_no}{question});
  				
@@ -25885,11 +26611,11 @@ sub modal4_mark_type4 {
 						        }
 						        
                                                 if($QUESTIONS{$quest_no}{vlink} && $QUESTIONS{$quest_no}{vlink} ne "0") {
-                                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" controls><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video</td></table><P>\n";
+                                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" oncontextmenu=\"return false\" controlslist=\"nodownload\" controls=\"\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video></td></table><P>\n";
                                                         }
                                         
                                                 if($QUESTIONS{$quest_no}{alink} && $QUESTIONS{$quest_no}{alink} ne "0") {
-                                                        print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video</td></table><P>\n";
+                                                        print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video></td></table><P>\n";
                                                         }
                                                 }
                                         else { # text in question
@@ -25908,11 +26634,11 @@ sub modal4_mark_type4 {
 						        }
 						        
                                                 if($QUESTIONS{$quest_no}{vlink} && $QUESTIONS{$quest_no}{vlink} ne "0") {
-                                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" controls><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video</td></table><P>\n";
+                                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" oncontextmenu=\"return false\" controlslist=\"nodownload\" controls=\"\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$quest_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video></td></table><P>\n";
                                                         }
                                         
                                                 if($QUESTIONS{$quest_no}{alink} && $QUESTIONS{$quest_no}{alink} ne "0") {
-                                                        print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video</td></table><P>\n";
+                                                        print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$quest_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video></td></table><P>\n";
                                                         }
                                                 }
 					} 
@@ -28395,6 +29121,12 @@ sub post_qst {
 	        $PQ{source} = 0;
                 }
 
+	if($PQ{memori} == 1) {
+		}
+	else {
+		$PQ{memori} = 0;
+                }
+                
 	my $type = $PQ{type};
 	$type =~ s/\D//g;
 	my $sub_type = $PQ{sub_type};
@@ -28435,6 +29167,9 @@ sub post_qst {
 	$source  =~ s/\D//g;
 	my $explanations = $PQ{explanations};
 	$explanations  =~ s/\D//g;
+	my $memori = $PQ{memori};
+	$memori  =~ s/\D//g;
+
         my %TIMEZONE = ();
         
 	$error = &check_many_length_return("$qst_no","10","$class_id","10","start","10","end","10","$attempts","3","$result","1","$submissions","1","$rhm","1","$forall","1","$type","2","$class_open","10","$open_class","10","$avail","1","$start_month","2","$start_day","2","$start_hour","4","$finish_month","2","$finish_day","2","$finish_hour","4","$qtime","3","$delivery","1");
@@ -28477,6 +29212,8 @@ sub post_qst {
         delete($PQ{view_org_id});
         delete($PQ{source});
         delete($PQ{explanations});
+        delete($PQ{memori});
+        delete($PQ{memory});
         
 	my %RETURN = &select1("query","select qst from posted_qst WHERE qst=\"$qst_no\" AND class_id=\"$class_id\" AND u_id=\"$ids\"");
  
@@ -28499,7 +29236,7 @@ sub post_qst {
 				}
 			else {
  				if($type != 2) { # quizzes/tests
-					&update_general("query","UPDATE posted_qst SET attempts=\"$attempts\", start=\"$start\", end=\"$end\", result=\"$result\", submissions=\"$submissions\", rhm=\"$rhm\", forall=\"$forall\", posted=\"1\", avail=\"$avail\", start_month=\"$start_month\", start_day=\"$start_day\", start_hour=\"$start_hour\", finish_month=\"$finish_month\", finish_day=\"$finish_day\", finish_hour=\"$finish_hour\", qtime=\"$qtime\", delivery=\"$delivery\", shuffle=\"$shuffle\",display=\"$display\", shuffle_ans=\"$shuffle_ans\", explanation=\"$explanations\", source=\"$source\" WHERE qst=\"$qst_no\"");
+					&update_general("query","UPDATE posted_qst SET attempts=\"$attempts\", start=\"$start\", end=\"$end\", result=\"$result\", submissions=\"$submissions\", rhm=\"$rhm\", forall=\"$forall\", posted=\"1\", avail=\"$avail\", start_month=\"$start_month\", start_day=\"$start_day\", start_hour=\"$start_hour\", finish_month=\"$finish_month\", finish_day=\"$finish_day\", finish_hour=\"$finish_hour\", qtime=\"$qtime\", delivery=\"$delivery\", shuffle=\"$shuffle\",display=\"$display\", shuffle_ans=\"$shuffle_ans\", explanations=\"$explanations\", source=\"$source\" , memori=\"$memori\" WHERE qst=\"$qst_no\"");
 					}
 					
 				else { # surveys
@@ -28662,7 +29399,7 @@ sub post_qst {
 			}
 		}
 		
-	elsif ($error != 1) { # First Post
+	elsif ($error != 1) { # FIRST POST
 		my $count = &is_there("table","qst","number","$qst_no");
 		my %RETURN3 = &select_qst("query","select number,name,questions,marks,random_q,random_order,type,weight,branching from qst WHERE number=\"$qst_no\" AND u_id=\"$ids\"");
 		
@@ -28670,7 +29407,7 @@ sub post_qst {
 			if($forall != 1 && keys %PQ) { # only available for select students, otherwise do not post it
 
 				if($type != 2) { # quizzes/tests
-                                        &insert_qst("qst","$qst_no","attempts","$attempts","start","$start","end","$end","class_id","$class_id","result","$result","submissions","$submissions","rhm","$rhm","forall","$forall","avail","$avail","start_month","$start_month","start_day","$start_day","start_hour","$start_hour","finish_month","$finish_month","finish_day","$finish_day","finish_hour","$finish_hour","qtime","$qtime","delivery","$delivery","branching","$RETURN3{$qst_no}{branching}","shuffle","$shuffle","display","$display","shuffle_ans","$shuffle_ans","explanations","$explanations","source","$source");
+                                        &insert_qst("qst","$qst_no","attempts","$attempts","start","$start","end","$end","class_id","$class_id","result","$result","submissions","$submissions","rhm","$rhm","forall","$forall","avail","$avail","start_month","$start_month","start_day","$start_day","start_hour","$start_hour","finish_month","$finish_month","finish_day","$finish_day","finish_hour","$finish_hour","qtime","$qtime","delivery","$delivery","branching","$RETURN3{$qst_no}{branching}","shuffle","$shuffle","display","$display","shuffle_ans","$shuffle_ans","explanations","$explanations","source","$source","memori","$memori");
 					}
 					
 				else { # surveys
@@ -28694,7 +29431,7 @@ sub post_qst {
 				
 			elsif ($forall == 1) { # for all students in class
 				if($type != 2) { # quizzes/tests
-                                        &insert_qst("qst","$qst_no","attempts","$attempts","start","$start","end","$end","class_id","$class_id","result","$result","submissions","$submissions","rhm","$rhm","forall","$forall","avail","$avail","start_month","$start_month","start_day","$start_day","start_hour","$start_hour","finish_month","$finish_month","finish_day","$finish_day","finish_hour","$finish_hour","qtime","$qtime","delivery","$delivery","branching","$RETURN3{$qst_no}{branching}","shuffle","$shuffle","display","$display","shuffle_ans","$shuffle_ans","explanations","$explanations","source","$source");
+                                        &insert_qst("qst","$qst_no","attempts","$attempts","start","$start","end","$end","class_id","$class_id","result","$result","submissions","$submissions","rhm","$rhm","forall","$forall","avail","$avail","start_month","$start_month","start_day","$start_day","start_hour","$start_hour","finish_month","$finish_month","finish_day","$finish_day","finish_hour","$finish_hour","qtime","$qtime","delivery","$delivery","branching","$RETURN3{$qst_no}{branching}","shuffle","$shuffle","display","$display","shuffle_ans","$shuffle_ans","explanations","$explanations","source","$source","memori","$memori");
 					}
 					
 				else {	# surveys
@@ -28714,8 +29451,8 @@ sub post_qst {
 				}
 			}
 		}
+		
 	&make_type("class_open","1","open_class","$class_id","type","$type","sub_type","$sub_type","from","$from","expand","x","u_id","$u_id","session_id","$session_id");
-	
 	}
 
 #####################
@@ -28796,6 +29533,13 @@ sub post_qst_top {
 			else \{
 			sourc = \"\"
        			\}
+			if\(document.form1.memori.checked\) \{
+			memori = \"1\"
+			\}
+			else \{
+			memori = \"\"
+       			\}
+
 	 		if\(document.form1.result.checked\) \{
 	 		res = \"1\"
        			\}
@@ -28805,6 +29549,7 @@ sub post_qst_top {
 		 	self.parent.bota.document.post_qst.submissions.value =subm
 		 	self.parent.bota.document.post_qst.explanations.value =explan
 		 	self.parent.bota.document.post_qst.source.value =sourc
+		 	self.parent.bota.document.post_qst.memori.value =memori
 		 	self.parent.bota.document.post_qst.result.value =res
 		 	self.parent.bota.document.post_qst.attempts.value =att
 		 	self.parent.bota.document.post_qst.rhm.value =rhm
@@ -28997,15 +29742,15 @@ sub post_qst_top {
                                 
                                 
                         print"<TD width=\"10\"></TD>\n";
-                        if($RETURN{$PQT{qst_no}}{display} == 1) { # Modal
+                        if($RETURN{$PQT{qst_no}}{display} == 1) { # Modal  Removed Nov 18, 2023
                                 print"<TD>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Display}&nbsp\; <SELECT name=\"display\">\n";
                                 print"<option value=\"0\">$LANGUAGE{$set_language}{NewWindowResizeable}</option>
-                                <option value=\"1\" selected>$LANGUAGE{$set_language}{ModalNoresize}</option></select></TD></TR>\n";
+                                <option value=\"1\" selected>$LANGUAGE{$set_language}{NewWindowNoresize}</option></select></TD></TR>\n";
                                 }
                         else {
                                 print"<TD >&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Display}&nbsp\; <SELECT name=\"display\">\n";
                                 print"<option value=\"0\" selected>$LANGUAGE{$set_language}{NewWindowResizeable}</option>
-                                <option value=\"1\">$LANGUAGE{$set_language}{ModalNoresize}</option></select></TD></TR>\n";
+                                <option value=\"1\">$LANGUAGE{$set_language}{NewWindowNoresize}</option></select></TD></TR>\n";
                                 }
                                 
 			print"<TR><TD width=\"10\"><TD>$LANGUAGE{$set_language}{Duration}&nbsp\;
@@ -29105,15 +29850,17 @@ sub post_qst_top {
                                         
                                 else {
                                         if($RETURN{$PQT{qst_no}}{submissions} == 0) {
-                                                print"<TR><TD width=\"10\"></TD><TD><label for=\"radio1\"><input type=\"checkbox\" name=\"submissions\" value=\"1\" id=\"radio1\" onClick=\"check_submiss\(1\)\"> $LANGUAGE{$set_language}{Submissionsareviewable} </label>";
-						print"&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<span ID=\"show_op\" style=\"display: none\"><label for=\"explan\">";
+                                                print"<TR><TD width=\"10\"></TD><TD ><label for=\"radio1\"><input type=\"checkbox\" name=\"submissions\" value=\"1\" id=\"radio1\" onClick=\"check_submiss\(1\)\"> $LANGUAGE{$set_language}{Submissionsareviewable} </label>";
+						print"&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;</TD><TD style=\"font-family\:Arial\; font-size\: 11pt\; border-radius:6px\;border: 1px solid grey\; padding-bottom: 4px\; padding-top: 4px\; margin-left:15px\; background: #A0AECD\;\">&nbsp\;&nbsp\;<span ID=\"show_op\" style=\"display: none\" ><label for=\"explan\">";
 						print"<label for=\"explan\"><input type=\"checkbox\" name=\"explanations\" value=\"1\" id=\"explan\"> $LANGUAGE{$set_language}{Explanations} </label>";
 						print"&nbsp\;&nbsp\;<label for=\"source\"><input type=\"checkbox\" name=\"source\" value=\"1\" id=\"source\"> $LANGUAGE{$set_language}{SOURCE} </label>\n";
+						print"&nbsp\;&nbsp\;<label for=\"memori\"><input type=\"checkbox\" name=\"memori\" value=\"1\" id=\"memori\"> $LANGUAGE{$set_language}{Memory} </label>\n";
+
 						print"</TD></TR>\n";
                                                 }
                                         else {
                                         	print"<TR><TD width=\"10\"></TD><TD><label for=\"radio1\"><input type=\"checkbox\" name=\"submissions\" value=\"1\" id=\"radio1\" checked onClick=\"check_submiss\(1\)\">  $LANGUAGE{$set_language}{Submissionsareviewable} </label>";
-						print"&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<span ID=\"show_op\" style=\"display: inline-block\"><label for=\"explan\">\n";
+						print"&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;</TD><TD style=\"font-family\:Arial\; font-size\: 11pt\; border-radius:6px\;border: 1px solid grey\; padding-bottom: 4px\; padding-top: 4px\; margin-left:15px\; background: #A0AECD\;\">&nbsp\;&nbsp\;<span ID=\"show_op\" style=\"display: inline-block\"><label for=\"explan\">\n";
 
                                         	if($RETURN{$PQT{qst_no}}{explanation} == 1) {
                                         		print"<label for=\"explan\"><input type=\"checkbox\" name=\"explanations\" value=\"1\" id=\"explan\" checked> $LANGUAGE{$set_language}{Explanations} </label>\n";
@@ -29130,7 +29877,16 @@ sub post_qst_top {
 						else {
 						        print"&nbsp\;&nbsp\;<label for=\"source\"><input type=\"checkbox\" name=\"source\" value=\"1\" id=\"source\"> $LANGUAGE{$set_language}{SOURCE} </label>\n";
                                         		}
-                                        	print"</TD></TR>\n";
+                                        		
+                                        	if($RETURN{$PQT{qst_no}}{memori} == 1) {
+							print"&nbsp\;&nbsp\;<label for=\"memori\"><input type=\"checkbox\" name=\"memori\" value=\"1\" id=\"memori\" checked> $LANGUAGE{$set_language}{Memory} </label>\n";
+							}
+												                                        		
+						else {
+							print"&nbsp\;&nbsp\;<label for=\"memori\"><input type=\"checkbox\" name=\"memori\" value=\"1\" id=\"memori\"> $LANGUAGE{$set_language}{Memory} </label>\n";
+                                        		}
+                                        		
+                                        	print"&nbsp\;&nbsp\;</TD></TR>\n";
                                                 }
 					
                                         if($RETURN{$PQT{qst_no}}{result} == 0) {
@@ -29175,7 +29931,7 @@ sub post_qst_top {
 			print"<TD width=\"10\"></TD>\n";
                         print"<TD>&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Display}&nbsp\; <SELECT name=\"display\">\n";
                         print"<option value=\"0\">$LANGUAGE{$set_language}{NewWindowResizeable}</option>
-                            <option value=\"1\">$LANGUAGE{$set_language}{ModalNoresize}</option></select></TD></TR>\n";
+                            <option value=\"1\">$LANGUAGE{$set_language}{NewWindowNoresize}</option></select></TD></TR>\n";
                                 
 			if($PQT{type} != 2) { # QUIZZES/TESTS
                                 if($RETURN2{$PQT{qst_no}}{branching} == 1) {
@@ -29262,7 +30018,14 @@ sub post_qst_top {
 				
                                         print"<TD>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<font size =\"-1\">- if multiple attempts records highest mark only if all questions are T/F,<BR>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; multiple choice or multiple answer, otherwise records last attempt.</font></TD></TR></TABLE>";
                                         
-                                        print"<TABLE style=\"font-family\:Arial\; font-size\: 11pt\;\"><TR><TD width=\"10\"></TD><TD><label for=\"radio1\"><input type=\"checkbox\" onClick=\"check_submiss\(1\)\" name=\"submissions\" value=\"1\" id=\"radio1\"> $LANGUAGE{$set_language}{Submissionsareviewable} </label>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<span ID=\"show_op\" style=\"display: none\"><label for=\"explan\"><input type=\"checkbox\" name=\"explanations\" value=\"1\" id=\"explan\"> $LANGUAGE{$set_language}{Explanations} </label>&nbsp\;&nbsp\;<label for=\"source\"><input type=\"checkbox\" name=\"source\" value=\"1\" id=\"source\"> $LANGUAGE{$set_language}{SOURCE} </label></span></TD></TR><TR><TD width=\"10\"></TD><TD><label for=\"radio3\"><input type=\"checkbox\" onClick=\"check_results\(1\)\" name=\"result\" value=\"1\" id=\"radio3\"> Results \(mark\) is viewable </label></TD></TR>\n";
+                                        print"<TABLE style=\"font-family\:Arial\; font-size\: 11pt\;\"><TR><TD width=\"10\"></TD><TD><label for=\"radio1\"><input type=\"checkbox\" onClick=\"check_submiss\(1\)\" name=\"submissions\" value=\"1\" id=\"radio1\"> $LANGUAGE{$set_language}{Submissionsareviewable} </label>
+                                        &nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<span ID=\"show_op\" style=\"display: none\">
+                                        <label for=\"explan\"><input type=\"checkbox\" name=\"explanations\" value=\"1\" id=\"explan\"> $LANGUAGE{$set_language}{Explanations} </label>
+                                        &nbsp\;&nbsp\;<label for=\"source\"><input type=\"checkbox\" name=\"source\" value=\"1\" id=\"source\"> $LANGUAGE{$set_language}{SOURCE} </label>
+                                        &nbsp\;&nbsp\;<label for=\"memori\"><input type=\"checkbox\" name=\"memori\" value=\"1\" id=\"memori\"> $LANGUAGE{$set_language}{Memory} </label>
+                                        </span></TD></TR>
+                                        <TR><TD width=\"10\"></TD><TD><label for=\"radio3\"><input type=\"checkbox\" onClick=\"check_results\(1\)\" name=\"result\" value=\"1\" id=\"radio3\"> Results \(mark\) is viewable </label></TD></TR>\n";
+
                                         }
 				}
 				
@@ -31571,6 +32334,13 @@ sub preview_quest {
 	$PVQ{mode} =~ s/\D//g;
 	$PVQ{ans_mode} =~ s/\D//g;
 	$PVQ{MCans} =~ s/\D//g;
+	my %LIST_ANSWERS = ();
+	my %LIST_CORRECT = ();
+	my %LIST = ();
+	my %LIST_MARK = ();
+	my %MATCH = ();
+	my %M = ();
+	my %MMARK = ();
 	
 	&print_style_sheet();
 	
@@ -31583,11 +32353,117 @@ sub preview_quest {
         my @lines = split(/\n/,$content);
         my $rows = @lines;
         $rows = $question_rows + $rows;
-
-    #### PRINT QUESTION
-	print"$image1 $LANGUAGE{$set_language}{PreviewQuestion}</TD><TD width=\"100\"></TD><TD align=\"right\"><input type=\"button\" style=\"cursor\:pointer\;\"onClick=\"window.close\(\)\" value=\"$LANGUAGE{$set_language}{Close}\">&nbsp\;&nbsp\;</TD></table><P> \n";
 	
-	if($PVQ{mode} == 1) { # ADVANCED EDITOR
+	&print_javascript_begin();
+	&print_clear_memory();
+	&print_javascript_end();
+	
+	if($PVQ{select} eq"CZ") {
+		my $empty = 0;
+		
+		foreach my $ky(keys %PVQ) {
+			if ($ky =~ /LTans/) {
+				my $list = substr($ky, 5, 1);
+				
+				if($list ne"") {
+					$LIST_CORRECT{$list} = "$PVQ{$ky}";
+					}
+				}
+				
+			if ($ky =~ /selectlt/) {
+				my $list = substr($ky, 8, 1);
+				my $ans = substr($ky, 9, 1);
+				$LIST_ANSWERS{$list}{$ans}= "$PVQ{$ky}";
+				}
+				
+			if ($ky =~ /LTmark/) {
+				$LIST_MARK{$ky} = $PVQ{$ky};
+				}
+				
+			if ($ky =~ /m_match_ans/) { #m_match_ans1
+				$MATCH{$ky} = $PVQ{$ky};
+				}
+				
+			if ($ky =~ /Mmark/) { #
+				$MMARK{$ky} = $PVQ{$ky};
+				}
+			}
+
+		if(keys %LIST_ANSWERS) {
+			foreach my $key(keys %LIST_ANSWERS) {
+				my $list = "<select name=\"list$key\" id=\"list$key\" style=\"font-family:Arial\; font-size:14\"><option value=\"\"></option>";
+				my $mark = "LTmark"."$key";
+				
+				foreach my $ans(sort keys %{$LIST_ANSWERS{$key}}) {
+					$list = "$list"."<option value=\"$ans\">+$LIST_MARK{$mark} $LIST_ANSWERS{$key}{$ans} </option>";
+					}
+				$list = "$list"."</select>";
+				$LIST{$key} = $list;
+				}
+			}
+			
+		$PVQ{question} =~ s/\*\^List1\^\*/$LIST{1}/;
+		$PVQ{question} =~ s/\*\^List2\^\*/$LIST{2}/;
+		$PVQ{question} =~ s/\*\^List3\^\*/$LIST{3}/;
+		$PVQ{question} =~ s/\*\^List4\^\*/$LIST{4}/;
+		$PVQ{question} =~ s/\*\^List5\^\*/$LIST{5}/;
+		$PVQ{question} =~ s/\*\^List6\^\*/$LIST{6}/;
+
+		if(keys %MATCH) {
+			if(keys %MMARK) {
+				foreach my $key(keys %MATCH) {
+					my $m_size = length($MATCH{$key});
+					my $num = $key;
+					$num = substr($key, 11, 1);
+					if($m_size > 0) {
+						++$empty;
+						if($m_size > 10) {
+							$M{$num} = 22;
+							}
+						else {
+							$M{$num} = 10;
+							}
+						}
+					}
+				}
+			}
+		
+		if($empty > 0) {
+			$PVQ{que
+			stion} =~ s/\*\^Match1\^\*/<input type=\"text\" name=\"\" value=\"\" size =\"$M{1}\" placeholder=\"$MATCH{m_match_ans1}\">/;
+			$PVQ{question} =~ s/\*\^Match2\^\*/<input type=\"text\" name=\"\" value=\"\" size =\"$M{2}\" placeholder=\"$MATCH{m_match_ans2}\">/;
+			$PVQ{question} =~ s/\*\^Match3\^\*/<input type=\"text\" name=\"\" value=\"\" size =\"$M{3}\" placeholder=\"$MATCH{m_match_ans3}\">/;
+			$PVQ{question} =~ s/\*\^Match4\^\*/<input type=\"text\" name=\"\" value=\"\" size =\"$M{4}\" placeholder=\"$MATCH{m_match_ans4}\">/;
+			$PVQ{question} =~ s/\*\^Match5\^\*/<input type=\"text\" name=\"\" value=\"\" size =\"$M{5}\" placeholder=\"$MATCH{m_match_ans5}\">/;
+			$PVQ{question} =~ s/\*\^Match6\^\*/<input type=\"text\" name=\"\" value=\"\" size =\"$M{6}\" placeholder=\"$MATCH{m_match_ans6}\">/;
+			}
+			
+		}
+		
+	if($PVQ{explanation} eq "<p><br></p>") {
+		$PVQ{explanation} = "";
+		}
+	
+	if($PVQ{memory} eq "<p><br></p>") {
+		$PVQ{memory} = "";
+		}
+	
+	
+    #### PRINT QUESTION
+	print"$image1 $LANGUAGE{$set_language}{PreviewQuestion}</TD><TD width=\"100\"></TD><TD align=\"right\"><input type=\"button\" style=\"cursor\:pointer\;\" onClick=\"window.close\(\)\" value=\"$LANGUAGE{$set_language}{Close}\">&nbsp\;&nbsp\;</TD></table><P> \n";
+	
+	
+	if($PVQ{memory} ne "") { # MEMORY
+		$PVQ{memory} =~ s/&quot;/"/g;
+		
+		print"<DIV ID=\"MEMORY\" style=\"display: block\" >\n";
+		print"<TABLE><TR><TD width=\"15\"></TD><TD style=\"border: 1px solid #660616\; padding-left: 7px\; padding-right: 7px\; padding-top: 7px\; padding-bottom: 7px\">$PVQ{memory}</TD></TR></TABLE><BR><center><B onClick=\"clear_memory\(\)\" style=\"cursor\:pointer\;\">Continue</B></center><BR>\n";
+		print"</DIV>\n";
+		
+		print"<DIV ID=\"QUESTION\" style=\"display: none\" >\n";
+		}
+
+	if($PVQ{mode} == 1) { # ADVANCED EDITOR			
                 if($PVQ{question} =~ /float\:/){
                         print"<FORM><TABLE><TR><TD>$PVQ{question}</TD></TR></TABLE><P>\n";
                         }
@@ -31621,12 +32497,12 @@ sub preview_quest {
                         }
                         
                 if(defined $PVQ{vlink}  && $PVQ{vlink} ne"") {
-                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" controls>
+                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" oncontextmenu=\"return false\" controlslist=\"nodownload\" controls=\"\">
                         <source src=\"$PVQ{vlink}\" type=\"video/mp4\">
                         <source src=\"$PVQ{vlink}\" type=\"video/ogg\">
                         <source src=\"$PVQ{vlink}\" type=\"video/webm\">
                         $LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}
-                        </video</td></table><P>\n";
+                        </video></td></table><P>\n";
                         }
 		
                 if(defined $PVQ{alink}  && $PVQ{alink} ne"") {
@@ -31635,7 +32511,7 @@ sub preview_quest {
                         <source src=\"$PVQ{alink}\" type=\"audio/ogg\">
                         <source src=\"$PVQ{alink}\" type=\"audio/wav\">
                         $LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}
-                        </video</td></table><P>\n";
+                        </video></td></table><P>\n";
                         }
 		}
 		
@@ -32173,6 +33049,28 @@ sub preview_quest {
                 print"<TABLE>";
 		}
 		
+	elsif ($PVQ{select} eq"OR") {
+		my %ORANS = ();
+		my $i = 1;
+		
+		foreach my $k(keys %PVQ){
+			if ($k =~ /selector/) {
+				if($PVQ{$k} ne"") {
+					#print"<pre style=\"display: block\; cursor: pointer\" OnClick=\"selector(\'$k\')\"> $PVQ{$k} </pre>\n";
+					print"<pre> $PVQ{$k} </pre>\n";
+					$ORANS{$k} = 1;
+					}
+				}
+			}
+		
+		print"<P>\n";
+		
+		foreach my $ke(sort keys %ORANS) {
+			print"<pre>    $i. $PVQ{$ke}</pre>\n";
+			++$i;
+			}	
+		}
+		
 	elsif ($PVQ{select} eq"AD") {
 		print"<TABLE>
 		 <TR><TD width=\"20\"></TD><TD style=\"vertical-align:middle\"><input type=\"radio\" name=\"\" value=\"\"></TD><TD width=\"5\"></TD><TD style=\"vertical-align:middle\"> $standard[0] </TD></TR>
@@ -32192,8 +33090,11 @@ sub preview_quest {
 
 	my $there = length($check);
 	if( $there > 0) {
+		$PVQ{explanation} =~ s/&quot;/"/g;
 		print"<P><TABLE><TR><TD width=\"40\"></TD><TD><TABLE style=\"border:1px solid grey\; border-radius:.3em\;\"><TR style=\"padding-bottom: 4px\;\"><TD><i>&nbsp\;Explanation:</i><font style=\"font-family:Times New Roman\;\">$PVQ{explanation} </font><BR></TD></TR></TABLE></TD></TR></TABLE>\n";
 		}
+		
+	print"</DIV>\n";
 	}
     
 ##########################
@@ -32265,7 +33166,7 @@ sub print_out_2columns_active {
                         $sub_length = $sub_length * .7;
                         if($sub_length =~ /\./) {
 				my @num = split(/\./,$sub_length);
-			        $sub_length = $num[0] + 1;
+			        $sub_length = $num[0] + 3;
                                 }
                         }
                 
@@ -33478,7 +34379,7 @@ EOPP
 
 #########################
 #
-# PRINT_MODAL_STUDENTS_SCREEN
+# PRINT_MODAL_STUDENTS_SCREEN  
 #
 #########################
 sub print_modal_students_screen {
@@ -33504,6 +34405,8 @@ var qst_right
 var right_top
 var right_bot
 
+const screenWidth = window.screen.availWidth;
+const screenHeight = window.screen.availHeight
 
 function check_handler(inn){
 var no_good = 1;
@@ -33536,349 +34439,149 @@ document.form_1.submit()
 }
 }
 
-function doo_modal(qst,class_id,class_name,questions,marks,name_in) {
-document.mod_form.name_in.value=name_in
-document.mod_form.questions.value=questions
-document.mod_form.marks.value=marks
-location.href="#openModal"
-}
-
-function doo_modal2(qst,class_id,class_name,questions,marks,name_in) {
-document.mod_form2.name_in.value=name_in
-document.mod_form2.questions.value=questions
-document.mod_form2.marks.value=marks
-location.href="#openModal2"
-}
-
-function doo_modal3(qst,class_id,class_name,questions,marks,name_in) {
-document.mod_form3.name_in.value=name_in
-document.mod_form3.questions.value=questions
-document.mod_form3.marks.value=marks
-location.href="#openModal3"
-}
-
-function doo_modal4(qst,class_id,class_name,questions,marks,name_in) {
-document.mod_form4.name_in.value=name_in
-document.mod_form4.questions.value=questions
-document.mod_form4.marks.value=marks
-location.href="#openModal4"
-}
-
-function doo_modal5(qst,class_id,class_name,questions,marks,name_in) {
-document.mod_form5.name_in.value=name_in
-location.href="#openModal5"
-}
 
 </script>
-<style>
-	.modalDialog {
-	position: fixed;
-	font-family: Arial, Helvetica, sans-serif;
-	top: -100;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	background: rgba(0,0,0,0.8);
-	z-index: 99999;
-	opacity:0;
-	overflow: auto;
-	-webkit-transition: opacity 400ms ease-in;
-	-moz-transition: opacity 400ms ease-in;
-	transition: opacity 400ms ease-in;
-	pointer-events: none;
-}
-
-
-
-.modalDialog:target {
-	opacity:1;
-	pointer-events: auto;
-}
-
-.modalDialog > div {
-	width: 940px;
-	height: 790px;
-	position: relative;
-	margin: 10% auto;
-	padding: 1px 10px 5px 10px;
-	border-radius: 10px;
-	background: #fff;
-	background: -moz-linear-gradient(#fff, #FFFFE0);
-	background: -webkit-linear-gradient(#fff, #FFFFE0);
-	background: -o-linear-gradient(#fff, #FFFFE0);
-}
-
-
-
-.close {
-	background: #00d9ff;
-	color: #FFFFFF;
-	line-height: 25px;
-	position: absolute;
-	right: -12px;
-	text-align: center;
-	top: -10px;
-	width: 24px;
-	text-decoration: none;
-	font-weight: bold;
-	-webkit-border-radius: 12px;
-	-moz-border-radius: 12px;
-	border-radius: 12px;
-	-moz-box-shadow: 1px 1px 3px #000;
-	-webkit-box-shadow: 1px 1px 3px #000;
-	box-shadow: 1px 1px 3px #000;
-}
-
-.close:hover { background: #0000FF; }
-
-	.modalDialog2 {
-	position: fixed;
-	font-family: Arial, Helvetica, sans-serif;
-	top: -100;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	background: rgba(0,0,0,0.8);
-	z-index: 99999;
-	opacity:0;
-	overflow: auto;
-	-webkit-transition: opacity 400ms ease-in;
-	-moz-transition: opacity 400ms ease-in;
-	transition: opacity 400ms ease-in;
-	pointer-events: none;
-}
-
-
-
-.modalDialog2:target {
-	opacity:1;
-	pointer-events: auto;
-}
-
-.modalDialog2 > div {
-	width: 940px;
-	height: 600px;
-	position: relative;
-	margin: 10% auto;
-	padding: 1px 20px 5px 20px;
-	border-radius: 10px;
-	background: #fff;
-	background: -moz-linear-gradient(#fff, #FFFFE0);
-	background: -webkit-linear-gradient(#fff, #FFFFE0);
-	background: -o-linear-gradient(#fff, #FFFFE0);
-}
-
-	.modalDialog3 {
-	position: fixed;
-	font-family: Arial, Helvetica, sans-serif;
-	top: -100;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	background: rgba(0,0,0,0.8);
-	z-index: 99999;
-	opacity:0;
-	overflow: auto;
-	-webkit-transition: opacity 400ms ease-in;
-	-moz-transition: opacity 400ms ease-in;
-	transition: opacity 400ms ease-in;
-	pointer-events: none;
-}
-
-
-
-.modalDialog3:target {
-	opacity:1;
-	pointer-events: auto;
-}
-
-.modalDialog3 > div {
-	width: 940px;
-	height: 600px;
-	position: relative;
-	margin: 10% auto;
-	padding: 1px 20px 5px 20px;
-	border-radius: 10px;
-	background: #fff;
-	background: -moz-linear-gradient(#fff, #FFFFE0);
-	background: -webkit-linear-gradient(#fff, #FFFFE0);
-	background: -o-linear-gradient(#fff, #FFFFE0);
-}
-
-.modalDialog4 {
-	position: fixed;
-	font-family: Arial, Helvetica, sans-serif;
-	top: -100;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	background: rgba(0,0,0,0.8);
-	z-index: 99999;
-	opacity:0;
-	overflow: auto;
-	-webkit-transition: opacity 400ms ease-in;
-	-moz-transition: opacity 400ms ease-in;
-	transition: opacity 400ms ease-in;
-	pointer-events: none;
-}
-
-
-
-.modalDialog4:target {
-	opacity:1;
-	pointer-events: auto;
-}
-
-.modalDialog4 > div {
-	width: 940px;
-	height: 600px;
-	position: relative;
-	margin: 10% auto;
-	padding: 1px 20px 5px 20px;
-	border-radius: 10px;
-	background: #fff;
-	background: -moz-linear-gradient(#fff, #FFFFE0);
-	background: -webkit-linear-gradient(#fff, #FFFFE0);
-	background: -o-linear-gradient(#fff, #FFFFE0);
-}
-
-.modalDialog5 {
-	position: fixed;
-	font-family: Arial, Helvetica, sans-serif;
-	top: -100;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	background: rgba(0,0,0,0.8);
-	z-index: 99999;
-	opacity:0;
-	overflow: auto;
-	-webkit-transition: opacity 400ms ease-in;
-	-moz-transition: opacity 400ms ease-in;
-	transition: opacity 400ms ease-in;
-	pointer-events: none;
-}
-
-
-
-.modalDialog5:target {
-	opacity:1;
-	pointer-events: auto;
-}
-
-.modalDialog5 > div {
-	width: 940px;
-	height: 600px;
-	position: relative;
-	margin: 10% auto;
-	padding: 1px 20px 5px 20px;
-	border-radius: 10px;
-	background: #fff;
-	background: -moz-linear-gradient(#fff, #FFFFE0);
-	background: -webkit-linear-gradient(#fff, #FFFFE0);
-	background: -o-linear-gradient(#fff, #FFFFE0);
-}
-
-</style> 
-
-<div id="openModal" class="modalDialog">
-<div>
-
-
-<TABLE style="font-size:11pt; font-family:Arial; border-radius: 5px\;" bgcolor="#00000" width="100%"><TR><TD><font color="white">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD><TD style=\"padding-top: 6px\; padding-bottom: 6px\"> 
 
 EOA
 
+        print"<script>\n";
+        
+        print"function display_modalm1\(qst,class_id,class_name\)\{\n";
+		print"qstWindow = window.open\(\"\",\"qstWindow\",\"width=2500,height=1600,menubar=no,status=no\"\)\n";
+		print"qstWindow.focus\(\)\n";
+		print"qstWindow.document.writeln\(\'\<html oncontextmenu=\"return false\" \>\<head\>\'\)
+		qstWindow.document.writeln\(\'\<title\>QST\</title\>\</head\>\'\)
+		
+		qstWindow.document.writeln\(\'<script>document.onkeydown = function (event) \{event = (event || window.event)\; return keyFunction(event)\;\} \'\)	
+		qstWindow.document.writeln\(\'function keyFunction(event)\{if (event.keyCode == 123) \{open_full_screen\(\)\; return false\;\}\'\)
+		qstWindow.document.writeln\(\'if (event.keyCode == 122) \{open_full_screen\(\)\; return false\;\}\'\)
+		qstWindow.document.writeln\(\'if (event.key === \"Escape\") \{open_full_screen\(\)\; return false\;\}\}\'\)
+		qstWindow.document.writeln\(\'var elem = document.documentElement\;\'\)
+		qstWindow.document.writeln\(\'function open_full_screen()\{\'\)
+		qstWindow.document.writeln\(\'if (elem.requestFullscreen) \{\'\)
+		qstWindow.document.writeln\(\'elem.requestFullscreen()\; \}\'\)
+		qstWindow.document.writeln\(\'else if (elem.mozRequestFullscreen) \{\'\)
+		qstWindow.document.writeln\(\'elem.mozRequestFullscreen()\; \}\'\)
+		qstWindow.document.writeln\(\'else if (elem.webkitRequestFullscreen) \{\'\)
+		qstWindow.document.writeln\(\'elem.webkitRequestFullscreen()\; \}\'\)
+		qstWindow.document.writeln\(\'else if (elem.msRequestFullscreen) \{\'\)
+		qstWindow.document.writeln\(\'elem.msRequestFullscreen()\; \} \}\'\)
+		
+		qstWindow.document.writeln\(\'<\\/script>\'\)
+		qstWindow.document.writeln\(\'\<body style=\"background: #660616\" oncontextmenu =\"return false\"\><P><BR><P><BR><P>\'\)
+		qstWindow.document.writeln\(\'<center><TABLE style=\"background: white\; border-spacing: 0px\; vertical-align: middle\; border-radius:6px\;\"><TR><TD style=\"background: white\;\" border=\"0\">\'\)
+		qstWindow.document.writeln\(\'<iframe src=\"\" width=\"770\" name=\"m1qst_left\" height=\"800\" style=\"border: none\">\'\)
+		qstWindow.document.writeln\(\'</iframe\>\'\)
+		qstWindow.document.writeln\(\'</TD><TD border=\"0\"> \'\)
+		qstWindow.document.writeln\(\'<iframe src=\"/blank.htm\" width=\"200\" name=\"m1right_top\" height=\"99\" style=\"border: none\">\'\)
+		qstWindow.document.writeln\(\'</iframe\><BR> \'\)
+		qstWindow.document.writeln\(\'<iframe src=\"\" width=\"200\" name=\"m1right_bot\" height=\"700\" style=\"border: none\">\'\)
+		qstWindow.document.writeln\(\'</iframe\> \'\)
+		qstWindow.document.writeln\(\'</TD></TR></TABLE></center>\'\)
+		
+		qstWindow.document.writeln\(\'</body><\/html>\'\)\n";
+		print"qstWindow.document.close()
+		qstWindow.focus()
+		\}\n";
 
-        print"<form name=\"mod_form\"><input style=\"border:none\; background-color: black\; color: white\; font-weight: bold\; font-size: 18px\;\" type=\"text\" name=\"name_in\" value=\"\">\n";
-        
-        print"</font><font color=\"white\"><B> $LANGUAGE{$set_language}{Questions}: <input style=\"border:none\; background-color: black\; color: white\; font-weight: bold\; font-size: 12px\;\" type=\"text\" name=\"questions\" value=\"\">\n";
-        
-        print" $LANGUAGE{$set_language}{Marks}: <input style=\"border:none\; background-color: black\; color: white\; font-weight: bold\; font-size: 12px\;\" type=\"text\" name=\"marks\" value=\"\">\n";
-        
-        print"</form></B></font></TD></TR></TABLE>
-        <iframe src=\"/mod1_qst.htm\" width=\"100%\" height=\"700\" style=\"border:none\;\"></iframe>
-        </div></div>\n";
+        print"function display_modalm2\(qst,class_id,class_name\)\{\n";
+		print"qstWindow = window.open\(\"\",\"qstWindow\",\"width=1920,height=1400,,menubar=no,status=no\"\)\n";
+		print"qstWindow.focus\(\)\n";
+		print"qstWindow.document.writeln\(\'\<html oncontextmenu=\"return false\"\>\<head\>\'\)
+		qstWindow.document.writeln\(\'\<title\>QST\</title\>\</head\>\'\)
+		qstWindow.document.writeln\(\'<script>document.onkeydown = function (event) \{event = (event || window.event)\; return keyFunction(event)\;\} \'\)	
+		qstWindow.document.writeln\(\'function keyFunction(event)\{if (event.keyCode == 123) \{return false\;\}\}\'\)
+		qstWindow.document.writeln\(\'<\\/script>\'\)
+		qstWindow.document.writeln\(\'\<body style=\"background: #660616\" oncontextmenu =\"return false\"\><P><BR><P><BR><P><BR><P>\'\)
+		qstWindow.document.writeln\(\'<center><TABLE style=\"background: white\; border-spacing: 0px\; vertical-align: middle\; border-radius:6px\;\"><TR><TD style=\"background: white\;\" border=\"0\">\'\)
+		qstWindow.document.writeln\(\'<iframe src=\"\" width=\"770\" name=\"m2qst_left\" height=\"600\" style=\"border: none\">\'\)
+		qstWindow.document.writeln\(\'</iframe\>\'\)
+		qstWindow.document.writeln\(\'</TD><TD border=\"0\"> \'\)
+		qstWindow.document.writeln\(\'<iframe src=\"/blank.htm\" width=\"200\" name=\"m2right_top\" height=\"99\" style=\"border: none\">\'\)
+		qstWindow.document.writeln\(\'</iframe\><BR> \'\)
+		qstWindow.document.writeln\(\'<iframe src=\"\" width=\"200\" name=\"m2right_bot\" height=\"500\" style=\"border: none\">\'\)
+		qstWindow.document.writeln\(\'</iframe\> \'\)
+		qstWindow.document.writeln\(\'</TD></TR></TABLE></center>\'\)
+		qstWindow.document.writeln\(\'</body><\/html>\'\)\n";
+		print"qstWindow.document.close()
+		qstWindow.focus()
+		\}\n";
 
+        print"function display_modalm3\(qst,class_id,class_name\)\{\n";
+		print"qstWindow = window.open\(\"\",\"qstWindow\",\"width=1920,height=1400,,menubar=no,status=no\"\)\n";
+		print"qstWindow.focus\(\)\n";
+		print"qstWindow.document.writeln\(\'\<html oncontextmenu=\"return false\"\>\<head\>\'\)		
+		qstWindow.document.writeln\(\'\<title\>QST\</title\>\</head\>\'\)
+		qstWindow.document.writeln\(\'<script>document.onkeydown = function (event) \{event = (event || window.event)\; return keyFunction(event)\;\} \'\)	
+		qstWindow.document.writeln\(\'function keyFunction(event)\{if (event.keyCode == 123) \{return false\;\}\}\'\)
+		qstWindow.document.writeln\(\'<\\/script>\'\)
+		qstWindow.document.writeln\(\'\<body style=\"background: #660616\" oncontextmenu =\"return false\"\><P><BR><P><BR><P><BR><P>\'\)
+		qstWindow.document.writeln\(\'<center><TABLE style=\"background: white\; border-spacing: 0px\; vertical-align: middle\; border-radius:6px\;\"><TR><TD style=\"background: white\;\" border=\"0\">\'\)
+		qstWindow.document.writeln\(\'<iframe src=\"\" width=\"770\" name=\"m3qst_left\" height=\"600\" style=\"border: none\">\'\)
+		qstWindow.document.writeln\(\'</iframe\>\'\)
+		qstWindow.document.writeln\(\'</TD><TD border=\"0\"> \'\)
+		qstWindow.document.writeln\(\'<iframe src=\"/blank.htm\" width=\"200\" name=\"m3right_top\" height=\"99\" style=\"border: none\">\'\)
+		qstWindow.document.writeln\(\'</iframe\><BR> \'\)
+		qstWindow.document.writeln\(\'<iframe src=\"\" width=\"200\" name=\"m3right_bot\" height=\"500\" style=\"border: none\">\'\)
+		qstWindow.document.writeln\(\'</iframe\> \'\)
+		qstWindow.document.writeln\(\'</TD></TR></TABLE></center>\'\)
+		qstWindow.document.writeln\(\'</body><\/html>\'\)\n";
+		print"qstWindow.document.close()
+		qstWindow.focus()
+		\}\n";
+		
+        print"function display_modalm4\(qst,class_id,class_name\)\{\n";
+		print"qstWindow = window.open\(\"\",\"qstWindow\",\"width=1920,height=1400,,menubar=no,status=no\"\)\n";
+		print"qstWindow.focus\(\)\n";
+		print"qstWindow.document.writeln\(\'\<html oncontextmenu=\"return false\"\>\<head\>\'\)
+		qstWindow.document.writeln\(\'\<title\>QST\</title\>\</head\>\'\)
+		qstWindow.document.writeln\(\'<script>document.onkeydown = function (event) \{event = (event || window.event)\; return keyFunction(event)\;\} \'\)	
+		qstWindow.document.writeln\(\'function keyFunction(event)\{if (event.keyCode == 123) \{return false\;\}\}\'\)
+		qstWindow.document.writeln\(\'<\\/script>\'\)
+		qstWindow.document.writeln\(\'\<body style=\"background: #660616\" oncontextmenu =\"return false\"\><P><BR><P><BR><P><BR><P>\'\)
+		qstWindow.document.writeln\(\'<center><TABLE style=\"background: white\; border-spacing: 0px\; vertical-align: middle\; border-radius:6px\;\"><TR><TD style=\"background: white\;\" border=\"0\">\'\)
+		qstWindow.document.writeln\(\'<iframe src=\"\" width=\"770\" name=\"m4qst_left\" height=\"600\" style=\"border: none\">\'\)
+		qstWindow.document.writeln\(\'</iframe\>\'\)
+		qstWindow.document.writeln\(\'</TD><TD border=\"0\"> \'\)
+		qstWindow.document.writeln\(\'<iframe src=\"/blank.htm\" width=\"200\" name=\"m4right_top\" height=\"99\" style=\"border: none\">\'\)
+		qstWindow.document.writeln\(\'</iframe\><BR> \'\)
+		qstWindow.document.writeln\(\'<iframe src=\"\" width=\"200\" name=\"m4right_bot\" height=\"500\" style=\"border: none\">\'\)
+		qstWindow.document.writeln\(\'</iframe\> \'\)
+		qstWindow.document.writeln\(\'</TD></TR></TABLE></center>\'\)
+		qstWindow.document.writeln\(\'</body><\/html>\'\)\n";
+		print"qstWindow.document.close()
+		qstWindow.focus()
+		\}\n";
 
- 
-        ###### OTHER DIV ##########
-        print"<div id=\"openModal2\" class=\"modalDialog2\">
-        <div>
-        <BR>
-        <center>
-        <TABLE style=\"font-family:Arial\; border-radius: 5px\;\" id=\"table1\" name=\"table1\" bgcolor=\"#00000\" width=\"100%\"><TR><TD><font color=\"white\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD><TD valign=\"middle\"> \n";
-        
-        print"<BR><form name=\"mod_form2\"><input style=\"border:none\; background-color: black\; color: white\; font-weight: bold\; font-size: 20px\;\" type=\"text\" name=\"name_in\" value=\"\">\n";
-        
-        print"</font><font  color=\"white\"><B>$LANGUAGE{$set_language}{Questions}: <input style=\"border:none\; background-color: black\; color: white\; font-weight: bold\; font-size: 12px\;\" type=\"text\" name=\"questions\" value=\"\">\n";
-        
-        print" $LANGUAGE{$set_language}{Marks}: <input style=\"border:none\; background-color: black\; color: white\; font-weight: bold\; font-size: 12px\;\" type=\"text\" name=\"marks\" value=\"\">\n";
-        
-        print"</form></B></font></TD></TR></TABLE>
-        </center><BR>
-        <iframe src=\"/mod2_qst.htm\" width=\"100%\" height=\"500\" style=\"border:none\;\"></iframe>
-        </div></div>\n";
-        
-        ############ FINISHED DIV ##########
-        
-         ###### OTHER DIV ##########
-        print"<div id=\"openModal3\" class=\"modalDialog3\">
-        <div>
-        <BR>
-        <center>
-        <TABLE style=\"font-size:11pt\; font-family:Arial\; border-radius: 5px\;\" id=\"table1\" name=\"table1\" bgcolor=\"#00000\" width=\"100%\"><TR><TD><font color=\"white\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD><TD valign=\"middle\"> \n";
-        
-        print"<BR><form name=\"mod_form3\"><input style=\"border:none\; background-color: black\; color: white\; font-weight: bold\; font-size: 20px\;\" type=\"text\" name=\"name_in\" value=\"\">\n";
-        
-        print"</font><font  color=\"white\"><B>$LANGUAGE{$set_language}{Questions}: <input style=\"border:none\; background-color: black\; color: white\; font-weight: bold\; font-size: 12px\;\" type=\"text\" name=\"questions\" value=\"\">\n";
-        
-        print" $LANGUAGE{$set_language}{Marks}: <input style=\"border:none\; background-color: black\; color: white\; font-weight: bold\; font-size: 12px\;\" type=\"text\" name=\"marks\" value=\"\">\n";
-        
-        print"</form></B></font></TD></TR></TABLE>
-        </center><BR>
-        <iframe src=\"/mod3_qst.htm\" width=\"100%\" height=\"500\" style=\"border:none\;\"></iframe>
-        </div></div>\n";
-        
-        ############ FINISHED DIV ##########
-        
-          ###### OTHER DIV ##########
-        print"<div id=\"openModal4\" class=\"modalDialog4\">
-        <div>
-        <BR>
-        <center>
-        <TABLE style=\"font-size:11pt\; font-family:Arial\; border-radius: 5px\;\" id=\"table1\" name=\"table1\" bgcolor=\"#00000\" width=\"100%\"><TR><TD><font color=\"white\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD><TD valign=\"middle\"> \n";
-        
-        print"<BR><form name=\"mod_form4\"><input style=\"border:none\; background-color: black\; color: white\; font-weight: bold\; font-size: 20px\;\" type=\"text\" name=\"name_in\" value=\"\">\n";
-        
-        print"</font><font  color=\"white\"><B>$LANGUAGE{$set_language}{Questions}: <input style=\"border:none\; background-color: black\; color: white\; font-weight: bold\; font-size: 12px\;\" type=\"text\" name=\"questions\" value=\"\">\n";
-        
-        print" $LANGUAGE{$set_language}{Marks}: <input style=\"border:none\; background-color: black\; color: white\; font-weight: bold\; font-size: 12px\;\" type=\"text\" name=\"marks\" value=\"\">\n";
-        
-        print"</form></B></font></TD></TR></TABLE>
-        </center><BR>
-        <iframe src=\"/mod4_qst.htm\" width=\"100%\" height=\"500\" style=\"border:none\;\"></iframe>
-        </div></div>\n";
-        
-        ############ FINISHED DIV ##########
-        
-          ###### OTHER DIV ##########
-        print"<div id=\"openModal5\" class=\"modalDialog5\">
-        <div>
-        <BR>
-        <center>
-        <TABLE style=\"font-size:11pt\; font-family:Arial\; border-radius: 5px\;\" id=\"table1\" name=\"table1\" bgcolor=\"#00000\" width=\"100%\"><TR><TD><font color=\"white\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD><TD valign=\"middle\"> \n";
-        
-        print"<BR><form name=\"mod_form5\"><input style=\"border:none\; background-color: black\; color: white\; font-weight: bold\; font-size: 20px\;\" type=\"text\" name=\"name_in\" value=\"\">\n";
-        
-        print"</form></B></font></TD></TR></TABLE>
-        </center><BR>
-        <iframe src=\"/mod5_qst.htm\" width=\"100%\" height=\"500\" style=\"border:none\;\"></iframe>
-        </div></div>\n";
-        
-        ############ FINISHED DIV ##########
-        
-        
+        print"function display_modalm5\(qst,class_id,class_name\)\{\n";
+		print"qstWindow = window.open\(\"\",\"qstWindow\",\"width=1920,height=1400,,menubar=no,status=no\"\)\n";
+		print"qstWindow.focus\(\)\n";
+		print"qstWindow.document.writeln\(\'\<html oncontextmenu=\"return false\"\>\<head\>\'\)
+		qstWindow.document.writeln\(\'\<title\>QST\</title\>\</head\>\'\)
+		qstWindow.document.writeln\(\'<script>document.onkeydown = function (event) \{event = (event || window.event)\; return keyFunction(event)\;\} \'\)	
+		qstWindow.document.writeln\(\'function keyFunction(event)\{if (event.keyCode == 123) \{return false\;\}\}\'\)
+		qstWindow.document.writeln\(\'<\\/script>\'\)
+		qstWindow.document.writeln\(\'\<body style=\"background: #660616\" oncontextmenu =\"return false\"\><P><BR><P><BR><P><BR><P>\'\)
+		qstWindow.document.writeln\(\'<center><TABLE style=\"background: white\; border-spacing: 0px\; vertical-align: middle\; border-radius:6px\;\"><TR><TD style=\"background: white\;\" border=\"0\">\'\)
+		qstWindow.document.writeln\(\'<iframe src=\"\" width=\"770\" name=\"m5qst_left\" height=\"600\" style=\"border: none\">\'\)
+		qstWindow.document.writeln\(\'</iframe\>\'\)
+		qstWindow.document.writeln\(\'</TD><TD border=\"0\"> \'\)
+		qstWindow.document.writeln\(\'<iframe src=\"/blank.htm\" width=\"200\" name=\"m5right_top\" height=\"99\" style=\"border: none\">\'\)
+		qstWindow.document.writeln\(\'</iframe\><BR> \'\)
+		qstWindow.document.writeln\(\'<iframe src=\"\" width=\"200\" name=\"m5right_bot\" height=\"500\" style=\"border: none\">\'\)
+		qstWindow.document.writeln\(\'</iframe\> \'\)
+		qstWindow.document.writeln\(\'</TD></TR></TABLE></center>\'\)
+		qstWindow.document.writeln\(\'</body><\/html>\'\)\n";
+		print"qstWindow.document.close()
+		qstWindow.focus()
+		\}\n";
+
+	&print_stop_F12();
+
+ 	print"</script>\n";
+
+	print"<TABLE style=\"font-size:11pt\; font-family:Arial\; border-radius: 5px\;\" width=\"100%\"><TR><TD><font color=\"white\">&nbsp\;&nbsp\;</TD><TD style=\"padding-top: 6px\; padding-bottom: 6px\" width=\"100%\"> \n";
+
         
         print"<TABLE width=\"100%\"><TR><TD width=\"35%\" valign=\"top\">\n";
         
@@ -33904,16 +34607,16 @@ EOA
 	
         &print_form("form_name","form_reload","form_target","","input","print_modal_students_screen","class_name","$PSS{class_name}","class_id","$PSS{class_id}","u_id","$PSS{u_id}","session_id","$PSS{session_id}");
 
-	&show_modal_classes("u_id","$PSS{u_id}","session_id","$PSS{session_id}","org_id","$PSS{org_id}");
+	&show_modal_classes("u_id","$PSS{u_id}","session_id","$PSS{session_id}","org_id","$PSS{org_id}","lang_direction","$language_direction");
 
         print"</TD><TD width=\"70%\" style=\"vertical-align:top\; padding-top:7px\">\n";
         
         if($PSS{class_id} > 0) {
-                &show_modal_qsts_for_students("class_id","$PSS{class_id}","class_name","$PSS{class_name}","u_id","$PSS{u_id}","session_id","$PSS{session_id}","org_id","$PSS{org_id}");
+                &show_modal_qsts_for_students("class_id","$PSS{class_id}","class_name","$PSS{class_name}","u_id","$PSS{u_id}","session_id","$PSS{session_id}","org_id","$PSS{org_id}","lang_direction","$language_direction");
                 }
                 
         print"</TD></TR></TABLE>\n";
-        
+                        
 	}
 
 #########################
@@ -34151,6 +34854,8 @@ sub print_out_question_form {
 	   <input type=\"hidden\" name=\"question\" value=\"\">
 	   <input type=\"hidden\" name=\"ans_mode\" value=\"$POQF{ans_mode}\">
 	   <input type=\"hidden\" name=\"active_summernote\" value=\"\">
+	   <input type=\"hidden\" name=\"thislistselected\" value=\"\">
+	   <input type=\"hidden\" name=\"thismatchselected\" value=\"\">
 	   <input type=\"hidden\" name=\"kolum\" value=\"1\">\n";
 	   
 	   if($mc_num > $ma_num) {
@@ -34175,17 +34880,46 @@ sub print_out_question_form {
                 ++$u;
                 }
                 
+        #LT answers
+	for(my $ii = 1; $ii <= $lt_list; $ii++) { 
+		for(my $jj = 1; $jj <= $lt_num; $jj++) { 
+        		print"<input type=\"hidden\" name=\"selectlt$ii$jj\" value=\"\">\n";
+        		}
+        	}
+       
+        #LT correct answers and MATCH
+	for(my $ij = 1; $ij <= 6; $ij++) { 
+        	print"<input type=\"hidden\" name=\"LTans$ij\" value=\"\">\n";
+        	print"<input type=\"hidden\" name=\"LTmark$ij\" value=\"\">\n";
+        	print"<input type=\"hidden\" name=\"Mmark$ij\" value=\"\">\n";
+        	print"<input type=\"hidden\" name=\"m_match_ans$ij\" value=\"\">\n";
+        	}
+        	
+        #OR answers
+	for(my $or = 1; $or <= $or_num; $or++) { 
+	        print"<input type=\"hidden\" name=\"selector$or\" value=\"\">\n";
+        	}
+        	
         print"<input type=\"hidden\" name=\"u_id\" value=\"$POQF{u_id}\">
 	   <input type=\"hidden\" name=\"session_id\" value=\"$POQF{session_id}\">
 	   <input type=\"hidden\" name=\"image_number\" value=\"\">\n";
 
         if($POQF{type} == 1) { #QUIZ/TEST question
-                print"<span style=\"padding-top:5px\; display: inline-block\;\"></span><center><TABLE style=\" border-radius: 5px\; background: #A0AECD\;\"><TR><TD style=\"padding-top:5px\; padding-bottom: 5px\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Value} <input type=\"text\" STYLE=\"border-radius:.3em\;\" size=\"1\" maxlength=\"2\" name=\"value\" value=\"1\" >
+                print"<span style=\"padding-top:5px\; display: inline-block\;\"></span><center><TABLE style=\" border-radius: 5px\; background: #A0AECD\;\"><TR>";
+                
+                if($u_type == 5) {
+                	print"<TD style=\"padding-top:5px\; padding-bottom: 5px\; border: 1px solid black\;\">";
+                	}
+                else {
+                	print"<TD style=\"padding-top:5px\; padding-bottom: 5px\;\">";
+                	}
+                	
+                print"&nbsp\;&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Value} <input type=\"text\" STYLE=\"border-radius:.3em\;\" size=\"1\" maxlength=\"2\" name=\"value\" value=\"1\" >
                 &nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Description} <input type=\"text\" name=\"descrip\" size=\"45\" maxlength=\"60\" STYLE=\"border-radius:.3em\; font-size:11pt\;\" placeholder=\"$LANGUAGE{$set_language}{Textherewilldisplayasquestionnameunderfolders} \">&nbsp\;&nbsp\;&nbsp\;&nbsp\;</TD>
                 </TR><TR></TABLE><P></center><center>
-                <span ID=\"mode_display0\" style=\"display:none\; padding-bottom: 3px\;\">&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowAdvancedEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('1')\">&nbsp\;&nbsp\;&nbsp\; $LANGUAGE{$set_language}{Advanced}</i>&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('2')\">$LANGUAGE{$set_language}{Equation}</i>&nbsp\;&nbsp\;&nbsp\;<B>$LANGUAGE{$set_language}{Basic}</B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B></span>
-                <span ID=\"mode_display1\" style=\"display:block\; padding-bottom: 3px\;\"><B>&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Advanced}</B>&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('2')\">$LANGUAGE{$set_language}{Equation}</i><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowBasicEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('0')\">&nbsp\;&nbsp\; $LANGUAGE{$set_language}{Basic}</i>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B></span>
-                <span ID=\"mode_display2\" style=\"display:none\; padding-bottom: 3px\;\">&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowAdvancedEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('1')\">$LANGUAGE{$set_language}{Advanced}</i>&nbsp\;&nbsp\;&nbsp\;<b>$LANGUAGE{$set_language}{Equation}</b><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowBasicEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('0')\">&nbsp\;&nbsp\; $LANGUAGE{$set_language}{Basic}</i>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B></span>
+                <span ID=\"mode_display0\" style=\"display:none\; padding-bottom: 3px\;\">&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowAdvancedEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('1')\">&nbsp\;&nbsp\;&nbsp\; $LANGUAGE{$set_language}{Advanced}</i>&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('2')\">$LANGUAGE{$set_language}{Equation}</i>&nbsp\;&nbsp\;&nbsp\;<B>$LANGUAGE{$set_language}{Basic}</B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{CreateaMemory}\" STYLE=\"cursor: pointer\" OnClick=\"show_Memory()\"><font color=\"#660616\">$LANGUAGE{$set_language}{Memory}</font></i></B></span>
+                <span ID=\"mode_display1\" style=\"display:block\; padding-bottom: 3px\;\"><B>&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Advanced}</B>&nbsp\;&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowEquationEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('2')\">$LANGUAGE{$set_language}{Equation}</i><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowBasicEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('0')\">&nbsp\;&nbsp\; $LANGUAGE{$set_language}{Basic}</i>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{CreateaMemory}\" STYLE=\"cursor: pointer\" OnClick=\"show_Memory()\"><font color=\"#660616\">$LANGUAGE{$set_language}{Memory}</font></i></B></span>
+                <span ID=\"mode_display2\" style=\"display:none\; padding-bottom: 3px\;\">&nbsp\;&nbsp\;<i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowAdvancedEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('1')\">$LANGUAGE{$set_language}{Advanced}</i>&nbsp\;&nbsp\;&nbsp\;<b>$LANGUAGE{$set_language}{Equation}</b><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ShowBasicEditor}\" STYLE=\"cursor: pointer\" OnClick=\"mode_display('0')\">&nbsp\;&nbsp\; $LANGUAGE{$set_language}{Basic}</i>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{WriteanExplanationforchosenanswer}\" STYLE=\"cursor: pointer\" OnClick=\"show_explan()\"><font color=\"666666\">$LANGUAGE{$set_language}{Explanation}</font></i></B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B><i data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{CreateaMemory}\" STYLE=\"cursor: pointer\" OnClick=\"show_Memory()\"><font color=\"#660616\">$LANGUAGE{$set_language}{Memory}</font></i></B></span>
                 </center>";
                 }
                 
@@ -34203,7 +34937,11 @@ sub print_out_question_form {
 	print"<BR><center><TABLE><TR><TD><textarea class=\"summernote\" id=\"1summernote\" name=\"explanation\"></textarea></TD></TR></TABLE></center>\n";
 	print"</span>\n";
 
-	
+        #### SHOW Memory ADVANCED EDITOR
+	print"<span onClick=\"set_active_summernote\('3'\)\" ID=\"Memory\" style=\"display:none\; background: #660616\;\">\n";
+	print"<BR><center><TABLE><TR><TD><textarea class=\"summernote\" id=\"3summernote\" name=\"memory\"></textarea></TD></TR></TABLE></center>\n";
+	print"</span>\n";
+
         #### ADVANCED EDITOR
 	print"<span onClick=\"set_active_summernote\('2'\)\" ID=\"mode1\" style=\"display:block\;\">\n";
 	print"<center><TABLE ><TR><TD><textarea id=\"summernote\" name=\"question1\"></textarea></TD></TR></TABLE></center>\n";
@@ -34212,7 +34950,7 @@ sub print_out_question_form {
         #### BASIC EDITOR
         print"<div ID=\"mode0\" style=\"display:none\;\">";
                
-        print"<TABLE><TD width=\"40\"></TD><TD><textarea style=\"resize\:none\;\" wrap=\"hard\" rows=\"3\" cols=\"52\" name=\"question0\" value=\"\" placeholder=\" $LANGUAGE{$set_language}{Enteryourquestionhere}\n $LANGUAGE{$set_language}{AndorInsertImageorVideoAudioLink}\n $LANGUAGE{$set_language}{Thenselectananswertype}\" maxlength=\"1500\"></textarea></TD><TD>\n";
+        print"<TABLE><TD width=\"40\"></TD><TD><textarea style=\"resize\:none\;\" wrap=\"hard\" rows=\"5\" cols=\"52\" name=\"question0\" value=\"\" placeholder=\" $LANGUAGE{$set_language}{Enteryourquestionhere}\n $LANGUAGE{$set_language}{AndorInsertImageorVideoAudioLink}\n $LANGUAGE{$set_language}{Thenselectananswertype}\" maxlength=\"1500\"></textarea></TD><TD>\n";
 	
 	# Print Insert Image
         print"<span ID=\"disp1\" style=\"display:block\;\"><B data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{Insertimage}\" STYLE=\"cursor: pointer\" OnClick=\"question_image_handler\(\'question\'\)\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$image30</B></span>\n";
@@ -34241,7 +34979,12 @@ sub print_out_question_form {
 	if($POQF{sub_type} != 2) { # Quiz/test question
                     
                 # QUESTION TYPE BAR
-                print"<center><TABLE><TD>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;</TD><TD><span ID=\"anstype1\" style=\"display:block\;\"><font OnClick=\"show_mc\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{MultipleChoice}</font></span><span ID=\"anstype1a\" style=\"display:none\;\"><font OnClick=\"show_mc\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{MultipleChoice}</B></font></span></TD><TD width=\"15\"></TD><TD><span ID=\"anstype2\" style=\"display:block\;\"><font OnClick=\"show_ma\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{MultipleAnswer}</font></span><span ID=\"anstype2a\" style=\"display:none\;\"><font OnClick=\"show_ma\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{MultipleAnswer}</B></font></span></TD><TD width=\"15\"></TD><TD><span ID=\"anstype7\" style=\"display:block\;\"><font OnClick=\"show_mx\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{MatchXng}</font></span><span ID=\"anstype7a\" style=\"display:none\;\"><font OnClick=\"show_mx\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{MatchXng}</B></font></span></TD><TD width=\"15\"></TD><TD><span ID=\"anstype3\" style=\"display:block\;\"><font OnClick=\"show_tf\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{TF}</font></span><span ID=\"anstype3a\" style=\"display:none\;\"><font OnClick=\"show_tf\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{TF}</B></font></span></TD><TD width=\"15\"></TD><TD><span ID=\"anstype8\" style=\"display:block\;\"><font OnClick=\"show_yn\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{YN}</font></span><span ID=\"anstype8a\" style=\"display:none\;\"><font OnClick=\"show_yn\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{YN}</B></font></span></TD><TD width=\"15\"></TD><TD><span ID=\"anstype4\" style=\"display:block\;\"><font OnClick=\"show_sa\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{ShortAnswer}</font></span><span ID=\"anstype4a\" style=\"display:none\;\"><font OnClick=\"show_sa\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{ShortAnswer}</B></font></span></TD><TD width=\"15\"></TD><TD><span ID=\"anstype5\" style=\"display:block\;\"><font OnClick=\"show_p\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{Paragraph}</font></span><span ID=\"anstype5a\" style=\"display:none\;\"><font OnClick=\"show_p\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{Paragraph}</B></font></span></TD></TABLE></center><P>\n";
+		print"<center><TABLE><TD></TD><TD><span ID=\"anstype1\" style=\"display:block\;\"><font OnClick=\"show_mc\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{MultipleChoice}</font></span><span ID=\"anstype1a\" style=\"display:none\;\"><font OnClick=\"show_mc\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{MultipleChoice}</B></font></span></TD><TD width=\"15\"></TD><TD><span ID=\"anstype2\" style=\"display:block\;\"><font OnClick=\"show_ma\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{MultipleAnswer}</font></span><span ID=\"anstype2a\" style=\"display:none\;\"><font OnClick=\"show_ma\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{MultipleAnswer}</B></font></span></TD><TD width=\"15\"></TD><TD><span ID=\"anstype7\" style=\"display:block\;\"><font OnClick=\"show_mx\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{MatchXng}</font></span><span ID=\"anstype7a\" style=\"display:none\;\"><font OnClick=\"show_mx\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{MatchXng}</B></font></span></TD><TD width=\"15\"></TD><TD><span ID=\"anstype3\" style=\"display:block\;\"><font OnClick=\"show_tf\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{TF}</font></span><span ID=\"anstype3a\" style=\"display:none\;\"><font OnClick=\"show_tf\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{TF}</B></font></span></TD><TD width=\"15\"></TD>
+		<TD><span ID=\"anstype8\" style=\"display:block\;\"><font OnClick=\"show_yn\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{YN}</font></span><span ID=\"anstype8a\" style=\"display:none\;\"><font OnClick=\"show_yn\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{YN}</B></font></span></TD>";
+		
+	#	<TD width=\"15\"></TD><TD><span ID=\"anstype9\" style=\"display:none\;\"><font OnClick=\"show_cz\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{Cloze}</font></span><span ID=\"anstype9a\" style=\"display:none\;\"><font OnClick=\"show_cz\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{Cloze}</B></font></span></TD>
+	#	<TD width=\"15\"></TD><TD><span ID=\"anstype10\" style=\"display:none\;\"><font OnClick=\"show_or\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{Order}Order</font></span><span ID=\"anstype10a\" style=\"display:none\;\"><font OnClick=\"show_or\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{Order}Order</B></font></span></TD>
+		print"<TD width=\"15\"></TD><TD><span ID=\"anstype4\" style=\"display:block\;\"><font OnClick=\"show_sa\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{ShortAnswer}</font></span><span ID=\"anstype4a\" style=\"display:none\;\"><font OnClick=\"show_sa\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{ShortAnswer}</B></font></span></TD><TD width=\"15\"></TD><TD><span ID=\"anstype5\" style=\"display:block\;\"><font OnClick=\"show_p\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\">$LANGUAGE{$set_language}{Paragraph}</font></span><span ID=\"anstype5a\" style=\"display:none\;\"><font OnClick=\"show_p\(\)\" STYLE=\"text-decoration:none\; cursor:pointer\;\"><B>$LANGUAGE{$set_language}{Paragraph}</B></font></span></TD></TABLE></center><P>\n";
 		
 		print"<span ID=\"anstype6\" style=\"display:none\;\"></span><span ID=\"anstype6a\" style=\"display:none\;\"></span>\n";
 		}
@@ -34260,6 +35003,9 @@ sub print_out_question_form {
  	&print_form("form_name","y_n","form_target","quest2","input","question_yn","type","$POQF{type}","sub_type","$POQF{sub_type}","u_id","$POQF{u_id}","session_id","$POQF{session_id}");
         &print_form("form_name","s_a","form_target","quest2","input","question_sa","type","$POQF{type}","sub_type","$POQF{sub_type}","u_id","$POQF{u_id}","session_id","$POQF{session_id}");
 	&print_form("form_name","p","form_target","quest2","input","question_p","type","$POQF{type}","sub_type","$POQF{sub_type}","u_id","$POQF{u_id}","session_id","$POQF{session_id}");
+	&print_form("form_name","cz","form_target","quest2","input","question_cz","type","$POQF{type}","sub_type","$POQF{sub_type}","u_id","$POQF{u_id}","session_id","$POQF{session_id}");
+	&print_form("form_name","or","form_target","quest2","input","question_or","type","$POQF{type}","sub_type","$POQF{sub_type}","u_id","$POQF{u_id}","session_id","$POQF{session_id}");
+
         &print_form("form_name","eq_quest","form_target","MathJaax","input","print_eq_quest_ans","u_id","$POQF{u_id}","session_id","$POQF{session_id}","type","$POQF{type}","sub_type","$POQF{sub_type}","eq","1");
        
         if($u_type == 5) { #question bank 
@@ -34414,7 +35160,7 @@ sub questions {
 	\}\n";
 
         print"function export_quest\(folder_no\) \{
-        newwindo = window.open\(\"\",\"newwindo\",\"top=200,left=350,height=160,width=460\"\)
+        newwindo = window.open\(\"\",\"newwindo\",\"top=200,left=350,height=160,width=480\"\)
 	newwindo.document.writeln\(\'<html><head><title>$LANGUAGE{$set_language}{Exportquestions}<\/title><\/head><body>\'\)
 	newwindo.document.writeln\(\'<\/body><\/HTML>\'\)
 	newwindo.document.close()
@@ -34424,13 +35170,23 @@ sub questions {
 	\}\n";
 	
 	print"function import_quest\(folder_no\) \{
-        newwindo = window.open\(\"\",\"newwindo\",\"top=200,left=350,height=250,width=440\"\)
+        newwindo = window.open\(\"\",\"newwindo\",\"top=200,left=350,height=250,width=460\"\)
 	newwindo.document.writeln\(\'<html><head><title>$LANGUAGE{$set_language}{ImportQuestions}<\/title><\/head><body>\'\)
 	newwindo.document.writeln\(\'<\/body><\/HTML>\'\)
 	newwindo.document.close()
 	newwindo.focus\(\)
 	document.form10.folder_no.value=folder_no
 	document.form10.submit\(\)
+	\}\n";
+	
+	print"function import_ai\(folder_no\) \{
+	newwindo = window.open\(\"\",\"newwindo\",\"top=100,left=350,height=750,width=600\"\)
+	newwindo.document.writeln\(\'<html><head><title>$LANGUAGE{$set_language}{ImportAI}<\/title><\/head><body>\'\)
+	newwindo.document.writeln\(\'<\/body><\/HTML>\'\)
+	newwindo.document.close()
+	newwindo.focus\(\)
+	document.formai.folder_no.value=folder_no
+	document.formai.submit\(\)
 	\}\n";
 	
 	print"function create_rename_handler\(what,q_number,dir_name,parent,expand,disply,sub_type,from,display_num\)\{
@@ -34513,8 +35269,8 @@ sub questions {
 	&print_form("form_name","form7a","form_target","quest1","input","change_quest","number","i_n","expand","expand","i_n","i_n","sub_type","sub_type","from","","type","$QUEST{type}","parent","parent","name","name","disply","","u_id","$QUEST{u_id}","session_id","$QUEST{session_id}");
 	&print_form("form_name","form8a","form_target","theright","input","copy_quest","number","$QUEST{copy_quest}","expand","","folder_no","","u_id","$QUEST{u_id}","session_id","$QUEST{session_id}");
 	&print_form("form_name","form9","form_target","newwindo","input","print_export_quest","folder_no","","u_id","$QUEST{u_id}","session_id","$QUEST{session_id}");
-            
         &print_form("form_name","form10","form_target","newwindo","input","print_import_quest","folder_no","","u_id","$QUEST{u_id}","session_id","$QUEST{session_id}");
+        &print_form("form_name","formai","form_target","newwindo","input","print_import_ai","folder_no","","u_id","$QUEST{u_id}","session_id","$QUEST{session_id}");
 	}
 
 ######################
@@ -34755,6 +35511,54 @@ sub questions_bank_show {
 		}
 	}
 
+#########################
+#
+#  PRINT_IMPORT_AI
+#
+######################
+sub print_import_ai {
+	my %PIA = @_;
+	$PIA{u_id} =~ s/\D//g;
+	$PIA{session_id} =~ s/\D//g;
+	$PIA{expand} =~ s/\D//g;
+	$PIA{org_id} =~ s/\D//g;
+	$PIA{folder_no} =~ s/\D//g;
+	
+	&print_javascript_begin();
+	
+      	print"function load_handler\(\) \{
+	self.top.location = \"/index.htm\"
+	\}\n";
+	
+	print"function check_handler\(\) \{
+	spinner.style.display = \"block\"\;
+	document.importAI.submit\(\)
+	\}\n";
+
+	print"function Show_AIFormat\(\) \{
+	owindo = window.open(\"/show_ai_format.htm\",\"owindo\",\"top=200,left=350,height=650,width=680\"\)
+	owindo.focus()
+	\}\n";
+	
+	&print_javascript_end();
+	
+	print"<center><B>Import AI</B></center><P>\n";
+	print"<center>Copy the results of your <B onClick=\"Show_AIFormat\(\)\">AI query</B> and Paste it into the box below.</center><P>\n";
+	print"<FORM ACTION=\"\/qst\/one\" NAME=\"importAI\" METHOD=\"POST\">
+	<input type=\"hidden\" name=\"u_id\" value=\"$PIA{u_id}\">
+	<input type=\"hidden\" name=\"session_id\" value=\"$PIA{session_id}\">
+	<input type=\"hidden\" name=\"expand\" value=\"$PIA{expand}\">
+	<input type=\"hidden\" name=\"org_id\" value=\"$org_id\">
+	<input type=\"hidden\" name=\"folder_no\" value=\"$PIA{folder_no}\">
+        <input type=\"hidden\" name=\"mode\" value=\"7\">\n";
+        
+        print"<div id=\"spinner\" style=\"display:none\;\"><center><img style=\"width: 100px;\" src=\"/schools/spinner-gif.gif\" border=\"0\"></center></div>\n";
+         
+	print"<TABLE width=\"100%\" $action_bar><TR><TD STYLE=\"border-radius:6px\;\" align=\"center\"><font color=\"white\" STYLE=\"font-size:11pt; font-family:Arial;\"><B STYLE=\"cursor: pointer\" onClick=\"check_handler\(\)\">$LANGUAGE{$set_language}{Import} </B>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<B onClick=\"self.close()\" STYLE=\"cursor:pointer\">$LANGUAGE{$set_language}{Cancel} </font></b></TD></TABLE>\n";
+        print"<P><CENTER><TABLE widthe=\"90%\"><TR><TD><textarea style=\"resize\:none\; border-radius:6px\;\" rows=\"39\" cols=\"60\" name=\"importai\" value=\"\" placeholder=\"\" maxlength=\"15000\"></textarea></TD></TR></TABLE></center></FORM\n";
+
+        }
+
 ######################
 #
 # PRINT_IMPORT_QUEST
@@ -34767,7 +35571,7 @@ sub print_import_quest {
         &print_javascript_begin();
         
         print"function Show_Format\(format\) \{
-	if\(format == 2\) \{
+	if\(format == 2 || format == 5\) \{
 		owindo = window.open(\"/show_wordxml_format.htm\",\"owindo\",\"top=200,left=350,height=650,width=680\"\)
 		owindo.focus()
 	\}
@@ -34827,7 +35631,10 @@ sub print_import_quest {
         
         print"<div id=\"spinner\" style=\"display:none\;\"><center><img style=\"width: 100px;\" src=\"/schools/spinner-gif.gif\" border=\"0\"></center></div>\n";
         
-        print"<center><TABLE width=\"90%\"><TR><TD><center>QST XML<BR><input type=\"radio\" name=\"import_type\" value=\"1\"></center></TD><TD><center> <font STYLE=\"cursor: pointer\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ClicktoseeWordXMLformat}\" onClick=\"Show_Format(2)\">Word XML</font><BR><input type=\"radio\" name=\"import_type\" value=\"2\"></center></TD><TD><center><font STYLE=\"cursor: pointer\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ClicktoseeMoodlequestiontypes}\" onClick=\"Show_Format(3)\">Moodle XML</font><BR><input type=\"radio\" name=\"import_type\" value=\"3\"></center></TD><TD><font STYLE=\"cursor: pointer\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ClicktoseeQTIquestiontypes}\" onClick=\"Show_Format(4)\"><center>QTI 2/3</font><BR><input type=\"radio\" name=\"import_type\" value=\"4\"></center></TD></TR></TABLE></center><P></FORM>\n";
+        print"<center><TABLE width=\"90%\"><TR><TD><center>QST XML<BR><input type=\"radio\" name=\"import_type\" value=\"1\"></center></TD>
+        <TD><center> <font STYLE=\"cursor: pointer\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ClicktoseeWordXMLformat}\" onClick=\"Show_Format(2)\">Word XML</font><BR><input type=\"radio\" name=\"import_type\" value=\"2\"></center></TD>
+        <TD><center> <font STYLE=\"cursor: pointer\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ClicktoseeTextformat}\" onClick=\"Show_Format(5)\">Text</font><BR><input type=\"radio\" name=\"import_type\" value=\"5\"></center></TD>
+        <TD><center><font STYLE=\"cursor: pointer\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ClicktoseeMoodlequestiontypes}\" onClick=\"Show_Format(3)\">Moodle XML</font><BR><input type=\"radio\" name=\"import_type\" value=\"3\"></center></TD><TD><font STYLE=\"cursor: pointer\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{ClicktoseeQTIquestiontypes}\" onClick=\"Show_Format(4)\"><center>QTI 2/3</font><BR><input type=\"radio\" name=\"import_type\" value=\"4\"></center></TD></TR></TABLE></center><P></FORM>\n";
         
         print"<TABLE width=\"100%\" $action_bar><TR><TD align=\"center\"><font color=\"white\" STYLE=\"font-size:11pt; font-family:Arial;\"><B STYLE=\"cursor: pointer\" onClick=\"check_handler\(\)\">$LANGUAGE{$set_language}{Import} </B>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<B onClick=\"self.close()\" STYLE=\"cursor:pointer\">$LANGUAGE{$set_language}{Cancel} </font></b></TD></TABLE>\n";
         }
@@ -34867,6 +35674,9 @@ sub import_quests {
         my $missing_answers = 0;
         my $import_from;
         my $max_description = 70;
+        my $memory;
+        my $mem_image;
+        my $mem_image_name;
         
         if($u_type == 5) {
                 $IQ{u_id} = 0;
@@ -34875,7 +35685,7 @@ sub import_quests {
 	$xmlcontents =~ s/\r[\n]*/\n/gm;
         my @lines = split(/\n/,$xmlcontents);
 
-        if($IQ{import_format} == 1) {  # QST XML              ####################################################################
+        if($IQ{import_format} == 1) {  #   QST XML              ####################################################################
         	$import_from = "QST";
         	
             	foreach my $line_read(@lines) {
@@ -35103,7 +35913,88 @@ sub import_quests {
 		                }
                         }
                         
-                # LOOK FOR FIRST MATCH
+                if($keep_reading == 10) { # MEMORY
+		        if($line_read =~ /<\/memory>$/) {
+		        	$memory = $line_read;
+		                $memory =~ s/<\/memory>//g;
+		                $QUESTIONS{$quest_no}{memory} = "$QUESTIONS{$quest_no}{memory}"."$memory";
+					if(length($QUESTIONS{$quest_no}{memory}) < 5000) {
+						$memory = "";
+						}
+					else {
+						$NO_GOOD{$quest_no} = "$LANGUAGE{$set_language}{Memorylongerthen5000characters}";
+						$memory = "";
+			                	}
+			                
+			                # GET THE ALT TAGS
+			                if($QUESTIONS{$quest_no}{memory} =~ /<img /) { # <img class="img-fluid align-top" src="@@PLUGINFILE@@/1bludot.png" alt="one blue dot" width="27" height="20">
+						my @img = split(/<img/,$QUESTIONS{$quest_no}{memory});
+						foreach my $imgg(@img) {
+							if($imgg =~ /alt/) {
+							        my @alt = split(/alt/,$imgg);
+							        my @alt_part = split(/\"/,$alt[1]);
+							        my $filedescription = $alt_part[1];
+					
+								my @img_name = split(/\/schools\/qst_files\//,$imgg);
+								my @name = split(/\"/,$img_name[1]);
+								my $image_name = $name[0];
+
+								if(length($image_name) < 51) {
+							        	if(length($filedescription) > 0 && length($filedescription) < 501) {
+							        		$QUESTIONS{$quest_no}{mem_image}{filedescrip}{$image_name} = $filedescription;
+							        		}
+							        	elsif($filedescription eq"") {
+							        		}
+							        	else {
+										$NO_GOOD{$quest_no} = "$LANGUAGE{$set_language}{Filedescriptiontoobig}";
+									        delete($QUESTIONS{$quest_no});
+							        		}
+									}
+								else {
+									$NO_GOOD{$quest_no} = "$LANGUAGE{$set_language}{Imagenametoobig}";
+									delete($QUESTIONS{$quest_no});
+									}
+							        }
+							}
+						}
+			                
+			                
+			                $keep_reading = 0;
+		                        }
+		        else {
+		                 $QUESTIONS{$quest_no}{memory} = "$QUESTIONS{$quest_no}{memory}"."$line_read";
+		                 }
+                        }
+                        
+                 if($keep_reading == 11) {
+		 	if($line_read =~ /<\/mem_image>$/) { # MEMORY done with image
+		 		 $line_read =~ s/<\/mem_image>//;
+		 		 $mem_image = "$mem_image"."$line_read";
+		 		 my $decoded = decode_base64($mem_image);
+		 		                                
+		 		 if(length($mem_image) < $max_import_image_upload_size) {
+		 		 	if($name_to_long == 0) {
+		 		                $QUESTIONS{$quest_no}{mem_image}{$mem_image_name} = $decoded;
+		 		                }
+		 		        }
+		 		 else {
+		 		        $NO_GOOD{$quest_no} = "$LANGUAGE{$set_language}{Imagetoobig}";
+		 		        delete($QUESTIONS{$quest_no});
+		 		        }
+		 		                                		 		 
+		 		 $keep_reading = 0;
+		 		 $name_to_long = 0;
+		 		 $line_read = "";
+		 		 next;
+		 		 }
+		 	else {
+		 		 $mem_image = "$mem_image"."$line_read";
+		 		 next;
+		 		 }
+                        }
+                        
+                        
+                # LOOK FOR FIRST MATCH   #########################################
                 if($line_read =~ /^<item>/) {
                         ++$quest_no;
                         $answer_num = 0;
@@ -35169,7 +36060,7 @@ sub import_quests {
 			
                         $descrip =~ s/<descrip>//g;
                         $descrip =~ s/<\/descrip>//g;
-			$descrip = &funny_char("$descrip","0");
+			$descrip = &funny_char2("$descrip","0");
 			
                         if(length($descrip) < $max_descrip) {
                                 $QUESTIONS{$quest_no}{descrip} = $descrip;
@@ -35243,6 +36134,101 @@ sub import_quests {
                         next;
                         }
 
+		if($line_read =~ /^<mem_image_name>/) {
+		        $mem_image_name = "";
+			$mem_image_name = $line_read;
+			$mem_image_name =~ s/<mem_image_name>//g;
+		        $mem_image_name =~ s/<\/mem_image_name>//g;
+			if(length($mem_image_name) < $max_image_name) {
+				$QUESTIONS{$quest_no}{mem_image_name}{$mem_image_name} = 0;
+			        }
+			else {
+			        $NO_GOOD{$quest_no} = "$LANGUAGE{$set_language}{Memoryimagenamelongerthen} $max_image_name characters";
+		                }
+		                
+		        next;
+			}
+
+		if($line_read =~ /^<mem_image>/) { # MEMORY image
+                	$mem_image = "";
+                        if($line_read =~ /<\/mem_image>$/) {
+                                $mem_image = $line_read;
+                                $mem_image =~ s/<mem_image>//;
+                                $mem_image =~ s/<\/mem_image>//;
+                                
+                                if(length($mem_image) < $max_import_image_upload_size) {
+                                        $QUESTIONS{$quest_no}{mem_image}{$mem_image_name} = $mem_image;
+                                        }
+                                else {
+                                        $NO_GOOD{$quest_no} = "$LANGUAGE{$set_language}{Imagetoobig}";
+                                        delete($QUESTIONS{$quest_no});
+                                        }
+                                         
+                                $mem_image = "";
+                                $keep_reading = 0;
+                                $line_read = "";
+                                next;
+                                }
+                        else {
+                                $line_read =~ s/^<mem_image>//;
+                                $mem_image = $line_read;
+                                $keep_reading =11;
+                                next;
+                                }
+                        }
+
+		if($line_read =~ /^<memory>/) {
+		        $memory = $line_read;
+		        $memory =~ s/<memory>//g;
+		        if($memory =~ /<\/memory>/) {
+		                $memory =~ s/<\/memory>//g;
+			        if(length($memory) < 5000) {
+			                $QUESTIONS{$quest_no}{memory} = $memory;
+			                $memory = "";
+			                
+			                # GET THE ALT TAGS
+			                if($QUESTIONS{$quest_no}{memory} =~ /<img /) { # <img class="img-fluid align-top" src="@@PLUGINFILE@@/1bludot.png" alt="one blue dot" width="27" height="20">
+						my @img = split(/<img/,$QUESTIONS{$quest_no}{memory});
+						foreach my $imgg(@img) {
+							if($imgg =~ /alt/) {
+							        my @alt = split(/alt/,$imgg);
+							        my @alt_part = split(/\"/,$alt[1]);
+							        my $filedescription = $alt_part[1];
+					
+								my @img_name = split(/\/schools\/qst_files\//,$imgg);
+								my @name = split(/\"/,$img_name[1]);
+								my $image_name = $name[0];
+
+								if(length($image_name) < 51) {
+							        	if(length($filedescription) > 0 && length($filedescription) < 501) {
+							        		$QUESTIONS{$quest_no}{mem_image}{filedescrip}{$image_name} = $filedescription;
+							        		}
+							        	elsif($filedescription eq"") {
+							        		}
+							        	else {
+										$NO_GOOD{$quest_no} = "$LANGUAGE{$set_language}{Filedescriptiontoobig}";
+									        delete($QUESTIONS{$quest_no});
+							        		}
+									}
+								else {
+									$NO_GOOD{$quest_no} = "$LANGUAGE{$set_language}{Imagenametoobig}";
+									delete($QUESTIONS{$quest_no});
+									}
+							        }
+							}
+						}
+			                }
+			        else {
+			                $NO_GOOD{$quest_no} = "$LANGUAGE{$set_language}{Memorylongerthen5000characters}";
+			                $memory = "";
+			                }
+		                }
+		         else {
+		                $keep_reading = 10;
+		                }
+		        next;
+                        }
+                        
 		if($line_read =~ /^<bq_pdf_name>[a-zA-Z0-9_\-\.]*<\/bq_pdf_name>$/) { # BASIC question pdf name
 			my $bq_pdf_name = $&;
 		        $bq_pdf_name =~ s/<bq_pdf_name>//g;
@@ -35572,7 +36558,7 @@ sub import_quests {
 				if($line_read =~ /<text>/) { # Description of QUESTION
 					$line_read =~ s/<text>//;
 					$line_read =~ s/<\/text>//;
-					$line_read = &spec_char("$line_read","0");
+					$line_read = &funny_char2("$line_read","0");
 
 					if(length($line_read) > 0) {
 		        			if(length($line_read) < $max_descrip) {
@@ -36246,7 +37232,7 @@ sub import_quests {
                 $import_from = "WORD";
                 
                 my @items = split(/>\s*QST\s*/,$xmlcontents); # split by >QST
-                shift(@items); # DO NOT NEED FIRST PART is stuff before first question
+                shift(@items); # DO NOT NEED FIRST PART - is stuff before first question
                
                 foreach my $item(@items){
                         my @item_pieces = split(/\)@/,$item); # split for answers
@@ -36310,7 +37296,7 @@ sub import_quests {
                                         
                         foreach my $p(@list) {
                                 my $new_line;			                                
-			        if($p =~ /<w:pPr\>/) {
+			        if($p =~ /<w:pPr\>/) {  # Checking for New Paragraphs
 			        	$new_line = "<P>";
 			        	}
                                 my @quest = split(/<w:t[ xml:space="preserve"]*>/,$p);
@@ -36319,7 +37305,12 @@ sub import_quests {
                                 if($check_empty1 ne"") {
                                         $real_question = "$real_question"."$new_line $quest[1]";
                                         }
+                                        
+                                if($p =~ /<w:br\/>/) { # Checking for line breaks
+					$real_question = "$real_question"."<BR>";
+					}
                                 }
+                        
                         
                         # if image, add correct tag for it
                         my $answer_num = 1;
@@ -36329,11 +37320,21 @@ sub import_quests {
                                         }
                                 }
                         
-                        $QUESTIONS{$number}{question} = "$real_question";
-                        # Remove <P> for Description
+                        my $quest_length = length($real_question);
+                        if($quest_length < $max_question_length_import) {
+	                        $QUESTIONS{$number}{question} = "$real_question";
+	                        }
+	                else {
+	                	$NO_GOOD{$number} = "$LANGUAGE{$set_language}{Questiontoobig}";
+	                	}
+                        
+                        # Remove <P> and <BR> for Description
 			my $clean_quest = $real_question;
-			$clean_quest =~ s/<P\>/ /g;
+			$clean_quest =~ s/<P\>/ /ig;
+			$clean_quest =~ s/<BR>/ /ig;
 			my $descrip = substr($clean_quest, 0, 69);
+			$descrip = &funny_char2("$descrip","0");
+			
                         $QUESTIONS{$number}{descrip} = "$descrip";
                         $QUESTIONS{$number}{value} = 1;
                         $QUESTIONS{$number}{ans_mode} = 1;
@@ -36343,9 +37344,10 @@ sub import_quests {
                         $QUESTIONS{$number}{kolum} = 1;
                
      
-                	# ANSWERS    GO IN AS ADVANCED ANSWERS
+                	# ANSWERS  -  GO IN AS ADVANCED ANSWERS
 			foreach my $chunk(@item_pieces) {
                         	my @ans_piece;
+                        	
                             	# correct answer(s)
                             	if($chunk =~ /\*\*/) {
                             	        $QUESTIONS{$number}{answer_num}{$answer_num}{c_answer} = "1";
@@ -36360,10 +37362,10 @@ sub import_quests {
                                     
                             	#See if there are images
                             	if($chunk =~ /<v:imagedata r:id=[a-zA-Z0-9 :\\="]*\/>/ || $chunk =~ /<a:blip r:embed=[a-zA-Z0-9"\/]*>/ || $chunk =~ /<wp:docPr id=[a-zA-Z0-9" \.:-_\=\/]*\/>/) {
-                            	#<wp:docPr id="3" name="image07.jpg"/> wp:docPr id="5" name="image09.jpg" descr="http://www.morning-earth.org/Graphic-E/BIOSPHERE/PLANTIMAGE/DISPERSAL/FRUITS/blackberry.jpg"/>
-                            	#<wp:docPr id="14" name="Picture 14" descr="http://www.nps.gov/orpi/naturescience/images/Saguaro.JPG"/>
+                            	    #<wp:docPr id="3" name="image07.jpg"/> wp:docPr id="5" name="image09.jpg" descr="http://www.morning-earth.org/Graphic-E/BIOSPHERE/PLANTIMAGE/DISPERSAL/FRUITS/blackberry.jpg"/>
+                            	    #<wp:docPr id="14" name="Picture 14" descr="http://www.nps.gov/orpi/naturescience/images/Saguaro.JPG"/>
                                             
-                                if($chunk =~ /<wp:docPr id=[a-zA-Z0-9" \.:-_\=\/]*\/>/) {
+                                    if($chunk =~ /<wp:docPr id=[a-zA-Z0-9" \.:-_\=\/]*\/>/) {
                                 	my @wp = ($chunk =~ /<wp:docPr id=[a-zA-Z0-9" \.:-_\=\/]*\/>/g);
                                         foreach my $blp(@wp) {
                                                 my @pic = split(/name=/,$blp);
@@ -36507,8 +37509,14 @@ sub import_quests {
                                     my $check_empty = $ans[1];
                                     $check_empty =~ s/\s*//g;
                                     if($check_empty ne"") {
-                                            $real_ans = "$real_ans"."$ans[1]";
+                                    	$real_ans = "$real_ans"."$ans[1]";
                                             }
+                                            
+                                    # save the xtra spaces and other formatting <w:br/> or w:br
+				    if($ans[1] eq" ") { 
+				    	$real_ans = "$real_ans"."&nbsp;";
+				    	}
+
                                     }
                          
                             $real_ans =~ s/\**//g;
@@ -36542,19 +37550,58 @@ sub import_quests {
                             	}
                     	}
                 
-            	# CHECK for answers and correct answer
+            	# CHECK for answers and correct answer and size, decide if MA or SA or P
             	foreach my $key(keys %QUESTIONS) {
             	        my $no_correct_answer = 0;
+            	        my $corr_answers = 0;
+            	        my $answrs = 0;
+            	        
             	        if (!keys %{$QUESTIONS{$key}{answer_num}}) { # remove cause no answers
             	                $NO_GOOD{$key} = $key;
             	                $missing_answers = 1;
             	                }
-            	        else {foreach my $ans(keys %{$QUESTIONS{$key}{answer_num}}) { # must have a correct answer
-            	                if($QUESTIONS{$key}{answer_num}{$ans}{c_answer} == "1") {
-            	                        $no_correct_answer = 1;
-            	                        }
-            	                }
-            	            }
+            	        else {
+            	        	foreach my $ans(keys %{$QUESTIONS{$key}{answer_num}}) { # must have a correct answer
+            	                	if($QUESTIONS{$key}{answer_num}{$ans}{c_answer} == "1") {
+            	                        	$no_correct_answer = 1;
+            	                        	++$corr_answers;
+            	                        	}
+            	                        ++$answrs;
+            	                	}
+            	                	
+            	                if ($corr_answers > 1) {
+            	                	$QUESTIONS{$key}{type} = "MA";
+            	                	}
+            	                	
+            	                if ($answrs == 1 && $corr_answers == 1) {  # only one answer so SA or P, check sizes
+            	                	foreach my $ans(keys %{$QUESTIONS{$key}{answer_num}}) { 
+	            	                	my $ans_length = length($QUESTIONS{$key}{answer_num}{$ans}{answer});
+            	                		if($ans_length > 70) {
+            	                			if($ans_length < $max_answer_length_import) {
+            	                				$QUESTIONS{$key}{type} = "P";
+            	                				}
+            	                			else {
+            	                				$NO_GOOD{$key} = "$LANGUAGE{$set_language}{Answerimportuploadsize}";
+				               	 		#delete($QUESTIONS{$quest_no});
+            	                				}
+            	                			}
+            	                		else {
+				        		$QUESTIONS{$key}{type} = "SA";
+				        		}
+				        	}
+            	                	}
+            	                	
+            	                else {   # CHECK answer sizes for MC and MA are OK
+            	                	foreach my $ans(keys %{$QUESTIONS{$key}{answer_num}}) { 
+						my $ans_length = length($QUESTIONS{$key}{answer_num}{$ans}{answer});
+					        if($ans_length > $max_answer_length_import) {
+					        	$NO_GOOD{$key} = "$LANGUAGE{$set_language}{Answerimportuploadsize}";
+							#delete($QUESTIONS{$quest_no});
+					            	}
+				        	}
+            	                	}
+            	            	}
+            	            
             	        if($no_correct_answer == 0) { # set answer 1 as correct answer
             	                $QUESTIONS{$key}{answer_num}{1}{c_answer} = "1";
             	                }
@@ -36642,7 +37689,6 @@ sub import_quests {
 			 						
 			 					else {
 			 						if(length($line_read) > 0) {
-			 	
 			 			        			if(length($line_read) < $max_answer_length_import) {
 			 			        				$CORRECT_ANSWER_ID{$line_read} = $line_read;
 			 								}
@@ -37132,6 +38178,7 @@ sub import_quests {
 							}
 						
 			                 	my $descrip = $LINE{title};
+			                 	$descrip = &funny_char2("$descrip","0");
 						my $descr;
 						
 						if($descrip eq"") {
@@ -37273,11 +38320,15 @@ sub import_quests {
 							}
 		
 						if($QUESTIONS{$quest_no}{value} > 0) {
-							$QUESTIONS{$quest_no}{value} = $QUESTIONS{$quest_no}{value} + $actual_value;
+							my $value1 = substr($actual_value, 0, 2);
+							my $new_value = $QUESTIONS{$quest_no}{value} + $value1;
+							my $real_value = substr($new_value, 0, 2);
+							$QUESTIONS{$quest_no}{value} = $real_value;
 							}
 							
 						else {
-							$QUESTIONS{$quest_no}{value} = $actual_value;
+							my $value1 = substr($actual_value, 0, 2);
+							$QUESTIONS{$quest_no}{value} = $value1;
 							}
 		
 						$keep_going = 0;
@@ -37310,7 +38361,8 @@ sub import_quests {
 			 						$QUESTIONS{$quest_no}{value} = $whole_value[0];
 			 						}
 			 					else {
-			 						$QUESTIONS{$quest_no}{value} = $value[1];
+			 						my $value1 = substr($value[1], 0, 2);
+			 						$QUESTIONS{$quest_no}{value} = $value1;
 			 						}
 			 					
 			 					if($QUESTIONS{$quest_no}{value} eq"") {
@@ -37789,7 +38841,167 @@ sub import_quests {
 			} # DONE QTI
         
         
-        
+        elsif ($IQ{import_format} == 5) {  # Text            ####################################################################
+		$import_from = "Text";
+	        my $number = 1;      
+	        my $question;
+	        my @items = split(/\s*QST\s*/,$xmlcontents); # split by QST
+	        shift(@items); # $item[0] is empty
+	        
+	        foreach my $item(@items) { # Each contains the whole question and answers
+	                chomp $item;	        
+		        next if($item eq"");
+		        
+	                my @item_pieces = split(/\)\@/,$item);
+	                my $question = $item_pieces[0];
+	                my $question_length = length($question);
+	                
+	                if ($question_length > $max_question_length_import) { # Question to big
+	                	$NO_GOOD{$number} = "$LANGUAGE{$set_language}{Answerimportuploadsize}";
+	                	++$number;
+	                	next;
+	                	}
+	                else {
+	                	$QUESTIONS{$number}{type} = "MC";
+	                	$QUESTIONS{$number}{mode} = 1;
+				$QUESTIONS{$number}{sub_type} = 1;
+				$QUESTIONS{$number}{kolum} = 1;
+				$QUESTIONS{$number}{ans_mode} = 1;
+				$QUESTIONS{$number}{vlink} = 0;
+				$QUESTIONS{$number}{alink} = 0;
+				$QUESTIONS{$number}{value} = 1;
+							
+				my $clean_quest = $question;
+				$clean_quest =~ s/<P>/ /ig;
+				$clean_quest =~ s/<BR>/ /ig;
+
+				my $descrip = substr($clean_quest, 0, 69);
+				$descrip = &funny_char2("$descrip","0");
+				$QUESTIONS{$number}{descrip} = $descrip;
+				
+				$question =~ s/\"/&quot;/g;
+				$question =~ s/\n/<BR>/g; # Provides some basic formatting
+				$_ = $question;
+				if($question =~ /  /) { # Provides more basic formatting - tabs
+					$question =~ s/ /&nbsp;/g;
+					$question =~ s/&nbsp;&nbsp;/ &nbsp;/g;
+					$question =~ s/\t/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/g;
+					$question =~ s/\b&nbsp;\b/ /g;
+					}
+					
+				$QUESTIONS{$number}{question} = $question;
+				
+	                	my $answers = 1;
+	                	
+	                	shift(@item_pieces); # Get rid of question
+	                	my $how_many_ans = @item_pieces; # Decide if MA or SA or P
+	                
+	                	#convert "
+				#$item_pieces[0] =~ s/\"/&quot;/g;
+	
+	                	if($how_many_ans == 1) { # SA or P
+	                		$item_pieces[0] =~ s/\*\*//;
+	                		$item_pieces[0] =~ s/--$//g;
+	                		my $ans_length = length($item_pieces[0]);
+
+	                		if($ans_length > 70) {
+					        if($ans_length < $max_answer_length_import) {
+					        	$QUESTIONS{$number}{type} = "P";
+					        	$QUESTIONS{$number}{answer_num}{$answers}{answer} = "$item_pieces[0]";
+					        	$QUESTIONS{$number}{answer_num}{$answers}{c_answer} = "1";
+					        	$QUESTIONS{$number}{answer_num}{$answers}{q_order} = "1";
+					            	}
+					        else {
+					            	$NO_GOOD{$number} = "$LANGUAGE{$set_language}{Answerimportuploadsize}";
+					            	}
+					        }
+					else {
+						$QUESTIONS{$number}{type} = "SA";
+						$QUESTIONS{$number}{answer_num}{$answers}{answer} = "$item_pieces[0]";
+						$QUESTIONS{$number}{answer_num}{$answers}{c_answer} = "1";
+						$QUESTIONS{$number}{answer_num}{$answers}{q_order} = "1";
+						}
+	                		}
+	                		
+	                	else { # MC or MA
+	                		my $corr_ans = 0;
+	                		
+	                		foreach my $anser(@item_pieces) { # Only answers and possibly Explanation/Feedback
+						$anser =~ s/--$//g;
+						
+	                			if($anser =~ /%EXPLAN%/i) {
+	                				my @exp = split(/%EXPLAN%/,$anser);
+	                				my $explan = $exp[1];
+	                				$explan =~ s/%EXPLAN%//;
+	                				
+	                				if($explan =~ /%MEMORY%/i) {
+	                					my @mem = split(/%MEMORY%/,$explan);
+	                					$explan = $mem[0];
+	                					$anser = "$exp[0] "."%MEMORY% "."$mem[1]";
+	                					}
+	                				else {
+	                					$anser = "$exp[0]";
+	                					}
+	                					
+	                				my $expl_length = length($explan);
+	                				
+							if($expl_length > $max_answer_length_import) {
+							        $NO_GOOD{$number} = "$LANGUAGE{$set_language}{Answerimportuploadsize}";
+	                					}
+	                				else {
+	                					$explan  =~ s/\"/&quot;/g;
+	                					$QUESTIONS{$number}{explanation} = $explan;
+	                					}
+	                				}
+	                			
+	                			if($anser =~ /%MEMORY%/i) {
+							my @mem = split(/%MEMORY%/,$anser);
+							my $memory = $mem[1];
+							$memory =~ s/%MEMORY%//;
+							$anser = $mem[0];
+							my $mem_length = length($memory);
+							                				
+							if($mem_length > $max_answer_length_import) {
+								$NO_GOOD{$number} = "$LANGUAGE{$set_language}{Answerimportuploadsize}";
+							        }
+							else {
+							        $memory  =~ s/\"/&quot;/g;
+							        $QUESTIONS{$number}{memory} = $memory;
+							        }
+	                				}
+	                				
+	                			my $ans_length = length($anser);
+	                			
+	                			if($ans_length > $max_answer_length_import) {
+	                				$NO_GOOD{$number} = "$LANGUAGE{$set_language}{Answerimportuploadsize}";
+	                				}
+	                			else {
+	                				if($anser =~ /\*\*/) { # A correct answer
+	                					 $QUESTIONS{$number}{answer_num}{$answers}{c_answer} = "1";
+	                					 $anser =~ s/\*\*//;
+	                					 ++$corr_ans;
+	                					}
+	                				else {
+	                					$QUESTIONS{$number}{answer_num}{$answers}{c_answer} = "0";
+	                					}
+	                					
+	                				$QUESTIONS{$number}{answer_num}{$answers}{answer} = "$anser";
+	                				}
+	                				
+	                			$QUESTIONS{$number}{answer_num}{$answers}{q_order} = "$answers";
+	                			
+	                			if($corr_ans > 1) { # MA
+	                				$QUESTIONS{$number}{type} = "MA";
+	                				}
+	                				
+	                			++$answers;
+	                			}
+	                		}
+	                	}
+	                
+	                ++$number;
+	                } 
+		} # DONE Text
         
         # NEXT PUT INFO INTO DATABASE 		#############################################################
             
@@ -37818,10 +39030,15 @@ sub import_quests {
                 #$QUESTIONS{$quest_no}{qimage_name}{$qimage_name} = $qimage;
                 #$QUESTIONS{$quest_no}{qimage_id}{$qimage_id} = 0;
                 #$QUESTIONS{$quest_no}{question} = $question
+                #$QUESTIONS{$quest_no}{descrip} = $descrip;
                 #$QUESTIONS{$quest_no}{explanation} = $explanation
                 #$QUESTIONS{$quest_no}{explanimage_name}{$explanimage_name} = 0;
                 #$QUESTIONS{$quest_no}{explanimage}{filedescrip}{$image_name} = $alt[1];
                 #$QUESTIONS{$quest_no}{explanimage}{$explanimage_name} = $decoded;
+                #$QUESTIONS{$quest_no}{memory} = $memory
+		#$QUESTIONS{$quest_no}{mem_image_name}{$mem_image_name} = 0;
+		#$QUESTIONS{$quest_no}{mem_image}{filedescrip}{$mem_image} = $alt[1];
+                #$QUESTIONS{$quest_no}{mem_image}{$mem_image_name} = $decoded;
                 #$QUESTIONS{$quest_no}{value} = $value1;
                 #$QUESTIONS{$quest_no}{ans_mode} = $ans_mode1;
                 #$QUESTIONS{$quest_no}{mode} = $mode1;
@@ -37871,6 +39088,10 @@ sub import_quests {
                                 $contains_images = 1;
                                 last;
                 		}
+                	elsif(keys %{$QUESTIONS{$numbr}{mem_image_name}}) { # MEMORY IMAGES
+			        $contains_images = 1;
+			        last;
+                		}
                 	elsif(keys %{$QUESTIONS{$numbr}{answer_num}}) { # ADVANCED ANSWER IMAGES
 			        foreach my $ans_num(keys %{$QUESTIONS{$numbr}{answer_num}}) {
                                         if(keys %{$QUESTIONS{$numbr}{answer_num}{$ans_num}{adv_ans_image_name}}) {
@@ -37910,7 +39131,9 @@ sub import_quests {
                 	$import_images_num = $return;
 			}
                         
-             #### INSERT EVERYTHING
+                        
+             #### INSERT EVERYTHING     #########################################################
+             
                 foreach my $num(sort {$a<=>$b} keys %QUESTIONS) {
                
                         # CONVERT IMAGES, GET THEIR NEW NUMBERS, WRITE THE FILES
@@ -37995,6 +39218,43 @@ sub import_quests {
                                         }
                                 }
 
+                        if(keys %{$QUESTIONS{$num}{mem_image}}) { # MEMORY IMAGES                         	
+                                foreach my $image_name(keys %{$QUESTIONS{$num}{mem_image}}) { 
+                                        next if($image_name =~ /filedescrip/); 
+
+                                        # INSERT TO QST_FILES AND GET NUMBER
+                                        my $error = 0;
+                                        my @extension = split(/\./,$image_name);
+                                        my $type = "image\/"."$extension[1]";
+                                        my $size = length($extension[0]);
+                                        
+                                        my $return = &insert_file_info("f_name","$image_name","u_id","$IQ{u_id}","parent","$import_images_num","org_id","$org_id","type","$type","size","$size","u_type","$u_type","filedescrip","$QUESTIONS{$num}{mem_image}{filedescrip}{$image_name}");
+
+                                        # WRITE THE FILE - NUMBER
+                                        my $real_file_name = $upload_directory."$return"."\."."$extension[1]";
+                                        my $new_file_name = "$return"."\."."$extension[1]";
+
+                                        if (! open(GOODFILE, ">$real_file_name") ) {
+                                                print "Can't open file for writing - $!";
+                                                $error = 1;
+                                                }
+                                    
+                                        if( $error == 0) {
+                                                my $image = $QUESTIONS{$num}{mem_image}{$image_name};
+                                                
+                                                if ($IQ{import_format} == 2) { # Word XML
+                                                       $image = decode_base64($QUESTIONS{$num}{mem_image}{$image_name});
+                                                        }
+                                                        
+                                                binmode GOODFILE;
+                                                print GOODFILE $image;
+                                                close(GOODFILE);
+                                                }
+   
+                                        # REPLACE image name with number in question
+                                        $QUESTIONS{$num}{memory} =~ s/\/schools\/qst_files\/$image_name/\/schools\/qst_files\/$new_file_name/g;
+                                        }
+                                }
 
                         if(keys %{$QUESTIONS{$num}{answer_num}}) { # ADVANCED ANSWER IMAGES
                                 foreach my $ans_num(keys %{$QUESTIONS{$num}{answer_num}}) {
@@ -38144,9 +39404,9 @@ sub import_quests {
                         if($QUESTIONS{$num}{bq_pdf_id} eq "") {
 			        $QUESTIONS{$num}{bq_pdf_id} = 0;
                                 }
-                                
-                        my $return = &insert_import_question_return("u_id","$IQ{u_id}","question","$QUESTIONS{$num}{question}","type","$QUESTIONS{$num}{type}","value","$QUESTIONS{$num}{value}","org_id","$IQ{org_id}","sub_type","$QUESTIONS{$num}{sub_type}","image_id","$QUESTIONS{$num}{bq_imageid}","vlink","$QUESTIONS{$num}{vlink}","alink","$QUESTIONS{$num}{alink}","kolum","$QUESTIONS{$num}{kolum}","mode","$QUESTIONS{$num}{mode}","descrip","$QUESTIONS{$num}{descrip}","ans_mode","$QUESTIONS{$num}{ans_mode}","pdf","$QUESTIONS{$num}{bq_pdf_id}","explanation","$QUESTIONS{$num}{explanation}");
-	
+                               
+                        my $return = &insert_import_question_return("u_id","$IQ{u_id}","question","$QUESTIONS{$num}{question}","type","$QUESTIONS{$num}{type}","value","$QUESTIONS{$num}{value}","org_id","$IQ{org_id}","sub_type","$QUESTIONS{$num}{sub_type}","image_id","$QUESTIONS{$num}{bq_imageid}","vlink","$QUESTIONS{$num}{vlink}","alink","$QUESTIONS{$num}{alink}","kolum","$QUESTIONS{$num}{kolum}","mode","$QUESTIONS{$num}{mode}","descrip","$QUESTIONS{$num}{descrip}","ans_mode","$QUESTIONS{$num}{ans_mode}","pdf","$QUESTIONS{$num}{bq_pdf_id}","explanation","$QUESTIONS{$num}{explanation}","memory","$QUESTIONS{$num}{memory}");
+
                         # INSERT INTO CATEGORIES_TO_QUESTIONS TABLE
                         &insert_generic("query","INSERT categories_to_questions VALUES(\"$IQ{folder_no}\",\"$return\",\"$IQ{u_id}\",\"$org_id\")");
 				
@@ -38230,7 +39490,9 @@ sub import_quests_qti_zip {
         my $contains_images = 0;
         my $return_num;
         my $import_images_num;
+        my $version;
         my $import_from = "QTI 2/3 ZIP";
+        my $new_dir;
         my %FILES = ();
 
         if($u_type == 5) {
@@ -38238,14 +39500,29 @@ sub import_quests_qti_zip {
                 }
 	
         # parse the directories and files in the directory
+	# CHECK FOR QTI VERSION
+	opendir(INQTI, $dir_name) || die "Can't open $dir_name: $!"; # Open original directory 'u_id _ u_id'
+	while (readdir INQTI) {
+		next if(/^\./);
+		next if(/^\.\./);
+		next if(/imsmanifest/);
+		next if(/assessment/);
 
+		### FOR QTI 2.1 no folders
+		if (/pool/ || /\.xml$/) {
+			$version = 21;
+			}
+		}
+		
+	closedir(INQTI);
+		
 	opendir(IN, $dir_name) || die "Can't open $dir_name: $!"; # Open original directory 'u_id _ u_id'
 	while (readdir IN) {
 		next if(/^\./);
 		next if(/^\.\./);
 		next if(/imsmanifest/);
 		next if(/assessment/);
-
+			
 		my $new_dir = "$dir_name/"."$_";
 
 		opendir(INN, $new_dir); # Each xml file has it's own directory
@@ -39024,11 +40301,15 @@ sub import_quests_qti_zip {
 							}
 
 						if($QTIQUESTIONS{$quest_no}{value} > 0) {
-							$QTIQUESTIONS{$quest_no}{value} = $QTIQUESTIONS{$quest_no}{value} + $actual_value;
+							my $value1 = substr($actual_value, 0, 2);
+							my $new_value = $QTIQUESTIONS{$quest_no}{value} + $value1;
+							my $new_value2 = substr($new_value, 0, 2);
+							$QTIQUESTIONS{$quest_no}{value} = $new_value2;
 							}
 					
 						else {
-							$QTIQUESTIONS{$quest_no}{value} = $actual_value;
+							my $value1 = substr($actual_value, 0, 2);
+							$QTIQUESTIONS{$quest_no}{value} = $value1;
 							}
 
 						$keep_going = 0;
@@ -39058,10 +40339,12 @@ sub import_quests_qti_zip {
 	 				
 			 					if($value[1] =~ /\./) {
 									my @whole_value = split(/\./,$value[1]);
-			 						$QTIQUESTIONS{$quest_no}{value} = $whole_value[0];
+									my $value1 = substr($whole_value[0], 0, 2);
+			 						$QTIQUESTIONS{$quest_no}{value} = $value1;
 			 						}
 			 					else {
-			 						$QTIQUESTIONS{$quest_no}{value} = $value[1];
+			 						my $value1 = substr($value[1], 0, 2);
+			 						$QTIQUESTIONS{$quest_no}{value} = $value1;
 			 						}
 	 					
 			 					if($QTIQUESTIONS{$quest_no}{value} eq"") {
@@ -40729,6 +42012,7 @@ sub export_quests {
                                                                 close(XML_EXPORT);
                                                                 }
                                                                 
+                                                        $QUESTIONS{$key}{explanation} =~ s/&quot;/"/g;
                                                         print XML_DOWNLOAD"<explanation>$QUESTIONS{$key}{explanation}</explanation>\n";
                                                         }
                                                         
@@ -40740,6 +42024,63 @@ sub export_quests {
 
                                             ### QUESTIONS
                                             
+						# ADVANCED EDITOR IMAGES FOR MEMORY
+                                                if($QUESTIONS{$key}{memory} =~ /\/schools\/qst_files\/[a-zA-Z0-9.]*/) {
+                                                        $_ = "$QUESTIONS{$key}{memory}";
+                                                        my @files;
+                                                        
+                                                        while($_ =~ /(\/schools\/qst_files\/[a-zA-Z0-9.]*)+/g) {
+                                                                push(@files, $&);                                       
+                                                                }
+                                                            
+                                                        while (@files) {
+                                                                my $file = pop(@files);
+                                                                my @string = split(/\//,$file);
+                                                                my $image_name = pop(@string);
+
+                                                                my @name = split(/\./, $image_name);
+                                                                my %IMAG_NAME = &select4("query","select number,file_name from qst_files where number=\"$name[0]\"");
+                                                                
+                                                                # change image name to correct one
+                                                                $QUESTIONS{$key}{memory} =~ s/$image_name/$IMAG_NAME{$name[0]}/;
+                                                                
+                                                                print XML_DOWNLOAD"<mem_image_name>$IMAG_NAME{$name[0]}</mem_image_name>\n";
+                    
+                                                                #open image file
+                                                                my $file_name = "$upload_directory"."$image_name";
+
+                                                                my $error = 0;
+
+                                                                if (! open(XML_EXPORT, "<$file_name") ) {
+                                                                        print "Can't open file for reading - $!";
+                                                                        $error = 1;
+                                                                        }
+                                                                
+                                                                if($error == 0) {
+                                                                        my $convert;
+                                                                        binmode XML_EXPORT;
+                                                                        print XML_DOWNLOAD"<mem_image>"; 
+                                                                        
+                                                                        # store images in xml base 64 encoded
+                                                                        $convert = do{ local $/ = undef; <XML_EXPORT>; };
+                                                                        
+                                                                        my $encoded = encode_base64( $convert );
+                                                                        print XML_DOWNLOAD $encoded;
+                                                                        print XML_DOWNLOAD"</mem_image>\n";
+                                                                        }
+                                                        
+                                                                close(XML_EXPORT);
+                                                                }
+                                                                
+                                                        $QUESTIONS{$key}{memory} =~ s/&quot;/"/g;
+                                                        print XML_DOWNLOAD"<memory>$QUESTIONS{$key}{memory}</memory>\n";
+                                                        }
+                                                        
+                                                else {
+                                                        print XML_DOWNLOAD"<memory>$QUESTIONS{$key}{memory}</memory>\n";
+                                                        }
+                                            	
+                                            	
                                                 # ADVANCED EDITOR IMAGES FOR QUESTION
                                                 if($QUESTIONS{$key}{question} =~ /\/schools\/qst_files\/[a-zA-Z0-9.]*/) {
                                                         $_ = "$QUESTIONS{$key}{question}";
@@ -41766,11 +43107,11 @@ sub export_quests_pdf {
 						}
 		
 		                        if($QUESTIONS{$quest}{vlink} && $QUESTIONS{$quest}{vlink} ne "0") {
-		                                print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" controls><source src=\"$QUESTIONS{$quest}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$quest}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$quest}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video</td></table><P>\n";
+		                                print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" oncontextmenu=\"return false\" controlslist=\"nodownload\" controls=\"\"><source src=\"$QUESTIONS{$quest}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$quest}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$quest}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video></td></table><P>\n";
 		                                }
 		                                        
 		                        if($QUESTIONS{$quest}{alink} && $QUESTIONS{$quest}{alink} ne "0") {
-		                                print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$quest}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$quest}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$quest}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video</td></table><P>\n";
+		                                print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$quest}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$quest}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$quest}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video></td></table><P>\n";
 		                                }
 		                        }
 		                 else {
@@ -41789,11 +43130,11 @@ sub export_quests_pdf {
 						}
 		
 		                        if($QUESTIONS{$quest}{vlink} && $QUESTIONS{$quest}{vlink} ne "0") {
-		                                print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" controls><source src=\"$QUESTIONS{$quest}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$quest}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$quest}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video</td></table><P>\n";
+		                                print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" oncontextmenu=\"return false\" controlslist=\"nodownload\" controls=\"\"><source src=\"$QUESTIONS{$quest}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$quest}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$quest}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video></td></table><P>\n";
 		                                }
 		                                        
 		                        if($QUESTIONS{$quest}{alink} && $QUESTIONS{$quest}{alink} ne "0") {
-		                                print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$quest}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$quest}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$quest}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video</td></table><P>\n";
+		                                print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$quest}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$quest}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$quest}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video></td></table><P>\n";
 		                                }
 		                        }
 				} 
@@ -42295,7 +43636,7 @@ sub export_quests_pdf {
 						
 			my $there = length($check);
 			if( $there > 0) {
-				print"<P><TABLE><TR><TD width=\"40\"></TD><TD><TABLE style=\"border:1px solid grey\; border-radius:.3em\;\"><TR style=\"padding-bottom: 4px\;\"><TD><i>&nbsp\;$LANGUAGE{$set_language}{Explanation}:</i><font style=\"font-family:Times New Roman\;\">$QUESTIONS{$quest}{explanation} </font><BR></TD></TR></TABLE></TD></TR></TABLE>\n";
+				print"<P><TABLE><TR><TD width=\"40\"></TD><TD><TABLE style=\"border:1px solid grey\; border-radius:.3em\;\"><TR style=\"padding-bottom: 4px\;\"><TD style=\"padding-bottom: 4px\;\"><i>&nbsp\;$LANGUAGE{$set_language}{Explanation}:</i><font style=\"font-family:Times New Roman\;\">$QUESTIONS{$quest}{explanation} </font></TD></TR></TABLE></TD></TR></TABLE>\n";
 				}
 							
 			print"<P><TABLE><TR><TD width=\"40\"></TD><TD><TABLE style=\"border:1px solid grey\; border-radius:.3em\;\"><TR style=\"padding-bottom: 4px\;\"><TD><i>&nbsp\;$LANGUAGE{$set_language}{SOURCE}:</i> <font style=\"font-family:Times New Roman\;\" >$SOURCE{$quest} &nbsp\;</font><BR></TD></TR></TABLE></TD></TR></TABLE>\n";
@@ -42364,6 +43705,21 @@ sub question_done {
 	my %ALREADY_SAVED_QUESTIONS = ();
 	my %RETURN1 = ();
 	
+	&print_javascript_begin();
+	
+	print"document.onkeydown = function (event) \{
+	event = (event || window.event);
+	return keyFunction(event);
+	\}\n";
+							
+	print"function keyFunction(event)\{
+	if (event.keyCode == 123) \{
+	return false;
+	\}
+    	\}\n";
+    					
+    	&print_javascript_end();				
+    					
 	#check are in class, answer is not empty, qst is posted, have access to qst and question is in qst
 	
 	if(defined $USER{$ids}{$QD{class_id}} && ($ans ne"" || $saanswer ne "" || $panswer ne "")) {
@@ -43088,7 +44444,7 @@ sub write_bank_quest {
 	print"var view_files_right\n";
 
 	print"function ClearAType(i_n) \{
-        for (i = 1\; i <= 8\; i++) \{
+        for (i = 1\; i <= 7\; i++) \{
                 if(i != i_n) \{
                         var sel = 'anstype'+i;
                         var sela = 'anstype'+i+'a';
@@ -43142,6 +44498,26 @@ sub write_bank_quest {
                 x.style.display = \"none\"\;
                 }
         } \n";
+
+	&print_function_question_pptx_delete_handler();
+		
+		print"function Show_PPTX_File\(i_nn\) \{
+		        var x = document.getElementById(\"ppt1\")\;
+		        if (x.style.display === \"none\") {
+		                x.style.display = \"block\"\;
+		        } else {
+		                x.style.display = \"none\"\;
+		                }
+	        } \n";
+	        
+	        print"function Show_PPTX_Image\(i_nn\) \{
+		        var x = document.getElementById(\"ppt\")\;
+		        if (x.style.display === \"none\") {
+		                x.style.display = \"block\"\;
+		        } else {
+		                x.style.display = \"none\"\;
+		                }
+	        } \n";
 
 	print"function click_handler\(i_n\) \{\n";
 	&print_function_click_handler_variables();
@@ -43272,11 +44648,68 @@ sub print_rest_of_function_click_handler {
 	my %PROFCH = @_;
 	
 	# Preview Question
-        print" if \(i_n == \"1\" && not_there == \"1\"\) \{\n";
-	print"new_window = window.open\(\"about\:blank\",\"pre_view\",\"top=0,left=0,height=450,width=677,scrollbars\"\)\n";
-	print"new_window.focus\(\)\n";
-	print"select = document.question_form.select.value\n";
+        print" if \(i_n == \"1\" && not_there == \"1\"\) \{
+        qmode = document.question_form.mode.value
+        ansmode = document.question_form.select.value
+        if (qmode != \"1\" && ansmode === \"LT\") \{
+           alert\(\"List answers can only be used in Advanced Editor question.\"\)
+           \}\n";
         
+        print"else \{\n";
+
+	print"select = document.question_form.select.value\n";
+	
+        print"if\(select == \"OR\"\) \{
+        	var new_mark = 0;
+		for (i = 1; i <= $or_num; i++) \{
+		  var xy = 'selector'+i;
+		  var ans = self.parent.quest2.document.form1.elements[xy].value
+		  document.question_form.elements[xy].value=ans
+		   \}
+	\}\n";
+
+        print"if\(select == \"CZ\"\) \{
+        	var new_mark = 0;
+		for (i = 1; i <= $lt_list; i++) \{
+		  var xy = 'LTans'+i;
+		  var chek = document.question_form.elements[xy].value
+		  var chkmark = 'LTmark'+i;
+		  var mrk = parseInt(self.parent.quest2.document.form1.elements[chkmark].value)
+		  document.question_form.elements[chkmark].value=mrk
+		  
+		  var mat = 'm_match_ans'+i;
+		  var m_ans = self.parent.quest2.document.form1.elements[mat].value
+		  document.question_form.elements[mat].value=m_ans
+		  
+		  var mmat = 'Mmark'+i;
+		  var m_mrk = parseInt(self.parent.quest2.document.form1.elements[mmat].value)
+
+		  if(m_mrk >= 1) \{
+		       new_mark = new_mark + m_mrk;
+		       document.question_form.elements[mmat].value=m_mrk
+		      \}
+		  else \{
+		       document.question_form.elements[mmat].value=\"\"
+		  	\}
+		  if(chek >= 1) \{
+		      new_mark = new_mark + mrk;
+		      for (j = 1; j <= $lt_num; j++) \{
+		         var selectlt = 'selectlt'+i+j;
+		         var stuff = self.parent.quest2.document.form1.elements[selectlt].value
+		         if(stuff) \{
+			    document.question_form.elements[selectlt].value=stuff
+			    var there = document.question_form.elements[selectlt].value
+			    \}
+		         \}
+		      \}
+		      
+		   \}
+		 document.question_form.value.value=new_mark
+	\}\n";
+
+	print"new_window = window.open\(\"about\:blank\",\"pre_view\",\"top=0,left=0,height=450,width=677,scrollbars\"\)
+	new_window.focus\(\)\n";
+	
 	print"if\(select == \"MC\"\) \{\n";
             print"kolum_no = self.parent.quest2.document.form1.kolum.value
             document.question_form.kolum.value=kolum_no
@@ -43381,6 +44814,7 @@ sub print_rest_of_function_click_handler {
 
 	print"document.question_form.input.value=\"preview_quest\"
 	document.question_form.submit\(\)
+	\}
 	\}\n";
 
 	
@@ -43446,6 +44880,21 @@ sub print_rest_of_function_click_handler {
 	
 	
 	if($PROFCH{sub_type} == 1) { # quiz/test questions
+		print"if\(select == \"LT\"\) \{\n";
+		my $a =1;
+		 for ($a = 1; $a <= $mc_num; ++$a) {
+		                print"select$a = self.parent.quest2.document.form1.select$a.value
+		                document.question_form.select$a.value=select$a\n";
+		                }
+
+		print"tf_ans = document.question_form.TFans.value
+		if\(tf_ans ==\"\"\) \{
+		alert\(\"An answer was not seleted.\"\)
+		not_there = 2
+		\}
+		\}\n";
+
+	
 		print"if\(select == \"SA\"\) \{
 		sa_ans = self.parent.quest2.document.form1.SAans.value
 		document.question_form.SAans.value=sa_ans
@@ -43946,7 +45395,7 @@ sub write_quest2 {
 	var view_files_right\n";
 
 	print"function ClearAType(i_n) \{
-         for (i = 1\; i <= 8\; i++) \{
+         for (i = 1\; i <= 7\; i++) \{
                 if(i != i_n) \{
                         var sel = 'anstype'+i;
                         var sela = 'anstype'+i+'a';
@@ -48945,6 +50394,691 @@ sub question_sa {
 
 ##################
 #
+# QUESTION_OR
+#
+##################
+sub question_or {
+	my %QMC = @_;
+
+	print"<style>
+	textarea\{ border-radius:.5em\; outline: none\; font-size:10pt\; font-family:Arial\;\}
+	</style>\n";
+	
+	&print_javascript_begin();
+	
+	print"var file_windo\n";
+	print"var view_files_left\n";
+	print"var view_files_right\n";
+
+	&print_function_mc_image_handler();
+	&print_function_mc_image_delete_handler();
+                
+        print"function question_image_handler\(inn\) \{\n";
+	print"file_windo = window.open\(\"\",\"file_windo\",\"top=40,left=50,height=500,width=700\"\)\n";
+	print"file_windo.document.writeln\(\'<html><head><title>$LANGUAGE{$set_language}{ViewSelectFile}<\/title><\/head>\'\)\n";
+	print"file_windo.document.writeln\(\'<frameset cols=\\\"50\%,50\%\\\" FRAMEBORDER=\\\"0\\\" FRAMESPACING=\\\"0\\\">\'\)\n";
+	print"file_windo.document.writeln\(\'<frame src=\\\"\/schools\/blank.htm\\\" name=\\\"view_files_left\\\">\'\)\n";
+	print"file_windo.document.writeln\(\'<frame src=\\\"\/schools\/blank.htm\\\" name=\\\"view_files_right\\\">\'\)\n";
+	print"file_windo.document.writeln\(\'<\/frameset>\'\)\n";
+	print"file_windo.document.writeln\(\'<\/html>\'\)\n";
+	print"file_windo.document.close()\n";
+	print"file_windo.focus\(\)\n";
+	print"mode = document.form1.ans_mode.value
+	document.view_files.mode.value=mode
+	document.view_files.targit.value=inn
+	document.view_files.submit\(\)
+	\}\n";
+        
+        &print_mode_display_answers_mc();
+                        	
+		
+	print"function set_kolums\(i_n\) \{
+	var e = document.getElementById(\"kolumms\");
+        var num = e.options[e.selectedIndex].value;
+	self.parent.quest1.document.question_form.kolum.value = num\;
+	\}\n";
+	
+	print"function Show_Next_Row(i_nn,num,old) \{
+	var an = 'ans'+i_nn
+	var nxt = 'ans'+num
+	var dispans = 'dispans'+i_nn
+	var disp = 'disp'+i_nn
+	var dis = 'dis'+old
+	var dispold = 'disp'+old
+
+	Show_Ans(an)
+	Show_Ans(dispans)
+	if(i_nn < $or_num) \{
+                Show_Ans(nxt)
+                \}
+
+	if(old > 4) \{
+                var myfld = \'image\'+old\;
+                var img = self.parent.quest1.document.question_form.elements[myfld].value
+                if(img > 0) \{
+                        \}
+                else \{
+                        Show_Ans(dispold)
+                        Show_Ans(dis)
+                        \}
+                \}
+
+        var x = document.getElementById(disp)\;
+
+        if (x.style.display === \"none\") \{
+                x.style.display = \"block\"\;
+        \} else \{
+                x.style.display = \"none\"\;
+                \}
+	\} \n";
+
+	
+	print"function Show_Next_Edit_Row(i_nn,nxt,prev) \{
+	var disp = 'mdisp'+i_nn
+        var an = 'mans'+i_nn
+	var nxt = 'mans'+nxt
+	var dispans = 'mdispans'+i_nn
+	
+	Hide_Ans_eq(an)
+	Show_Ans(dispans)
+	
+        if(i_nn < 15) \{
+            Show_Ans(nxt)
+            \}
+        
+        if(i_nn > 4) \{
+                if(prev > 4) \{
+                    var xprev = 'X'+prev
+                    Hide_Ans_eq(xprev)
+                    \}
+                    
+                var xnxt = 'X'+i_nn
+                Show_Ans_eq(xnxt)
+                \}
+	\} \n";
+
+	print"function Remove_Row(i_nn,num,old) \{
+	var an = 'ans'+i_nn
+	var nxt = 'ans'+num
+	var dispans = 'dispans'+i_nn
+	var disp = 'disp'+i_nn
+	var sel = 'select'+i_nn
+	var dis = 'dis'+old
+	var dispold = 'disp'+old
+	var uklik= 'selector'+i_nn
+	var imag = 'image'+i_nn
+
+	self.parent.quest1.document.question_form.elements[uklik].value = \"\"\;
+	
+	Show_Ans(an)
+	Show_Ans(dispans)
+        if(num <= $or_num) \{
+                Show_Ans(nxt)
+                }
+	Show_Ans(disp)
+        
+	if(i_nn == 5) \{
+                self.parent.quest1.document.question_form.selector5.value=\"\"
+                self.parent.quest1.document.question_form.image5.value = \"\"\;
+                document.form1.select5.value=\"\"
+                Show_Ans(dis)
+                \}
+        else if(i_nn > 5) \{
+                var myfld = \'image\'+i_nn\;
+                var prefld = \'image\'+old\;
+                var selectfld = \'selector\'+i_nn\;
+                var img = self.parent.quest1.document.question_form.elements[imag].value
+                
+                self.parent.quest1.document.question_form.elements[imag].value = \"\"\;
+                self.parent.quest1.document.question_form.elements[myfld].value=\"\"
+                self.parent.quest1.document.question_form.elements[selectfld].value=\"\"
+                document.form1.elements[selectfld].value=\"\"
+
+                if(img > 0) \{
+                        \}
+                else \{
+                        Show_Ans(dispold)
+                        Show_Ans(dis)
+                        \}
+                \}
+	} \n";
+		
+
+	print"function Show_Ans(i_nn) \{
+        var x = document.getElementById(i_nn)\;
+        if (x.style.display === \"none\") \{
+                x.style.display = \"block\"\;
+                \} 
+        else \{
+                x.style.display = \"none\"\;
+                \}
+        \} \n";
+        
+        print"function Numbering(i_nn) \{
+        if(i_nn == \'nu2\') \{
+                var x = document.getElementById(i_nn)\;
+                x.style.display = \"block\"\;
+                var inn = \'nu1\'
+                var y = document.getElementById(inn)\;
+                y.style.display = \"none\"\;
+                
+                var inn = \'nu\'
+                var y = document.getElementById(inn)\;
+                y.style.display = \"none\"\;
+                \}
+        else \{
+                var x = document.getElementById(i_nn)\;
+                x.style.display = \"block\"\;
+                var inn = \'nu2\'
+                var y = document.getElementById(inn)\;
+                y.style.display = \"none\"\;
+                
+                var inn = \'nu\'
+                var y = document.getElementById(inn)\;
+                y.style.display = \"block\"\;
+                \}
+        \} \n";
+        
+	print"function Show_Image(i_nn) \{
+        var x = document.getElementById(i_nn)\;
+        var num = i_nn.replace( /[^0-9]/g, '' );
+        var dsplay = 'display'+num
+        var w = document.getElementById(dsplay)\;
+        var dis = 'dis'+num
+	var z = document.getElementById(dis)\;
+	var dispp = 'disp'+num
+	var d = document.getElementById(dispp)\;
+	
+        num++\;
+        var disp = 'disp'+num
+        var disply = 'display'+num
+        var  u = document.getElementById(disply)\;
+
+	if(num < 5) \{
+                x.style.display = \"block\"\;
+                d.style.display = \"none\"\;
+                \}
+	else \{
+                if (x.style.display === \"none\") \{
+                        var y = document.getElementById(disp)\;
+                        
+                        if (y.style.display === \"block\" || u.style.display === \"block\") \{
+                                if(z.style.display === \"block\") \{
+                                        z.style.display = \"none\"\;
+                                        x.style.display = \"block\"\;
+                                        \}
+                                else \{
+                                        x.style.display = \"none\"\;
+                                        \}
+                                \}
+                        else \{
+                                x.style.display = \"block\"\;
+                                d.style.display = \"none\"\;
+                                \}
+                        \} 
+                
+                \}
+        \} \n";
+
+        print"function Show_Im(i_nn) \{	
+        var x = document.getElementById(i_nn)\;
+        var num = i_nn.replace( /[^0-9]/g, '' );
+        var digit = num\;
+        var displ = 'disp'+num
+	var z = document.getElementById(displ)\;
+	var dis = 'dis'+num
+	var w = document.getElementById(dis)\;
+
+        num++\;
+        var disp = 'disp'+num
+        var y = document.getElementById(disp)\;
+        var disply = 'display'+num
+        var  u = document.getElementById(disply)\;
+        
+        if(digit < 4) \{
+                x.style.display = \"none\"\;
+                z.style.display = \"block\"\;
+                \}
+        else \{
+                x.style.display = \"none\"\;
+                if (z.style.display === \"block\") \{
+                        \} 
+                else \{
+                       if (y.style.display === \"block\" || u.style.display === \"block\") \{
+                                w.style.display = \"block\"
+                                \}
+                        else \{
+                                if(y.style.display === \"none\" || u.style.display === \"none\") \{
+                                        z.style.display = \"block\"
+                                        \}
+                                else \{
+                                        w.style.display = \"block\"
+                                        \}
+                                \}
+                        \}
+                \}
+        \} \n";
+
+	&print_javascript_end();
+
+	&print_form("form_name","view_files","form_target","view_files_left","input","view_select_mc_files","targit","","u_id","$QMC{u_id}","session_id","$QMC{session_id}","mode","","expand","1");
+
+	print"<form name=\"form1\"><input type=\"hidden\" name=\"ans_mode\" value=\"$QMC{ans_mode}\">\n";
+	 
+    #### QUIZZES/TESTS
+	if($QMC{sub_type} != 2) { 
+                # PRINT COLUMNS LINE
+		print"<TABLE><TR><TD>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$image21&nbsp\;</TD><TD>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<font style=\"font-family:Arial\; font-size: 11pt\;\">$LANGUAGE{$set_language}{Columns} </font>&nbsp\;";
+		
+		if($QMC{kolum} > 1) { # COLUMNS
+                        print"<SELECT name=\"kolum\" style=\"font-family:Arial\; font-size: 10pt\;\">\n";
+                        
+                        for (my $in = 1; $in <= 3; ++$in) {
+                                if($QMC{kolum} == $in) {
+                                        print"<option value=\"$in\" selected>$in</option>\n";
+                                        }
+                                else {
+                                        print"<option value=\"$in\">$in</option>\n";
+                                        }
+                                }
+                        }
+                        
+                else { # 1 COLUMN
+                        print"<SELECT name=\"kolum\" style=\"font-family:Arial\; font-size: 10pt\;\"> 
+                        <option value=\"1\" selected>1</option>
+                        <option value=\"2\">2</option>
+                        <option value=\"3\">3</option></select>";
+                        }                        
+            
+            print"</TD></TR></TABLE>\n";
+            
+            # BASIC MODE DIV
+            if($QMC{ans_mode} > 0) {
+                    print"<div ID =\"mc_mode_disply0\" style=\"display:none\;\"><TABLE border=\"0\">\n";
+                    }
+                    
+            else {
+                    print"<div ID =\"mc_mode_disply0\" style=\"display:block\;\"><TABLE border=\"0\">\n";
+                    }
+                    
+                    
+            #### PRINT BASIC MODE
+		my $end = 0;
+		for (my $i = 1; $i <= $or_num; ++$i) {
+			my $select = "select"."$i";
+			my $image = "image"."$i";
+			my $image_name = "$image"."name";
+			my $next = $i;
+			++$next;
+			my $next_image = "image"."$next";
+			
+			print"<TR><TD>";
+			
+			if($i < 5) { # for the first 4 answers
+                                print"<TABLE><TR><TD>";
+                                print"&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$i</TD><TD>&nbsp\;&nbsp\;<textarea style=\"resize\:none\; overflow:auto\; font-family\:Arial\; font-size\: 10pt\;\" required rows=\"1\" cols=\"60\" maxlength=\"75\" name=\"selector$i\" ";
+                                
+                                if($i < 3 && $QMC{$select} ne "") {
+                                        print"placeholder=\" Enter answer here.\" value=\"\"";
+                                        }
+                                        
+                                print">";
+                                
+                                if($QMC{ans_mode} == 0) {
+                                        print"$QMC{$select}";
+                                        }
+                                        
+                                print"</textarea></TD><TD>\n";
+                                
+                                if($QMC{$image_name} ne"") {
+                                        print"<div ID=\"display$i\" style=\"display:block\;\"><text STYLE=\"font-family\:Arial\; font-size\: 8pt\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;</text> <input readonly type=\"text\" STYLE=\"font-family\:Arial\; border-radius:.5em\; outline: none\; font-size\: 8pt\;\" width=\"20\" name=\"$image\" value=\"&nbsp\;&nbsp\;$QMC{$image_name}\">&nbsp\;&nbsp\;&nbsp\;</text></font><B STYLE=\"cursor:pointer\; data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{RemoveImage}\" border-radius:.5em\; font-family\:Arial\; font-size\: 11pt\;\" OnClick=\"mc_image_delete_handler\(\'$image\'\)\">X</B></div>\n";
+                                
+                                        print"<div ID=\"disp$i\" style=\"display:none\;\"><B data-toggle=\"tooltip\" title=\"Insert image\" STYLE=\"cursor: pointer\; font-family\:Arial\; font-size\: 9pt\;\" OnClick=\"mc_image_handler(\'$image\')\"> &nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$image30</B></div>\n";
+                                        }
+                                        
+                                else {
+                                        print"<div ID=\"disp$i\" style=\"display:block\;\"><B data-toggle=\"tooltip\" title=\"Insert image\" STYLE=\"cursor: pointer\; font-family\:Arial\; font-size\: 9pt\;\" OnClick=\"mc_image_handler(\'$image\')\"> &nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$image30</B></div>\n";
+	   		
+                                        print"<div ID=\"display$i\" style=\"display:none\;\"><text STYLE=\"font-family\:Arial\; font-size\: 8pt\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;</text> <input readonly type=\"text\" STYLE=\"font-family\:Arial\; border-radius:.5em\; outline: none\; font-size\: 8pt\;\" width=\"20\" name=\"$image\" value=\"&nbsp\;&nbsp\;$QMC{$image_name}\">&nbsp\;&nbsp\;&nbsp\;</text><B STYLE=\"cursor:pointer\; font-family\:Arial\;  font-size\: 11pt\;\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{RemoveImage}\" OnClick=\"mc_image_delete_handler\(\'$image\'\)\">X</B></div>\n";
+                                        }
+                                        
+                                print"</TD></TR></TABLE>";
+                                }
+                                
+                        else { # for 5 through mc_num
+                                print"<TABLE><TR><TD>";
+                                my $nu = $i + 1;
+                                my $old = $i - 1;
+                                my $next_select = "select"."$nu";
+                                my $old_select = "select"."$old";
+
+                                ### ADD another row DISPLAY +
+                                if($QMC{ans_mode} == 1 && $end == 0) {
+                                        print"<div ID=\"ans$i\" style=\"display:block\;\">\n";
+                                        $end = 1;
+                                        }
+                                elsif(!defined $QMC{$select} && !defined $QMC{$image} && $end == 0) {
+                                        print"<div ID=\"ans$i\" style=\"display:block\;\">\n";
+                                        $end = 1;
+                                       }
+                                else {
+                                        print"<div ID=\"ans$i\" style=\"display:none\;\">\n";
+                                       }
+                                       
+                                print"<B><font STYLE=\"cursor:pointer\; font-family\:Arial\; font-size\: 18pt\;\" OnClick=\"Show_Next_Row\(\'$i\',$nu,$old\)\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{Addanotherrow}\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;+</font></B></div>\n";
+                                        
+                                ### DISPLAY RADIO button and answer
+                                if($QMC{answer} == $i && $QMC{ans_mode} != 1) {
+                                        print"<span ID=\"dispans$i\" style=\"display:block\;\"><TABLE><TR><TD>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$i\n";
+                                        }
+                                elsif ((defined $QMC{$select} && $QMC{ans_mode} != 1) || $QMC{$image} > 0){
+                                        print"<span ID=\"dispans$i\" style=\"display:block\;\"><TABLE><TR><TD>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$i\n";
+                                        }
+                                else {
+                                        print"<span ID=\"dispans$i\" style=\"display:none\;\"><TABLE><TR><TD>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$i\n";
+                                        }
+                                
+                                print"&nbsp\;</TD><TD><textarea style=\"resize\:none\; overflow:auto\; font-family\:Arial\; font-size\: 10pt\;\" required rows=\"1\" cols=\"60\" maxlength=\"75\" name=\"selector$i\" value=\"\">";
+                                
+                                if($QMC{ans_mode} == 0) {
+                                        print"$QMC{$select}";
+                                        }
+                                        
+                                print"</textarea></span></TD></TR></TABLE></TD><TD>\n";
+                                
+                                
+                                ### Display image name
+                                if($QMC{$image} ne"" && $QMC{$image} > 0) {
+                                        print"<div ID=\"display$i\" style=\"display:block\;\"><text STYLE=\"font-family\:Arial\; font-size\: 8pt\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;</text> <input readonly type=\"text\" STYLE=\"font-family\:Arial\; border-radius:.5em\; outline: none\; font-size\: 8pt\;\" width=\"20\" name=\"$image\" value=\"&nbsp\;&nbsp\;$QMC{$image_name}\">&nbsp\;&nbsp\;&nbsp\;</text></font><B STYLE=\"cursor:pointer\; font-family\:Arial\; font-size\: 11pt\;\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{RemoveImage}\" OnClick=\"mc_image_delete_handler\(\'$image\'\)\">X </B></div>\n";
+                                
+                                        print"<div ID=\"dis$i\" style=\"display:none\;\"><B data-toggle=\"tooltip\" title=\"Insert image\" STYLE=\"cursor: pointer\; font-family\:Arial\; font-size\: 9pt\;\" OnClick=\"mc_image_handler(\'$image\')\"> &nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$image30</B></div><div ID=\"disp$i\" style=\"display:none\;\"><B data-toggle=\"tooltip\" title=\"Insert image\" STYLE=\"cursor: pointer\; font-family\:Arial\; font-size\: 9pt\;\" OnClick=\"mc_image_handler(\'$image\')\"> &nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$image30</B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B STYLE=\"cursor: pointer\; font-family\:Arial\; font-size\: 18pt\;\" OnClick=\"Remove_Row(\'$i\',\'$nu\')\" data-toggle=\"tooltip\" title=\"Remove row.\">X</B></div>\n";
+                                        }
+                                else {
+                                        if(defined $QMC{$select} && !defined $QMC{$next_select} && $QMC{ans_mode} != 1) {
+                                                print"<div ID=\"disp$i\" style=\"display:block\;\">\n";
+                                                }
+                                        else{
+                                                print"<div ID=\"disp$i\" style=\"display:none\;\">\n";
+                                                }
+
+                                        print"<B data-toggle=\"tooltip\" title=\"Insert image\" STYLE=\"cursor: pointer\; font-family\:Arial\; font-size\: 9pt\;\" OnClick=\"mc_image_handler(\'$image\')\"> &nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$image30</B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;";
+                                        
+                                        if(!defined $QMC{$next_select} && !defined $QMC{$next_image}) {
+                                                print"<B STYLE=\"cursor: pointer\; font-family\:Arial\; font-size\: 18pt\;\" OnClick=\"Remove_Row(\'$i\',\'$nu\',\'$old\')\" data-toggle=\"tooltip\" title=\"Remove row.\"> X</B></div>\n";
+                                                }
+                                        elsif($QMC{ans_mode} == 1) {
+                                                print"<B STYLE=\"cursor: pointer\; font-family\:Arial\; font-size\: 18pt\;\" OnClick=\"Remove_Row(\'$i\',\'$nu\',\'$old\')\" data-toggle=\"tooltip\" title=\"Remove row.\"> X</B></div>\n";
+                                                }
+                                        else {
+                                                print"</div>\n";
+                                                }
+                                        
+                                        ## Insert file
+                                        if(defined $QMC{$select} && defined $QMC{$next_select} && $QMC{ans_mode} != 1) {
+                                                print"<div ID=\"dis$i\" style=\"display:block\;\">\n";
+                                                }
+                                        else {
+                                                print"<div ID=\"dis$i\" style=\"display:none\;\">\n";
+                                                }
+                                                
+                                        print"<B data-toggle=\"tooltip\" title=\"Insert image\" STYLE=\"cursor: pointer\; font-family\:Arial\; font-size\: 9pt\;\" OnClick=\"mc_image_handler(\'$image\')\"> &nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$image30</B></div>\n";
+                                                
+                                        print"<div ID=\"display$i\" style=\"display:none\;\"><text STYLE=\"font-family\:Arial\; font-size\: 8pt\;\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;</text> <input readonly type=\"text\" STYLE=\"font-family\:Arial\; border-radius:.5em\; outline: none\; font-size\: 8pt\;\" width=\"20\" name=\"$image\" value=\"&nbsp\;&nbsp\;$QMC{$image_name}\">&nbsp\;&nbsp\;&nbsp\;</text></font><B STYLE=\"cursor:pointer\; font-family\:Arial\; font-size\: 11pt\;\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{RemoveImage}\" OnClick=\"mc_image_delete_handler\(\'$image\'\)\">X</B></div>\n";
+                                        }
+                                print"</TD></TR></TABLE>\n";
+                                }
+                        } 
+                }
+	}
+	
+#################
+#
+# QUESTION_CZ
+#
+#################
+sub question_cz {
+	my %CLZ = @_;
+	my $error = 0;
+    	
+	&print_javascript_begin();
+	
+	print"function clear_form\(i_n\) \{
+	var remv = 'LTans'+i_n;
+	self.parent.quest1.document.question_form.elements[remv].value=\"\"
+	
+	for (w = 1; w <= $lt_num; w++) \{
+	   var rem = 'LTans'+i_n+w;
+	   document.form1.elements[rem].checked = false;
+           \}
+
+	for (i = 1; i <= $lt_list; i++) \{
+	   var remov = 'selectlt'+i_n+i
+	   document.form1.elements[remov].value=\"\"
+	   self.parent.quest1.document.question_form.elements[remov].value=\"\"
+           \}
+	\}\n";
+
+	print"function insertlt\(i_n\) \{
+	for (i = 1; i <= $lt_list; i++) \{
+		var ltt = 'lt_mode_disply'+i;
+		var xx = document.getElementById(ltt);
+		
+		if (xx.style.display === \"none\") \{
+		        xx.style.display = \"block\";
+		        break;
+		        \}
+                \}\n";
+	print"\}\n";
+	
+	print"function insertmatch\(i_n\) \{
+	for (i = 1; i <= $lt_list; i++) \{
+		var ltt = 'm_mode_disply'+i;
+		var xx = document.getElementById(ltt);
+		
+		if (xx.style.display === \"none\") \{
+		        xx.style.display = \"block\";
+		        break;
+		        \}
+                \}\n";
+	print"\}\n";
+
+	print"function remove_match\(i_n\) \{
+		var ltt = 'm_mode_disply'+i_n;
+		var mat = 'm_match_ans'+i_n
+		var xx = document.getElementById(ltt);
+		var m_match = 'm_match_ans'+i_n;
+		xx.style.display = \"none\";
+		document.form1.elements[mat].value=\"\"
+		var m_mark = 'Mmark'+i_n;
+		document.form1.elements[m_mark].value=\"\"
+		self.parent.quest1.document.question_form.elements[m_match].value=\"\"
+	\}\n";
+
+	print"function this_list_selected\(i_n\) \{
+	var myfld = 'thislistselected';
+	var listit = '*^List'+i_n+'^*';
+	self.parent.quest1.document.question_form.elements[myfld].value=listit	
+	navigator.clipboard.writeText(listit);
+	\}\n";
+
+	print"function this_match_selected\(i_n\) \{
+	var myfld = 'thismatchselected';
+	var matchit = '*^Match'+i_n+'^*';
+	self.parent.quest1.document.question_form.elements[myfld].value=matchit
+	var m_match ='m_match_ans'+i_n;
+	var m_value= document.form1.elements[m_match].value
+	self.parent.quest1.document.question_form.elements[m_match].value=m_value
+	
+	navigator.clipboard.writeText(matchit);
+	\}\n";
+
+	print"function set_lt_ans\(i_n,inn\) \{
+	var set_lt = 'LTans'+inn;
+	var set_mark = 'LTmark'+inn
+	self.parent.quest1.document.question_form.elements[set_lt].value=i_n
+	var mark = document.form1.elements[set_mark].value
+	self.parent.quest1.document.question_form.elements[set_mark].value=mark
+	\}\n";
+
+	print"function Show_Next_Row(i_nn,num,old) \{
+	var an = 'ans'+i_nn
+	var nxt = 'ans'+num
+	var dispans = 'dispans'+i_nn
+	var disp = 'disp'+i_nn
+	 i_nn++
+	var nw = 'ans16'
+	var nn = document.getElementById(nw)\;
+	nn.style.display = \"block\"\;
+
+	Show_Ans(an)
+	Show_Ans(dispans)
+
+	if(i_nn < 70) \{
+                Show_Ans(nxt)
+                \}
+
+        var x = document.getElementById(disp)\;
+
+        if (x.style.display === \"none\") \{
+                x.style.display = \"block\"\;
+        \} else \{
+                x.style.display = \"none\"\;
+                \}
+	\} \n";
+
+	print"function Show_Ans(i_nn) \{
+        var x = document.getElementById(i_nn)\;
+        if (x.style.display === \"none\") \{
+                x.style.display = \"block\"\;
+                \} 
+        else \{
+                x.style.display = \"none\"\;
+                \}
+        \} \n";
+	
+	&print_javascript_end();
+
+	print"<TABLE style=\"width:100%\; vertical-align: top\;\"><TR><TD><center><B onClick=\"insertlt\(\)\" style=\"cursor: pointer\; vertical-align: top\;\"><font size=\"8\">+</font></B><center></TD><TD><center><B onClick=\"insertmatch\(\)\" style=\"color: #A0AECD\; cursor: pointer\; \"><font size=\"8\">+</font></B></center></TD></TR></TABLE>\n";
+
+	print"<form name=\"form1\">\n";
+	print"<TABLE style=\"width:100%\"><div style=\"display: inline-block\;\">\n";
+	print"<TR><TD style=\"width:50%;\"><TABLE >\n";
+	
+	for (my $io = 1; $io <= $lt_list; ++$io) {
+		print"<TR><TD style=\"vertical-align: top\; padding-bottom:6px\"><P><div ID=\"lt_mode_disply$io\" style=\"display:";
+		if($io == 1) {
+			print"block";
+			}
+		else {
+			print"none"; 
+			}
+
+		print"\; border: 2px solid black\;   border-radius:3px; padding-top: 6px\; padding-bottom: 6px\" padding-right: 5px\">\n";
+			
+		print"&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B style=\"cursor: pointer\" onClick=\"this_list_selected\(\'$io\'\)\" data-toggle=\"tooltip\" title=\"Click to paste Tag into editor\">Insert List $io</B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;Mark <input type=\"text\" name=\"LTmark$io\" size=\"1\" maxlength=\"2\" value=\"1\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<span data-toggle=\"tooltip\" title=\"Copy Tag and paste into editor\">*^List$io^* &nbsp\;&nbsp\;</span><BR>\n";
+		print"&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<img src=\"/schools/big_check.jpg\">\n";
+		print"&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<i style=\"cursor: pointer\" onClick=\"clear_form\(\'$io\'\)\" data-toggle=\"tooltip\" title=\"Clear form\">Clear</i>\n";
+			
+		print"&nbsp\;&nbsp\;&nbsp\;\n";
+		
+                #### PRINT LIST BASIC MODE
+		my $end = 0;
+		for (my $i = 1; $i <= $lt_num; ++$i) {
+			my $select = "select"."$io"."$i";
+			my $next = $i;
+			++$next;
+			
+			if($i < 5) { # for the first 4 answers
+                                print"<TABLE ><TR><TD>";
+                                if($CLZ{answer} == $i && $CLZ{ans_mode} == 0) {
+                                        print"&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<input type=\"radio\" id=\"LTans$io$i\" name=\"LTans$io\" value=\"$i\" onClick=\"set_lt_ans\(\'$i\',\'$io\'\)\" checked>\n";
+                                        }
+                                else {
+                                        print"&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<input type=\"radio\" id=\"LTans$io$i\" name=\"LTans$io\" value=\"$i\" onClick=\"set_lt_ans\(\'$i\',\'$io\'\)\">\n";
+                                        }
+
+                                print"</TD><TD>&nbsp\;<input type=\"text\" maxlength=\"30\" style=\"font-family\:Arial\; font-size\: 10pt\;\" name=\"selectlt$io$i\" width=\"22\" value=\"";
+                                                                        
+                                if($CLZ{ans_mode} == 0) {
+                                        print"$CLZ{$select}";
+                                        }
+                                        
+                                print"\"></TD><TD>\n";
+                                                                        
+                                print"</TD></TR></TABLE>";
+                                }
+                                
+                        else { # for 5 through lt_num
+                                print"<TABLE><TR><TD>";
+                                my $nu = $i + 1;
+                                my $old = $i - 1;
+                                my $next_select = "select"."$io"."$nu";
+                                my $old_select = "select"."$io"."$old";
+
+                                ### ADD another row DISPLAY +
+                                if($CLZ{ans_mode} == 1 && $end == 0) {
+                                        print"<span ID=\"ans$io$i\" style=\"display:block\;\">\n";
+                                        $end = 1;
+                                        }
+                                elsif(!defined $CLZ{$select} && $end == 0) {
+                                        print"<span ID=\"ans$io$i\" style=\"display:block\;\">\n";
+                                        $end = 1;
+                                       }
+                                else {
+                                        print"<span ID=\"ans$io$i\" style=\"display:none\;\">\n";
+                                       }
+                                       
+                                print"<B><font STYLE=\"cursor:pointer\; font-family\:Arial\; font-size\: 18pt\;\" OnClick=\"Show_Next_Row\(\'$io$i\','$nu','$old'\)\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{Addanotherrow}\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;+</font></B></span>\n";
+                                        
+                                ### DISPLAY RADIO button and answer
+                                if($CLZ{answer} == $i && $CLZ{ans_mode} != 1) {
+                                        print"<span ID=\"dispans$io$i\" style=\"display:block\;\"><TABLE style=\"display:none\;\"><TR><TD> &nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<input type=\"radio\" id=\"LTans$io$i\" name=\"LTans$io\" value=\"$i\" onClick=\"set_lt_ans\(\'$i\',\'$io\'\)\" checked>\n";
+                                        }
+                                elsif (defined $CLZ{$select} && $CLZ{ans_mode} != 1){
+                                        print"<span ID=\"dispans$io$i\" style=\"display:block\;\"><TABLE style=\"display:none\;\"><TR><TD> &nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<input type=\"radio\" id=\"LTans$io$i\" name=\"LTans$io\" value=\"$i\" onClick=\"set_lt_ans\(\'$i\',\'$io\'\)\">\n";
+                                        }
+                                else {
+                                        print"<span ID=\"dispans$io$i\" style=\"display:none\;\"><TABLE><TR><TD> &nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<input type=\"radio\" id=\"LTans$io$i\" name=\"LTans$io\" value=\"$i\" onClick=\"set_lt_ans\(\'$i\',\'$io\'\)\">\n";
+                                        }
+                                
+                                print"</TD><TD>&nbsp\;<input type=\"text\"  maxlength=\"30\" style=\"font-family\:Arial\; font-size\: 10pt\;\" width=\"22\" name=\"selectlt$io$i\" value=\"";
+                                
+                                if($CLZ{ans_mode} == 0) {
+                                        print"$CLZ{$select}";
+                                        }
+                                        
+                                print"\"></span></TD></TR></TABLE></TD><TD>\n";
+                                                                        
+                                print"</TD></TR></TABLE>\n";
+                                }
+                        }
+		print"</TR>\n";
+                }
+                
+        print"</TD></TR></TABLE></div></TD>\n";
+
+	print"<TD style=\"vertical-align: top\;\" width=\"50%\">\n"; # MATCH SIDE
+	
+	for (my $im = 1; $im <= $lt_list; ++$im) {
+                # PRINT MATCH MODE
+		print"<div ID=\"m_mode_disply$im\" style=\"display:";
+		if($im == 1) {
+			print"block";
+			}
+		else {
+			print"none"; 
+			}
+		print"\; vertical-align: top\; border-radius:3px; border: 4px solid #A0AECD\;   padding-top: 6px\; padding-bottom: 6px\" padding-right: 3px>\n";
+		print"&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B style=\"cursor: pointer\; color: #A0AECD\" onClick=\"this_match_selected\(\'$im\'\)\" data-toggle=\"tooltip\" title=\"Click to paste Tag into editor\">Insert Match $im</B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;Mark <input type=\"text\" name=\"Mmark$im\" id=\"Mmark$im\" size=\"1\" maxlength=\"2\" value=\"\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<span data-toggle=\"tooltip\" title=\"Copy Tag and paste into editor\">*^Match$im^* &nbsp\;&nbsp\;&nbsp\;</span><BR>\n";
+		print"&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<span style\"padding-top: 6px\"><input type=\"text\" width=\"20\" name=\"m_match_ans$im\" id=\"m_match_ans$im\" value=\"\">&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B style=\"cursor:pointer\" data-toggle=\"tooltip\" title=\"Remove Tag and option.\" onClick=\"remove_match\(\'$im\'\)\">X</B></span><P>\n";
+		print"</div><P>\n";
+		}
+	print"</TD></TR></TABLE>\n";
+	print"</FORM>\n";
+	}
+
+##################
+#
 #  QST_MARK
 #
 ##################
@@ -49002,6 +51136,8 @@ sub qst_mark {
                 self.parent.qst_left.close_qst()
                 \}\n";
                 
+                &print_stop_F12();
+                
 		&print_javascript_end();
 
 		print"<FORM>\n";
@@ -49015,10 +51151,10 @@ sub qst_mark {
 		print" &nbsp\;&nbsp\;&nbsp\;&nbsp\;<B>$na</B></font> $image17<font size =\"-1\">  $LANGUAGE{$set_language}{NoAnswer}</font><BR>\n";
 		
 		if($to_mark > 0 ) {
-			print"&nbsp\;&nbsp\;&nbsp\;&nbsp\; <font color=\"blue\"><B>$to_mark</B> <B>?</B></font> <font size =\"-1\">  $LANGUAGE{$set_language}{unmarked} ($value_of_quests_to_be_marked pts)</font><BR>\n";
+			print"&nbsp\;&nbsp\;&nbsp\;&nbsp\;<font color=\"blue\"><B>$to_mark</B> <B>?</B></font> <font size =\"-1\">  $LANGUAGE{$set_language}{unmarked} ($value_of_quests_to_be_marked pts)</font><BR>\n";
 			}
 			
-		print"&nbsp\;&nbsp\;&nbsp\;&nbsp\; <font color=\"#808080\" size=\"-1\"><B>P</B></font> <font size =\"-1\"> &nbsp\; $LANGUAGE{$set_language}{partialmark}</font><BR><P>\n";
+		print"&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <font color=\"#808080\" size=\"-1\"><B>P</B></font> <font size =\"-1\"> $LANGUAGE{$set_language}{partialmark}</font><BR><P>\n";
 		print"<P><TABLE width=\"100\%\">\n";
 		
 		my $total_keys = 0;
@@ -49057,10 +51193,10 @@ sub qst_mark {
 			 	
  			if (defined $RESULTS{$key}{tm}) {
  				if($INDEX_TO_QUEST_NO{$key}{type} eq"SA" || $INDEX_TO_QUEST_NO{$key}{type} eq"P") {
- 					print" <font color=\"blue\"><B>? &nbsp\;</B></font> <font color=\"#585858\" STYLE=\"cursor: pointer\" onClick=\"l_anchor\(\'$key\'\)\"><B>$key</B><sup><font size=\"-1\">$INDEX_TO_QUEST_NO{$key}{pts}</font></sup> &nbsp\;</font> \n";
+ 					print" &nbsp\;<font color=\"blue\"><B>? </B></font> <font color=\"#585858\" STYLE=\"cursor: pointer\" onClick=\"l_anchor\(\'$key\'\)\"><B>$key</B><sup><font size=\"-1\">$INDEX_TO_QUEST_NO{$key}{pts}</font></sup> &nbsp\;</font> \n";
  					}
  				else {
-					print" <font color=\"blue\"><B>? &nbsp\;</B></font><font color=\"black\" STYLE=\"cursor: pointer\" onClick=\"l_anchor\(\'$key\'\)\"><B>$key</B><sup><font size=\"-1\">$INDEX_TO_QUEST_NO{$key}{pts}</font></sup> &nbsp\;</font> \n";
+					print" &nbsp\;<font color=\"blue\"><B>? </B></font><font color=\"black\" STYLE=\"cursor: pointer\" onClick=\"l_anchor\(\'$key\'\)\"><B>$key</B><sup><font size=\"-1\">$INDEX_TO_QUEST_NO{$key}{pts}</font></sup> &nbsp\;</font> \n";
 					}
 				 }
 				 
@@ -49144,10 +51280,13 @@ sub modal_qst_mark {
 		print"self.parent.m1qst_left.link_anchor\(li_nk\)\n";
 		print"\}\n";
 		
-		print"function close_modal\(\)\{\n";
-		print"self.parent.m1qst_left.close_modal()\n";
-		print"\}\n";
+		print"function close_modal\(\) \{
+		self.top.opener.document.form_reload.submit()
+       	 	self.top.close()
+        	\}\n";
 		
+		&print_stop_F12();
+
 		&print_javascript_end();
 
 		print"<FORM>\n";
@@ -49161,10 +51300,10 @@ sub modal_qst_mark {
 		print" &nbsp\;&nbsp\;&nbsp\;&nbsp\;<B>$na</B></font> $image17<font size =\"-1\">  $LANGUAGE{$set_language}{NoAnswer}</font><BR>\n";
 		
 		if($to_mark > 0 ) {
-			print"&nbsp\;&nbsp\;&nbsp\;&nbsp\; <font color=\"blue\"><B>$to_mark</B> <B>?</B></font> <font size =\"-1\">  $LANGUAGE{$set_language}{unmarked} ($value_of_quests_to_be_marked pts)</font><BR>\n";
+			print"&nbsp\;&nbsp\;&nbsp\;&nbsp\;<font color=\"blue\"><B>$to_mark</B> <B>?</B></font> <font size =\"-1\">  $LANGUAGE{$set_language}{unmarked} ($value_of_quests_to_be_marked pts)</font><BR>\n";
 			}
 			
-		print"&nbsp\;&nbsp\;&nbsp\;&nbsp\; <font color=\"#808080\" size=\"-1\"><B>P</B></font> <font size =\"-1\"> &nbsp\; $LANGUAGE{$set_language}{partialmark}</font><BR><P>\n";
+		print"&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <font color=\"#808080\" size=\"-1\"><B>P</B></font> <font size =\"-1\"> $LANGUAGE{$set_language}{partialmark}</font><BR><P>\n";
 		print"<P><TABLE width=\"100\%\">\n";
 		
 		my $total_keys = 0;
@@ -49203,10 +51342,10 @@ sub modal_qst_mark {
 			 	
  			if (defined $RESULTS{$key}{tm}) {
  				if($INDEX_TO_QUEST_NO{$key}{type} eq"SA" || $INDEX_TO_QUEST_NO{$key}{type} eq"P") {
- 					print" <font color=\"blue\"><B>? &nbsp\;</B></font> <font color=\"#585858\" STYLE=\"cursor: pointer\" onClick=\"l_anchor\(\'$key\'\)\"><B>$key</B><sup><font size=\"-1\">$INDEX_TO_QUEST_NO{$key}{pts}</font></sup> &nbsp\;</font> \n";
+ 					print" <font color=\"blue\"><B>? </B></font> <font color=\"#585858\" STYLE=\"cursor: pointer\" onClick=\"l_anchor\(\'$key\'\)\"><B>$key</B><sup><font size=\"-1\">$INDEX_TO_QUEST_NO{$key}{pts}</font></sup> &nbsp\;</font> \n";
  					}
  				else {
-					print" <font color=\"blue\"><B>? &nbsp\;</B></font><font color=\"black\" STYLE=\"cursor: pointer\" onClick=\"l_anchor\(\'$key\'\)\"><B>$key</B><sup><font size=\"-1\">$INDEX_TO_QUEST_NO{$key}{pts}</font></sup> &nbsp\;</font> \n";
+					print" <font color=\"blue\"><B>? </B></font><font color=\"black\" STYLE=\"cursor: pointer\" onClick=\"l_anchor\(\'$key\'\)\"><B>$key</B><sup><font size=\"-1\">$INDEX_TO_QUEST_NO{$key}{pts}</font></sup> &nbsp\;</font> \n";
 					}
 				 }
 				 
@@ -49292,6 +51431,8 @@ sub modal2_qst_mark2 {
 		print"self.parent.m2qst_left.close_modal()\n";
 		print"\}\n";
 		
+		&print_stop_F12();
+
 		&print_javascript_end();
 
 		print"<FORM>\n";
@@ -49305,10 +51446,10 @@ sub modal2_qst_mark2 {
 		print" &nbsp\;&nbsp\;&nbsp\;&nbsp\;<B>$na</B></font> $image17<font size =\"-1\">  $LANGUAGE{$set_language}{NoAnswer}</font><BR>\n";
 		
 		if($to_mark > 0 ) {
-			print"&nbsp\;&nbsp\;&nbsp\;&nbsp\; <font color=\"blue\"><B>$to_mark</B> <B>?</B></font> <font size =\"-1\">  $LANGUAGE{$set_language}{unmarked} ($value_of_quests_to_be_marked pts)</font><BR>\n";
+			print"&nbsp\;&nbsp\;&nbsp\;&nbsp\;<font color=\"blue\"><B>$to_mark</B> <B>?</B></font> <font size =\"-1\">  $LANGUAGE{$set_language}{unmarked} ($value_of_quests_to_be_marked pts)</font><BR>\n";
 			}
 			
-		print"&nbsp\;&nbsp\;&nbsp\;&nbsp\; <font color=\"#808080\" size=\"-1\"><B>P</B></font> <font size =\"-1\"> &nbsp\; $LANGUAGE{$set_language}{partialmark}</font><BR><P>\n";
+		print"&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <font color=\"#808080\" size=\"-1\"><B>P</B></font> <font size =\"-1\"> $LANGUAGE{$set_language}{partialmark}</font><BR><P>\n";
 		print"<P><TABLE width=\"100\%\">\n";
 		
 		my $total_keys = 0;
@@ -49436,7 +51577,11 @@ sub modal3_qst_mark3 {
 		print"self.parent.m3qst_left.close_modal()\n";
 		print"\}\n";
 		
+		&print_stop_F12();
+
 		&print_javascript_end();
+
+		print"<DIV oncontextmenu =\"return false\">\n";
 
 		print"<FORM>\n";
 		print"$modal_close_button\n";
@@ -49448,10 +51593,10 @@ sub modal3_qst_mark3 {
 		print" &nbsp\;&nbsp\;&nbsp\;&nbsp\;<B>$na</B></font> $image17<font size =\"-1\">  $LANGUAGE{$set_language}{NoAnswer}</font><BR>\n";
 		
 		if($to_mark > 0 ) {
-			print"&nbsp\;&nbsp\;&nbsp\;&nbsp\; <font color=\"blue\"><B>$to_mark</B> <B>?</B></font> <font size =\"-1\">  $LANGUAGE{$set_language}{unmarked} ($value_of_quests_to_be_marked pts)</font><BR>\n";
+			print"&nbsp\;&nbsp\;&nbsp\;&nbsp\;<font color=\"blue\"><B>$to_mark</B> <B>?</B></font> <font size =\"-1\"> $LANGUAGE{$set_language}{unmarked} ($value_of_quests_to_be_marked pts)</font><BR>\n";
 			}
 			
-		print"&nbsp\;&nbsp\;&nbsp\;&nbsp\; <font color=\"#808080\" size=\"-1\"><B>P</B></font> <font size =\"-1\"> &nbsp\; $LANGUAGE{$set_language}{partialmark}</font><BR><P>\n";
+		print"&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; <font color=\"#808080\" size=\"-1\"><B>P</B></font> <font size =\"-1\"> $LANGUAGE{$set_language}{partialmark}</font><BR><P>\n";
 		print"<P><TABLE width=\"100\%\">\n";
 		
 		my $total_keys = 0;
@@ -49490,10 +51635,10 @@ sub modal3_qst_mark3 {
 			 	
  			if (defined $RESULTS{$key}{tm}) {
  				if($INDEX_TO_QUEST_NO{$key}{type} eq"SA" || $INDEX_TO_QUEST_NO{$key}{type} eq"P") {
- 					print" <font color=\"blue\"><B>? &nbsp\;</B></font> <font color=\"#585858\" STYLE=\"cursor: pointer\" onClick=\"l_anchor\(\'$key\'\)\"><B>$key</B><sup><font size=\"-1\">$INDEX_TO_QUEST_NO{$key}{pts}</font></sup> &nbsp\;</font> \n";
+ 					print" &nbsp\;<font color=\"blue\"><B>? </B></font> <font color=\"#585858\" STYLE=\"cursor: pointer\" onClick=\"l_anchor\(\'$key\'\)\"><B>$key</B><sup><font size=\"-1\">$INDEX_TO_QUEST_NO{$key}{pts}</font></sup> &nbsp\;</font> \n";
  					}
  				else {
-					print" <font color=\"blue\"><B>? &nbsp\;</B></font><font color=\"black\" STYLE=\"cursor: pointer\" onClick=\"l_anchor\(\'$key\'\)\"><B>$key</B><sup><font size=\"-1\">$INDEX_TO_QUEST_NO{$key}{pts}</font></sup> &nbsp\;</font> \n";
+					print" &nbsp\;<font color=\"blue\"><B>? </B></font><font color=\"black\" STYLE=\"cursor: pointer\" onClick=\"l_anchor\(\'$key\'\)\"><B>$key</B><sup><font size=\"-1\">$INDEX_TO_QUEST_NO{$key}{pts}</font></sup> &nbsp\;</font> \n";
 					}
 				 }
 				 
@@ -49519,6 +51664,7 @@ sub modal3_qst_mark3 {
 			}
 			
 		print"</TABLE></FORM>\n";
+		print"</DIV>\n";
 		}
 	}
 	
@@ -49633,10 +51779,10 @@ sub modal4_qst_mark4 {
 			 	
  			if (defined $RESULTS{$key}{tm}) {
  				if($INDEX_TO_QUEST_NO{$key}{type} eq"SA" || $INDEX_TO_QUEST_NO{$key}{type} eq"P") {
- 					print" <font color=\"blue\"><B>? &nbsp\;</B></font> <font color=\"#585858\" STYLE=\"cursor: pointer\" onClick=\"l_anchor\(\'$key\'\)\"><B>$key</B><sup><font size=\"-1\">$INDEX_TO_QUEST_NO{$key}{pts}</font></sup> &nbsp\;</font> \n";
+ 					print" &nbsp\;<font color=\"blue\"><B>? </B></font> <font color=\"#585858\" STYLE=\"cursor: pointer\" onClick=\"l_anchor\(\'$key\'\)\"><B>$key</B><sup><font size=\"-1\">$INDEX_TO_QUEST_NO{$key}{pts}</font></sup> &nbsp\;</font> \n";
  					}
  				else {
-					print" <font color=\"blue\"><B>? &nbsp\;</B></font><font color=\"black\" STYLE=\"cursor: pointer\" onClick=\"l_anchor\(\'$key\'\)\"><B>$key</B><sup><font size=\"-1\">$INDEX_TO_QUEST_NO{$key}{pts}</font></sup> &nbsp\;</font> \n";
+					print" &nbsp\;<font color=\"blue\"><B>? </B></font><font color=\"black\" STYLE=\"cursor: pointer\" onClick=\"l_anchor\(\'$key\'\)\"><B>$key</B><sup><font size=\"-1\">$INDEX_TO_QUEST_NO{$key}{pts}</font></sup> &nbsp\;</font> \n";
 					}
 				 }
 				 
@@ -49723,9 +51869,13 @@ sub qst_mark_ins {
 		}
 		
 	&print_javascript_begin();
+	
 	print"function l_anchor\(li_nk\)\{\n";
 	print"self.top.qst_left.link_anchor\(li_nk\)\n";
 	print"\}\n";
+	
+	&print_stop_F12();
+	
 	&print_javascript_end();
 
 	print"<FORM><BR><P>\n";
@@ -49860,6 +52010,9 @@ sub qst_side {
 	print"function reload_right\(\)\{\n";
 	print"document.s_formm.submit\(\)\n";
 	print"\}\n";
+	
+	&print_stop_F12();
+	
 	&print_javascript_end();
 	
 	&print_javascript_time_remaining();
@@ -49879,7 +52032,7 @@ sub qst_side {
 	
 	print"<center><TABLE STYLE=\"border-radius:6px\; font-size:10pt\; border: 1px solid black\; font-family:Arial\;\"><TD><B  onClick=\"sub_ques\(\)\" STYLE=\"cursor: pointer\" ><font>&nbsp\;$LANGUAGE{$set_language}{Submit} QST&nbsp\;</font></B></TD></TABLE></center><BR>\n";
 	
-	print"<center><table width=\"100%\" $action_bar><TR><TD align=\"center\" STYLE=\"border-radius:6px\;\"><font color=\"white\"><BR><B>$LANGUAGE{$set_language}{Questions} <BR>$LANGUAGE{$set_language}{Answered}</B><BR><BR></TD></TR></TABLE></center>\n";
+	print"<center><table width=\"100%\" $action_bar><TR><TD align=\"center\" STYLE=\"border-radius:6px\; padding-bottom:7px\;\"><font color=\"white\"><BR><B>$LANGUAGE{$set_language}{Questions} </B></font></TD></TR><TR><TD align=\"center\"><font color=\"white\"><B>$LANGUAGE{$set_language}{Answered}</B></font></B><BR><BR></font></TD></TR></TABLE></center>\n";
 	print"<TABLE width=\"100\%\"><TD>\n";
 	
 	my $total_keys = 0;
@@ -49981,6 +52134,7 @@ sub resume_qst_side {
 	self.parent.qst_left.resume_check_boxes_bot_right\(\)
 	\}\n";
 
+	&print_stop_F12();
 	
 	&print_javascript_end();
 	
@@ -50115,6 +52269,8 @@ sub resume_qst_side2 {
 	document.q_form.submit()
         \}\n";
 
+	&print_stop_F12();
+	
 	&print_javascript_end();
 	
 	&print_javascript_time_remaining();
@@ -50240,6 +52396,9 @@ sub modal_qst_side {
 	print"function reload_right\(\)\{\n";
 	print"document.s_formm.submit\(\)\n";
 	print"\}\n";
+	
+	&print_stop_F12();
+
 	&print_javascript_end();
 	
 	&print_javascript_time_remaining();
@@ -50366,6 +52525,19 @@ sub qst_side2 {
 	document.q_form.submit()
         \}\n";
         
+        print"document.onkeydown = function (event) \{
+	event = (event || window.event);
+	return keyFunction(event);
+	\}\n";
+							
+	print"function keyFunction(event)\{
+	   if (event.keyCode == 123) \{
+	   return false;
+	   \}
+    	\}\n";
+    	
+    	&print_stop_F12();
+    	
 	&print_javascript_end();
 	
 	&print_javascript_time_remaining();
@@ -50426,7 +52598,6 @@ sub qst_side2 {
 	print"</TABLE></FORM>\n";
   	&print_form("form_name","s_formm","input","qst_mark","qst","$QS{qst}","class_id","$class_id","type","$QS{type}","u_id","$QS{u_id}","session_id","$QS{session_id}");
   	&print_form("form_name","next_quest","form_target","qst_left","input","next_question2","order","","quest_no","","qst","$QS{qst}","class_id","$class_id","qtype","$QS{type}","type","","u_id","$QS{u_id}","session_id","$QS{session_id}","lquests","$QS{lquests}","attempt","$QS{attempt}");
-  	
         &print_form("form_name","q_form","form_target","qst_left","input","mark_type2","class_name","$QS{class_name}","qst_name","$QS{qst_name}","qst","$QS{qst}","class_id","$class_id","type","$QS{type}","u_id","$QS{u_id}","session_id","$QS{session_id}","display","2");
         
   	# load the clock
@@ -50497,6 +52668,8 @@ sub modal2_qst_side2 {
 	document.q_form.submit()
         \}\n";
         
+        &print_stop_F12();
+
 	&print_javascript_end();
 	
 	&print_javascript_time_remaining();
@@ -50621,6 +52794,8 @@ sub qst_side3 {
         document.q_form.submit()
         \}\n";
         
+        &print_stop_F12();
+        
 	&print_javascript_end();
 	
 	&print_javascript_time_remaining();
@@ -50631,6 +52806,7 @@ sub qst_side3 {
 	print"countdownTimeStart()\n";
 	&print_javascript_end();
 
+	print"<DIV oncontextmenu =\"return false\"> \n";
 	if($QS{qst_time} > 1) {
                 print"<center><span id=\"timeR\"><TABLE><TR><TD style=\"padding-bottom: 4px\"><font style='font-family:Arial; font-size:9pt;'>$LANGUAGE{$set_language}{TimeRemaining}</font></TD></TR></TABLE></span></center>\n";
 		print"<center><TABLE STYLE=\"border-radius:4px\;\" bgcolor=\"#00000\"><TR><TD style=\"padding-left:7px\; padding-right:7px\"><B><font style=\"font-size:13pt\; font-family:Arial\; color: white\;\" id=\"showtime\"></font></center></TD></TR></TABLE></center>";
@@ -50692,6 +52868,8 @@ sub qst_side3 {
         print"var interval_id = setInterval(\"countdown(1)\",60000\)\n";
         print"var iinterval_id = setInterval(\"countdown1(1)\",60000\)\n";
         &print_javascript_end();
+        
+        print"</DIV>\n";
 	}
 
 ##################
@@ -50746,6 +52924,8 @@ sub resume_qst_side3 {
 	print"function Finish\(qst\) \{
         document.q_form.submit()
         \}\n";
+        
+        &print_stop_F12();
         
 	&print_javascript_end();
 	
@@ -50872,6 +53052,8 @@ sub modal3_qst_side3 {
         document.q_form.submit()
         \}\n";
         
+        &print_stop_F12();
+
 	&print_javascript_end();
 	
 	&print_javascript_time_remaining();
@@ -50882,6 +53064,8 @@ sub modal3_qst_side3 {
 	print"countdownTimeStart()\n";
 	&print_javascript_end();
 
+	print"<DIV oncontextmenu =\"return false\">\n";
+	
 	if($QS{qst_time} > 1) {
 		print"<center><span id=\"timeR\"><TABLE><TR><TD style=\"padding-bottom: 4px\"><font style='font-family:Arial; font-size:9pt;'>$LANGUAGE{$set_language}{TimeRemaining}</font></TD></TR></TABLE></span></center>\n";
 		print"<center><TABLE STYLE=\"border-radius:4px\;\" bgcolor=\"#00000\"><TR><TD style=\"padding-left:7px\; padding-right:7px\"><B><font style=\"font-size:13pt\; font-family:Arial\; color: white\;\" id=\"showtime\"></font></center></TD></TR></TABLE></center>";
@@ -50937,13 +53121,15 @@ sub modal3_qst_side3 {
   	&print_form("form_name","s_formm","input","qst_mark","qst","$QS{qst}","class_id","$class_id","type","$QS{type}","u_id","$QS{u_id}","session_id","$QS{session_id}");
   	&print_form("form_name","next_quest","form_target","m3qst_left","input","modal_next_question3","order","","quest_no","","qst","$QS{qst}","class_id","$class_id","qtype","$QS{type}","type","","u_id","$QS{u_id}","session_id","$QS{session_id}","lquests","$QS{lquests}");
   	
-  	&print_form("form_name","q_form","form_target","m3qst_left","input","modal3_mark_type3","qst_name","$QS{qst_name}","qst","$QS{qst}","class_id","$class_id","type","$QS{type}","u_id","$QS{u_id}","session_id","$QS{session_id}","display","2");
+  	&print_form("form_name","q_form","form_target","m3qst_left","input","modal3_mark_type3","qst_name","$QS{qst_name}","qst","$QS{qst}","class_id","$class_id","type","$QS{type}","u_id","$QS{u_id}","session_id","$QS{session_id}","display","2","attempt","");
         
   	# load the clock
         &print_javascript_begin();
         print"var interval_id = setInterval(\"countdown(1)\",60000\)\n";
         print"var iinterval_id = setInterval(\"countdown1(1)\",60000\)\n";
         &print_javascript_end();
+        
+#        print"</DIV>\n";
 	}
 
 ##################
@@ -51125,6 +53311,8 @@ sub qst_side5 {
 	print"function Finish\(qst\) \{
         document.q_form.submit()
         \}\n";
+        
+        &print_stop_F12();
         
 	&print_javascript_end();
 	
@@ -51978,11 +54166,16 @@ sub next_question2 {
         document.next_quest.submit\(\)
         \}\n";
         
+        &print_clear_memory_viewed();
+        
+        &print_stop_F12();
+        
         &print_javascript_end();
         
         if($next_order <= @quests) {
                 my $query = "SELECT * from questions WHERE number=\"$next_quest\"";
-                my %QUESTIONS = &select_questions("query","$query");			
+                my %QUESTIONS = &select_questions("query","$query");
+                my $viewed = &select_viewed("u_id","$NQ{u_id}","quest_no","$next_quest","qst","$NQ{qst}","attempt","$NQ{attempt}");
                 my $question_rows = 1;
                 my $question_length = length($QUESTIONS{$NQ{quest_no}}{question});
  		
@@ -52005,8 +54198,24 @@ sub next_question2 {
                         }
                         
                 print"</center><form name=\"q_form\">\n";
-                print"<TABLE><TR><TD valign=\"top\"><B>$next_order\.</b></TD>\n";
-										
+
+		if($QUESTIONS{$next_quest}{memory} ne "" && $viewed==0) { # MEMORY
+			$QUESTIONS{$next_quest}{memory} =~ s/&quot;/"/g;
+			
+			print"<DIV ID=\"MEMORY\" style=\"display: block\;\">\n";
+			print"<TABLE><TR><TD valign=\"top\"><B>$next_order\.</b></TD><TD NOWRAP valign=\"top\"><font size=\"-2\">($QUESTIONS{$next_quest}{value})</font></td><TD valign=\"top\">\n";
+			print"<TABLE><TR><TD width=\"15\"></TD><TD style=\"border: 1px solid #660616\; padding-left: 7px\; padding-right: 7px\; padding-top: 7px\; padding-bottom: 7px\">$QUESTIONS{$next_quest}{memory}</TD></TR></TABLE><BR><center><B onClick=\"clear_memory_viewed\(\'$next_quest\'\)\" style=\"cursor\:pointer\;\">Continue</B></center><BR>\n";
+			print"</TD></TR></TABLE>\n";
+
+			print"</DIV>\n";
+			print"<DIV ID=\"QUESTION\" style=\"display: none\">\n";
+			print"<TABLE><TR><TD valign=\"top\"><B>$next_order\.</b></TD>\n";				
+			}
+								
+		else {
+			print"<TABLE><TR><TD valign=\"top\"><B>$next_order \.</b></TD>\n";				
+			}
+
                 &print_out_question("question","$QUESTIONS{$next_quest}{question}","value","$QUESTIONS{$next_quest}{value}","image_id","$QUESTIONS{$next_quest}{image_id}","pdf","$QUESTIONS{$next_quest}{pdf}","vlink","$QUESTIONS{$next_quest}{vlink}","alink","$QUESTIONS{$next_quest}{alink}","type","$QUESTIONS{$next_quest}{type}","question_rows","$question_rows","mode","$QUESTIONS{$next_quest}{mode}");
               
                 &print_out_question_answers_next("quest","$next_quest","index","$next_order","type","$QUESTIONS{$next_quest}{type}","key","$key","kolum","$QUESTIONS{$next_quest}{kolum}","attempt","$NQ{attempt}","qst","$NQ{qst}","ans_mode","$QUESTIONS{$next_quest}{ans_mode}");
@@ -52016,10 +54225,14 @@ sub next_question2 {
                 &print_form("form_name","form4","form_target","right_top","input","question_done","class_id","$NQ{class_id}","qst","$NQ{qst}","real_quest_no","","quest_no","","answer","","saanswer","","panswer","","mxselect","","answertype","","type","$NQ{type}","u_id","$NQ{u_id}","session_id","$NQ{session_id}");
         
                 &print_form("form_name","next_quest","input","next_question2","order","","quest_no","","qst","$NQ{qst}","class_name","$NQ{class_name}","class_id","$NQ{class_id}","qtype","$NQ{type}","type","","lquests","","u_id","$NQ{u_id}","session_id","$NQ{session_id}","attempt","$NQ{attempt}");
-                
+
+                &print_form("form_name","form5","form_target","right_top","input","viewed","qst","$NQ{qst}","quest_no","","u_id","$NQ{u_id}","session_id","$NQ{session_id}","attempt","$NQ{attempt}");
+
                 if($QUESTIONS{$next_quest}{mode} == 2  || $QUESTIONS{$next_quest}{ans_mode} == 2) {
                         &print_eq();
                         }
+                        
+                print"</DIV>\n";
                 }
         else {
                 print"<center>Done.</center>";
@@ -52163,6 +54376,10 @@ sub resume_next_question2 {
 	self.parent.qst_left.location = frame_url + \"#\" + this_link
 	\}\n";
 
+	&print_clear_memory_viewed3();
+	
+	&print_stop_F12();
+	
         &print_javascript_end();
         
         # check whether in class
@@ -52326,12 +54543,17 @@ sub modal_next_question2 {
         document.next_quest.submit\(\)
         \}\n";
         
+        &print_clear_memory_viewed3();
+
+	&print_stop_F12();
+
         &print_javascript_end();
         
         if($next_order <= @quests) {
                 my $query = "SELECT * from questions WHERE number=\"$next_quest\"";
-                my %QUESTIONS = &select_questions("query","$query");
-                
+                my %QUESTIONS = &select_question("query","$query");
+                my $viewed = &select_viewed("u_id","$NQ{u_id}","quest_no","$next_quest","qst","$NQ{qst}","attempt","$NQ{attempt}");
+
                 my %QUESTION_ANSWERED = &select_questions_already_answered("query","select answer,quest_no from qsts where u_id=\"$NQ{u_id}\" and quest_no=\"$next_quest\" and attempt=\"$NQ{attempt}\" and qst=\"$NQ{qst}\"");
 
                 my $question_rows = 1;
@@ -52356,15 +54578,30 @@ sub modal_next_question2 {
                         }
                         
                 print"</center><form name=\"q_form\">\n";
-                print"<TABLE><TR><TD valign=\"top\"><B>$next_order\.</b></TD>\n";
-										
-                &print_out_question("question","$QUESTIONS{$next_quest}{question}","value","$QUESTIONS{$next_quest}{value}","image_id","$QUESTIONS{$next_quest}{image_id}","vlink","$QUESTIONS{$next_quest}{vlink}","alink","$QUESTIONS{$next_quest}{alink}","type","$QUESTIONS{$next_quest}{type}","question_rows","$question_rows","mode","$QUESTIONS{$next_quest}{mode}");
-              
-                &print_out_question_answers_next("quest","$next_quest","index","$next_order","type","$QUESTIONS{$next_quest}{type}","key","$key","answer","$QUESTION_ANSWERED{$next_quest}","kolum","$QUESTIONS{$next_quest}{kolum}","attempt","$NQ{attempt}","qst","$NQ{qst}","ans_mode","$QUESTIONS{$next_quest}{ans_mode}");
+
+		if($QUESTIONS{$next_quest}{memory} ne "" && $viewed==0 ) { # MEMORY SHOW
+			$QUESTIONS{$next_quest}{memory} =~ s/&quot;/"/g;
+
+			print"<DIV ID=\"MEMORY\" style=\"display: block\;\">\n";
+			print"<TABLE><TR><TD valign=\"top\"><B>$next_order\.</b></TD><TD NOWRAP valign=\"top\"><font size=\"-2\">($QUESTIONS{$next_quest}{value})</td><TD valign=\"top\">\n";
+			print"<TABLE><TR><TD width=\"15\"></TD><TD style=\"border: 1px solid #660616\; padding-left: 7px\; padding-right: 7px\; padding-top: 7px\; padding-bottom: 7px\">$QUESTIONS{$next_quest}{memory}</TD></TR></TABLE><BR><center><B onClick=\"clear_memory_viewed3\(\'$next_quest\'\)\" style=\"cursor\:pointer\;\">Continue</B></center><BR>\n";
+			print"</TD></TR></TABLE>\n";
+			}
+								
+		else {  #QUESTION SHOW
+			print"<TABLE><TR><TD valign=\"top\"><B>$next_order\.</b></TD>\n";
+						
+		        &print_out_question("question","$QUESTIONS{$next_quest}{question}","value","$QUESTIONS{$next_quest}{value}","image_id","$QUESTIONS{$next_quest}{image_id}","vlink","$QUESTIONS{$next_quest}{vlink}","alink","$QUESTIONS{$next_quest}{alink}","type","$QUESTIONS{$next_quest}{type}","question_rows","$question_rows","mode","$QUESTIONS{$next_quest}{mode}");
+
+		        &print_out_question_answers_next("quest","$next_quest","index","$next_order","type","$QUESTIONS{$next_quest}{type}","key","$key","answer","$QUESTION_ANSWERED{$next_quest}","kolum","$QUESTIONS{$next_quest}{kolum}","attempt","$NQ{attempt}","qst","$NQ{qst}","ans_mode","$QUESTIONS{$next_quest}{ans_mode}");
+			}
                       
                 print"</FORM>\n";
-                
+
+                &print_form("form_name","memquest","input","modal_mem_quest2","order","$next_order","quest_no","","real_quest_no","","prev_quest_no","$NQ{quest_no}","qst","$NQ{qst}","class_name","","class_id","$NQ{class_id}","qtype","$NQ{type}","type","$NQ{type}","lquests","$NQ{lquests}","u_id","$NQ{u_id}","session_id","$NQ{session_id}","attempt","$NQ{attempt}");
+
                 &print_form("form_name","form4","form_target","m2right_top","input","question_done","class_id","$NQ{class_id}","qst","$NQ{qst}","real_quest_no","","quest_no","","answer","","saanswer","","panswer","","mxselect","","answertype","","type","$NQ{type}","u_id","$NQ{u_id}","session_id","$NQ{session_id}");
+                &print_form("form_name","form5","form_target","m2right_top","input","viewed","qst","$NQ{qst}","quest_no","","u_id","$NQ{u_id}","session_id","$NQ{session_id}","attempt","$NQ{attempt}");
         
                 &print_form("form_name","next_quest","input","modal_next_question2","order","","quest_no","","qst","$NQ{qst}","class_id","$NQ{class_id}","qtype","$NQ{type}","type","","lquests","","u_id","$NQ{u_id}","session_id","$NQ{session_id}","attempt","$NQ{attempt}");
                 
@@ -52395,8 +54632,10 @@ sub next_question3 {
         my @quests = split(/\,/,$NQ{lquests});
         my $next_order = $NQ{order};
         my $next_quest = $quests[$next_order];
-        ++$next_order;
         my $key;
+	my $viewed = &select_viewed("u_id","$NQ{u_id}","quest_no","$next_quest","qst","$NQ{qst}","attempt","$NQ{attempt}");
+        ++$next_order;
+
         &print_style_sheet();
         
         print"<style>table.table1\{ border-radius:6px\; font-size:10pt\; font-family:Arial\;\}</style>\n";
@@ -52412,6 +54651,10 @@ sub next_question3 {
         document.next_quest.lquests.value=quests
         document.next_quest.submit\(\)
         \}\n";
+        
+        &print_clear_memory_viewed();
+        
+        &print_stop_F12();
         
         &print_javascript_end();
         
@@ -52452,8 +54695,24 @@ sub next_question3 {
                         }
                         
                 print"</center><form name=\"q_form\">\n";
-                print"<TABLE><TR><TD valign=\"top\"><B>$next_order\.</b></TD>\n";
-										
+                
+		if($QUESTIONS{$next_quest}{memory} ne "" && $viewed==0) { # MEMORY
+			$QUESTIONS{$next_quest}{memory} =~ s/&quot;/"/g;
+			
+			print"<DIV ID=\"MEMORY\" style=\"display: block\;\">\n";
+			print"<TABLE><TR><TD valign=\"top\"><B>$next_order\.</b></TD><TD NOWRAP valign=\"top\"><font size=\"-2\">($QUESTIONS{$next_quest}{value})</font></td><TD valign=\"top\">\n";
+			print"<TABLE><TR><TD width=\"15\"></TD><TD style=\"border: 1px solid #660616\; padding-left: 7px\; padding-right: 7px\; padding-top: 7px\; padding-bottom: 7px\">$QUESTIONS{$next_quest}{memory}</TD></TR></TABLE><BR><center><B onClick=\"clear_memory_viewed\(\'$next_quest\'\)\" style=\"cursor\:pointer\;\">Continue</B></center><BR>\n";
+			print"</TD></TR></TABLE>\n";
+
+			print"</DIV>\n";
+			print"<DIV ID=\"QUESTION\" style=\"display: none\">\n";
+			print"<TABLE><TR><TD valign=\"top\"><B>$next_order\.</b></TD>\n";				
+			}
+								
+		else {
+			print"<TABLE><TR><TD valign=\"top\"><B>$next_order \.</b></TD>\n";				
+			}
+
                 &print_out_question("question","$QUESTIONS{$next_quest}{question}","value","$QUESTIONS{$next_quest}{value}","image_id","$QUESTIONS{$next_quest}{image_id}","pdf","$QUESTIONS{$next_quest}{pdf}","vlink","$QUESTIONS{$next_quest}{vlink}","alink","$QUESTIONS{$next_quest}{alink}","type","$QUESTIONS{$next_quest}{type}","question_rows","$question_rows","mode","$QUESTIONS{$next_quest}{mode}");
 										
                 &print_out_question_answers("quest","$next_quest","index","$next_order","type","$QUESTIONS{$next_quest}{type}","key","$key","answer","$QUESTION_ANSWERED{$next_quest}","kolum","$QUESTIONS{$next_quest}{kolum}","attempt","$NQ{attempt}","qst","$NQ{qst}","ans_mode","$QUESTIONS{$next_quest}{ans_mode}");
@@ -52461,12 +54720,16 @@ sub next_question3 {
                 print"</FORM>\n";
                 
                 &print_form("form_name","form4","form_target","right_top","input","question_done","class_id","$NQ{class_id}","qst","$NQ{qst}","real_quest_no","","quest_no","","answer","","saanswer","","panswer","","answertype","","mxselect","","type","$NQ{type}","u_id","$NQ{u_id}","session_id","$NQ{session_id}");
+
+                &print_form("form_name","form5","form_target","right_top","input","viewed","qst","$NQ{qst}","quest_no","","u_id","$NQ{u_id}","session_id","$NQ{session_id}","attempt","$NQ{attempt}");
         
                 &print_form("form_name","next_quest","input","next_question3","order","","quest_no","","real_quest_no","","prev_quest_no","$next_quest","qst","$NQ{qst}","class_id","$NQ{class_id}","qtype","$NQ{type}","type","","lquests","","u_id","$NQ{u_id}","session_id","$NQ{session_id}","attempt","$NQ{attempt}");
                 
                 if($QUESTIONS{$next_quest}{mode} == 2 || $QUESTIONS{$next_quest}{ans_mode} == 2) {
                         &print_eq();
                         }
+                        
+                print"</DIV>\n";
                 }
         else {
 		print"<P><BR><center><B>$LANGUAGE{$set_language}{TheQSThasended}</B></center><P><BR><center><P><B> $LANGUAGE{$set_language}{Submitit} </font></B><P>\n";
@@ -52509,6 +54772,10 @@ sub resume_next_question3 {
         document.next_quest.submit\(\)
         \}\n";
         
+        &print_clear_memory_viewed3();
+	
+	&print_stop_F12();
+	
         &print_javascript_end();
         
         #check if time has expired
@@ -52569,6 +54836,7 @@ sub resume_next_question3 {
         	}	        
         }
 
+
 ###########################
 #
 # MODAL_NEXT_QUESTION3
@@ -52604,6 +54872,8 @@ sub modal_next_question3 {
         document.next_quest.submit\(\)
         \}\n";
         
+	&print_clear_memory_viewed3();
+
         &print_javascript_end();
         
         #check if time has expired
@@ -52627,6 +54897,8 @@ sub modal_next_question3 {
                 my $new_lines = @number_of_newlines;
                 $question_rows = $question_rows + $new_lines;
 
+		print"<DIV oncontextmenu =\"return false\">\n";
+
                 print"<center>";
                 
                 if($next_order < @quests) {
@@ -52637,54 +54909,69 @@ sub modal_next_question3 {
                         }
                         
                 print"</center><form name=\"q_form\">\n";
-                print"<TABLE><TR><TD valign=\"top\"><B>$next_order\.</b></TD>\n";
-										
-                &print_out_question("question","$QUESTIONS{$next_quest}{question}","value","$QUESTIONS{$next_quest}{value}","image_id","$QUESTIONS{$next_quest}{image_id}","vlink","$QUESTIONS{$next_quest}{vlink}","alink","$QUESTIONS{$next_quest}{alink}","type","$QUESTIONS{$next_quest}{type}","question_rows","$question_rows","mode","$QUESTIONS{$next_quest}{mode}");
-										
-                &print_out_question_answers("quest","$next_quest","index","$next_order","type","$QUESTIONS{$next_quest}{type}","key","$key","answer","$QUESTION_ANSWERED{$next_quest}","kolum","$QUESTIONS{$next_quest}{kolum}","attempt","$NQ{attempt}","qst","$NQ{qst}","ans_mode","$QUESTIONS{$next_quest}{ans_mode}");
+                
+		if($QUESTIONS{$next_quest}{memory} ne "" && $QUESTIONS{$next_quest}{viewed}==0 ) { # MEMORY SHOW
+			$QUESTIONS{$next_quest}{memory} =~ s/&quot;/"/g;
+			
+			print"<DIV ID=\"MEMORY\" style=\"display: block\;\">\n";
+			print"<TABLE><TR><TD valign=\"top\"><B>$next_order\.</b></TD><TD NOWRAP valign=\"top\"><font size=\"-2\">($QUESTIONS{$next_quest}{value})</td><TD valign=\"top\">\n";
+			print"<TABLE><TR><TD width=\"15\"></TD><TD style=\"border: 1px solid #660616\; padding-left: 7px\; padding-right: 7px\; padding-top: 7px\; padding-bottom: 7px\">$QUESTIONS{$next_quest}{memory}</TD></TR></TABLE><BR><center><B onClick=\"clear_memory_viewed3\(\'$next_quest\'\)\" style=\"cursor\:pointer\;\">Continue</B></center><BR>\n";
+			print"</TD></TR></TABLE>\n";
+			}
+								
+		else {  #QUESTION SHOW
+			print"<TABLE><TR><TD valign=\"top\"><B>$next_order\.</b></TD>\n";
+						
+		        &print_out_question("question","$QUESTIONS{$next_quest}{question}","value","$QUESTIONS{$next_quest}{value}","image_id","$QUESTIONS{$next_quest}{image_id}","vlink","$QUESTIONS{$next_quest}{vlink}","alink","$QUESTIONS{$next_quest}{alink}","type","$QUESTIONS{$next_quest}{type}","question_rows","$question_rows","mode","$QUESTIONS{$next_quest}{mode}");
+
+		        &print_out_question_answers("quest","$next_quest","index","$next_order","type","$QUESTIONS{$next_quest}{type}","key","$key","answer","$QUESTION_ANSWERED{$next_quest}","kolum","$QUESTIONS{$next_quest}{kolum}","attempt","$NQ{attempt}","qst","$NQ{qst}","ans_mode","$QUESTIONS{$next_quest}{ans_mode}");
+			}
                       
                 print"</FORM>\n";
                 
+                &print_form("form_name","memquest","input","modal_mem_quest3","order","$next_order","quest_no","","real_quest_no","","prev_quest_no","$NQ{quest_no}","qst","$NQ{qst}","class_name","","class_id","$NQ{class_id}","qtype","$NQ{type}","type","$NQ{type}","lquests","$NQ{lquests}","u_id","$NQ{u_id}","session_id","$NQ{session_id}","attempt","$NQ{attempt}");
                 &print_form("form_name","form4","form_target","m3right_top","input","question_done","class_id","$NQ{class_id}","qst","$NQ{qst}","real_quest_no","","quest_no","","answer","","saanswer","","panswer","","answertype","","mxselect","","type","$NQ{type}","u_id","$NQ{u_id}","session_id","$NQ{session_id}");
-        
+  		&print_form("form_name","form5","form_target","m3right_top","input","viewed","qst","$NQ{qst}","quest_no","","u_id","$NQ{u_id}","session_id","$NQ{session_id}","attempt","$NQ{attempt}");
                 &print_form("form_name","next_quest","input","modal_next_question3","order","","quest_no","","real_quest_no","","qst","$NQ{qst}","class_id","$NQ{class_id}","qtype","$NQ{type}","type","","lquests","","u_id","$NQ{u_id}","session_id","$NQ{session_id}","attempt","$NQ{attempt}");
                 
                 if($QUESTIONS{$next_quest}{mode} == 2  || $QUESTIONS{$next_quest}{ans_mode} == 2) {
                         &print_eq();
                         }
+                        
+                print"</DIV>\n";
                 }
         else {
+        	print"<DIV oncontextmenu =\"return false\">\n";
                 print"<P><BR><center><B>$LANGUAGE{$set_language}{TheQSThasended}</B><P><BR><B> $LANGUAGE{$set_language}{Submitit} </font></B><center><P>\n";
+                print"</DIV>\n";
                 }
         }
         
 ###########################
 #
-# NEXT_QUESTION5
+# MEM_QUEST3      
 #
 ##########################
-sub next_question5 {
+sub mem_quest3 {
         my %NQ = @_;
         $NQ{quest_no} =~ s/\D//g;
+        $NQ{order} =~ s/\D//g;
         $NQ{qst} =~ s/\D//g;
         $NQ{type} =~ s/\D//g;
-        $NQ{sub_type} =~ s/\D//g;
+        $NQ{prev_quest_no} =~ s/\D//g;
         $NQ{lquests} =~ s/[^0-9,]//g;
-        $NQ{referer} =~ s/\D//g;
-
+        $NQ{attempt} =~ s/\D//g;
         my @quests = split(/\,/,$NQ{lquests});
-        my $next_quest = 0;
-        my %BRANCH = ();
-        my $lquests;
-        my $primary_quest;
-        my $len = @quests;
-        
+        my $next_order = $NQ{order};
+        my $next_quest = $quests[$next_order];
+        my $key;
+	my $viewed = &select_viewed("u_id","$NQ{u_id}","quest_no","$next_quest","qst","$NQ{qst}","attempt","$NQ{attempt}");
+        ++$next_order;
+
         &print_style_sheet();
         
-        print"<style>table.table1\{ border-radius:6px\; font-size:10pt\; font-family:Arial\;\}
-        table.table2{ border-radius:6px; font-size:9pt; border: 1px solid black; font-family:Arial;}
-	</style>\n";
-	
+        print"<style>table.table1\{ border-radius:6px\; font-size:10pt\; font-family:Arial\;\}</style>\n";
+        
         &print_javascript_begin();
         
         &print_javascript_enterMX();
@@ -52697,214 +54984,393 @@ sub next_question5 {
         document.next_quest.submit\(\)
         \}\n";
         
-        print"function close_qst() {
-        document.form_reload.submit\(\)
-        parent.self.close()
-        \}\n";
+        &print_clear_memory_viewed();
         
-         print"function load_handler() {
-        self.parent.right_top.location.replace\(\"\/schools/empty.htm\"\)
-        self.parent.right_bot.location.replace\(\"\/schools/empty.htm\"\)
-        \}\n";
+        &print_stop_F12();
         
         &print_javascript_end();
         
-        #get displayed question
-        my %DISP_QUESTION = &select8("query","select quest_no,q_order,value,q_select,branching from qst_questions WHERE qst_no=\"$NQ{qst}\" AND quest_no=\"$NQ{quest_no}\" AND referer =\"$NQ{referer}\"");
+        #check if time has expired
+	my %RETURN1 = &select_qst_attempts_info("query","SELECT qst_no,attempts,end,resume from qst_attempts WHERE qst_no=\"$NQ{qst}\" AND u_id=\"$ids\" and attempts=\"$NQ{attempt}\"");
+	my $time = time;
+	my $time_left = $RETURN1{$NQ{qst}}{end} - $time;		
+	
+        if($NQ{order} <= @quests && $time_left > 3) {
+                my $query = "SELECT * from questions WHERE number=\"$NQ{quest_no}\"";
+                my %QUESTIONS = &select_questions("query","$query");
+                my %QUESTION_ANSWERED = &select_questions_already_answered("query","select answer,quest_no from qsts where u_id=\"$NQ{u_id}\" and quest_no=\"$next_quest\" and attempt=\"$NQ{attempt}\" and qst=\"$NQ{qst}\"");
+                my %ALREADY_ANSWERED = &select_questions_already_answered("query","select answer,quest_no from qsts where u_id=\"$NQ{u_id}\" and quest_no=\"$NQ{prev_quest_no}\" and attempt=\"$NQ{attempt}\" and qst=\"$NQ{qst}\"");
 
-
-        # get the branches to the displayed question
-        my @piece = split(/\,/,$DISP_QUESTION{$NQ{quest_no}}{branching});
-                foreach my $chunk(@piece) {
-                        my @bran = split(/\=/,$chunk);
-                        if($bran[1] > 0) {
-                                $BRANCH{$bran[0]} = $bran[1];
-                                }
-                        }
-
-        # has branching questions
-        if(keys %BRANCH ) { 
-                my %QUEST_TYPE = &select4("query","SELECT number,type from questions WHERE number=\"$NQ{quest_no}\"");
-
-                if($QUEST_TYPE{$NQ{quest_no}} eq "TF") { # True / False
-                        my %ANSWER = &select5("query","select answer,quest_no from qsts where u_id=\"$NQ{u_id}\" AND qst=\"$NQ{qst}\" AND quest_no=\"$NQ{quest_no}\" AND referer=\"$NQ{referer}\"");
-                        
-                        if($NQ{referer} == 0 ) { # primary question
-                                $NQ{referer} = $NQ{quest_no};
-                                }
-
-                        if($ANSWER{$NQ{quest_no}} eq "T" && defined $BRANCH{1}) {
-                                 my %NEXT_QUESTION = &select8("query","select quest_no,q_order,value,q_select,branching from qst_questions WHERE qst_no=\"$NQ{qst}\" AND quest_no=\"$BRANCH{1}\" AND referer=\"$NQ{referer}\"");
-                                 
-                                 if($NEXT_QUESTION{$BRANCH{1}}{q_order} == 0) {
-                                        $next_quest = $BRANCH{1};
-                                        }
-                                }
-                                
-                        elsif($ANSWER{$NQ{quest_no}} eq "F" && defined $BRANCH{2}) {
-                                my %NEXT_QUESTION = &select8("query","select quest_no,q_order,value,q_select,branching from qst_questions WHERE qst_no=\"$NQ{qst}\" AND quest_no=\"$BRANCH{1}\" AND referer=\"$NQ{referer}\"");
-                                 
-                                 if($NEXT_QUESTION{$BRANCH{1}}{q_order} == 0) {
-                                        $next_quest = $BRANCH{2};
-                                        }
-                                }
-                        }
-                        
-                elsif($QUEST_TYPE{$NQ{quest_no}} eq "YN") { # Yes / No
-                        my %ANSWER = &select5("query","select answer,quest_no from qsts where u_id=\"$NQ{u_id}\" AND qst=\"$NQ{qst}\" AND quest_no=\"$NQ{quest_no}\" AND referer=\"$NQ{referer}\"");
-
-                        if($NQ{referer} == 0 ) { # primary question
-                                $NQ{referer} = $NQ{quest_no};
-                                }
-                                
-                        if($ANSWER{$NQ{quest_no}} eq "Y" && defined $BRANCH{1}) {
-                                 my %NEXT_QUESTION = &select8("query","select quest_no,q_order,value,q_select,branching from qst_questions WHERE qst_no=\"$NQ{qst}\" AND quest_no=\"$BRANCH{1}\" AND referer=\"$NQ{referer}\"");
-                                 
-                                 if($NEXT_QUESTION{$BRANCH{1}}{q_order} == 0) {
-                                        $next_quest = $BRANCH{1};
-                                        }
-                                }
-                                
-                        elsif($ANSWER{$NQ{quest_no}} eq "N" && defined $BRANCH{2}) {
-                                my %NEXT_QUESTION = &select8("query","select quest_no,q_order,value,q_select,branching from qst_questions WHERE qst_no=\"$NQ{qst}\" AND quest_no=\"$BRANCH{1}\" AND referer=\"$NQ{referer}\"");
-                                 
-                                 if($NEXT_QUESTION{$BRANCH{1}}{q_order} == 0) {
-                                        $next_quest = $BRANCH{2};
-                                        }
-                                }
-                        }
-                        
-                elsif($QUEST_TYPE{$NQ{quest_no}} eq "MC") { # MC
-                        my %ANSWER = &select5("query","select answer,quest_no from qsts where u_id=\"$NQ{u_id}\" AND qst=\"$NQ{qst}\" AND quest_no=\"$NQ{quest_no}\" AND referer=\"$NQ{referer}\"");
-                        
-                        my %NEXT_QUESTION = &select8("query","select quest_no,q_order,value,q_select,branching from qst_questions WHERE qst_no=\"$NQ{qst}\" AND quest_no=\"$BRANCH{$ANSWER{$NQ{quest_no}}}\" AND referer=\"$NQ{quest_no}\"");
-                                 
-                        $next_quest = $BRANCH{$ANSWER{$NQ{quest_no}}};
-                        }
-                        
-                elsif($QUEST_TYPE{$NQ{quest_no}} eq "MA") { # MA
-                        my %ANSWER = &select5("query","select answer,quest_no from qsts where u_id=\"$NQ{u_id}\" AND qst=\"$NQ{qst}\" AND quest_no=\"$NQ{quest_no}\" AND referer=\"$NQ{referer}\"");
-                        
-                        my %NEXT_QUESTION = &select8("query","select quest_no,q_order,value,q_select,branching from qst_questions WHERE qst_no=\"$NQ{qst}\" AND quest_no=\"$BRANCH{$ANSWER{$NQ{quest_no}}}\" AND referer=\"$NQ{quest_no}\"");
-                                 
-                        $next_quest = $BRANCH{$ANSWER{$NQ{quest_no}}};
-                        }
-                        
-                elsif($QUEST_TYPE{$NQ{quest_no}} eq "AD") { # AD
-                        my %ANSWER = &select5("query","select answer,quest_no from qsts where u_id=\"$NQ{u_id}\" AND qst=\"$NQ{qst}\" AND quest_no=\"$NQ{quest_no}\" AND referer=\"$NQ{referer}\"");
-                        
-                        my %NEXT_QUESTION = &select8("query","select quest_no,q_order,value,q_select,branching from qst_questions WHERE qst_no=\"$NQ{qst}\" AND quest_no=\"$BRANCH{$ANSWER{$NQ{quest_no}}}\" AND referer=\"$NQ{quest_no}\"");
-                                 
-                        $next_quest = $BRANCH{$ANSWER{$NQ{quest_no}}};
-                        }
-                }
-                
-                
-        # get the next primary question
-        if($len > 0 && $next_quest == 0) { 
-                $next_quest = shift(@quests);
-
-                 my %NEXT_QUESTION = &select8("query","select quest_no,q_order,value,q_select,branching from qst_questions WHERE qst_no=\"$NQ{qst}\" AND quest_no=\"$next_quest\" AND referer=\"0\"");
-                 
-                 $primary_quest = 1;
-                }
-              
-        # primary questions to pass
-        foreach my $q(@quests) { 
-                $lquests = "$lquests".","."$q";
-                }
-        $lquests =~ s/^\,//;
-                
-        my $error = 0;
-        $error = &check_many_length_return("$next_quest","10");
-        
-        my %QUESTIONS = ();
-        
-        if($error == 0) {
-                my $query = "SELECT * from questions WHERE number=\"$next_quest\"";
-                %QUESTIONS = &select_questions("query","$query");
-                }
+	        if(keys %ALREADY_ANSWERED) { # Just show the same question
+       	 	#	print"QQQQQRR<BR>\n";
+        		}
+        		
+        	
+                my $question_rows = 1;
+                my $question_length = length($QUESTIONS{$NQ{quest_no}}{question});
  		
- 		
-        # fix display to show new lines in text of question
-        my $question_rows = 1;
-        my $content = $QUESTIONS{$next_quest}{question};
-        $content =~ s/\r[\n]*/\n/gm;
-        my @number_of_newlines = split(/\n/,$content);
-        my $new_lines = @number_of_newlines;
-        $question_rows = $question_rows + $new_lines;
+                # fix display to show new lines in text of question
+                my $content = $QUESTIONS{$NQ{quest_no}}{question};
+                $content =~ s/\r[\n]*/\n/gm;
+                my @number_of_newlines = split(/\n/,$content);
+                my $new_lines = @number_of_newlines;
+                $question_rows = $question_rows + $new_lines;
 
-        print"<center>";
+                print"<center>";
                 
-        if($next_quest > 0) { # print out > 
-                if($lquests eq "") {
-                        $lquests = 0;
+                if($next_order <= @quests) {
+                        print"<B STYLE=\"cursor:pointer\; font-family\:Arial\; font-size\: 28pt\;\" OnClick=\"Show_Next('$NQ{order}','$NQ{lquests}')\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{Next}\">\></B>\n";
+                        }
+                else {
+                        print"<B STYLE=\" font-family\:Arial\; font-size\: 28pt\;\">&nbsp\;</B>\n";
                         }
                         
-                print"<center><TABLE><TR><TD>";
- 
-                print"<B ID=\"next\"  STYLE=\"cursor:pointer\; display:block\; font-family\:Arial\; font-size\:28pt\;\"><font color=\"white\">\></font></B><B ID=\"next1\"  STYLE=\"cursor:pointer\; display:none\; font-family\:Arial\; font-size\:28pt\;\" OnClick=\"Show_Next('0','$lquests')\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{Next}\"><font color=\"indigo\">\></font></B></TD></TR></TABLE></center>\n";
-                }
-
-                
-        #print out question and forms
-        if($next_quest > 0 && $error == 0) { # we have a question
                 print"</center><form name=\"q_form\">\n";
-                print"<TABLE><TR><TD valign=\"top\"></TD>\n";
+                
+		print"<TABLE><TR><TD valign=\"top\"><B>$NQ{order} \.</b></TD>\n";				
+
+                &print_out_question("question","$QUESTIONS{$NQ{quest_no}}{question}","value","$QUESTIONS{$NQ{quest_no}}{value}","image_id","$QUESTIONS{$NQ{quest_no}}{image_id}","pdf","$QUESTIONS{$NQ{quest_no}}{pdf}","vlink","$QUESTIONS{$NQ{quest_no}}{vlink}","alink","$QUESTIONS{$NQ{quest_no}}{alink}","type","$QUESTIONS{$NQ{quest_no}}{type}","question_rows","$question_rows","mode","$QUESTIONS{$NQ{quest_no}}{mode}");
 										
-                &print_out_question("question","$QUESTIONS{$next_quest}{question}","value","$QUESTIONS{$next_quest}{value}","image_id","$QUESTIONS{$next_quest}{image_id}","vlink","$QUESTIONS{$next_quest}{vlink}","alink","$QUESTIONS{$next_quest}{alink}","type","$QUESTIONS{$next_quest}{type}","question_rows","$question_rows","branch","1","mode","$QUESTIONS{$next_quest}{mode}");
-        
-                &print_out_question_answers("quest","$next_quest","index","1","type","$QUESTIONS{$next_quest}{type}","key","1","branch","1","kolum","$QUESTIONS{$next_quest}{kolum}","ans_mode","$QUESTIONS{$next_quest}{ans_mode}");
+                &print_out_question_answers("quest","$NQ{quest_no}","index","$NQ{order}","type","$QUESTIONS{$NQ{quest_no}}{type}","key","$key","answer","$QUESTION_ANSWERED{$NQ{quest_no}}","kolum","$QUESTIONS{$NQ{quest_no}}{kolum}","attempt","$NQ{attempt}","qst","$NQ{qst}","ans_mode","$QUESTIONS{$NQ{quest_no}}{ans_mode}");
                       
                 print"</FORM>\n";
-
-                my $temp_quest_no = $NQ{quest_no};
-        
-                # get previous question order
-                my %ORDER = ();
-                if($primary_quest == 1) {
-                        %ORDER = &select4("query","SELECT quest_no,quest_order from qsts WHERE quest_no=\"$temp_quest_no\" AND u_id=\"$NQ{u_id}\" AND qst=\"$NQ{qst}\" AND referer=\"$NQ{referer}\"");
-                        }
-                else {
-                        %ORDER = &select4("query","SELECT quest_no,quest_order from qsts WHERE quest_no=\"$temp_quest_no\" AND u_id=\"$NQ{u_id}\" AND qst=\"$NQ{qst}\"");
-                        }
-                        
-                my $order = $ORDER{$NQ{quest_no}};
-                ++$order;
-        
-                #add to qsts the next question for the qst for the user
-                my $referer;
-                if($primary_quest == 1) {
-                        $referer = 0;
-                        }
-                else {
-                        $referer = $NQ{quest_no};
-                        }
                 
-                &insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$NQ{qst}\",\"\",\"$next_quest\",\"0\",\"1\",\"0\",\"$org_id\",\"0\",\"$order\",\"$referer\")");
+                &print_form("form_name","form4","form_target","right_top","input","question_done","class_id","$NQ{class_id}","qst","$NQ{qst}","real_quest_no","","quest_no","","answer","","saanswer","","panswer","","answertype","","mxselect","","type","$NQ{type}","u_id","$NQ{u_id}","session_id","$NQ{session_id}");
+                &print_form("form_name","next_quest","input","next_question3","order","","quest_no","","real_quest_no","","prev_quest_no","$NQ{quest_no}","qst","$NQ{qst}","class_id","$NQ{class_id}","qtype","$NQ{type}","type","","lquests","","u_id","$NQ{u_id}","session_id","$NQ{session_id}","attempt","$NQ{attempt}");
                 
-                &print_form("form_name","form4","form_target","right_top","input","question_done5","referer","$referer","class_id","$NQ{class_id}","qst","$NQ{qst}","real_quest_no","","quest_no","","answer","","answertype","","type","$NQ{type}","u_id","$NQ{u_id}","session_id","$NQ{session_id}","attempt","1","marked","0","branch","1");
-        
-                &print_form("form_name","next_quest","input","next_question5","referer","$referer","real_quest_no","","quest_no","$next_quest","qst","$NQ{qst}","class_id","$NQ{class_id}","sub_type","$NQ{sub_type}","type","$QUESTIONS{$next_quest}{type}","lquests","$lquests","u_id","$NQ{u_id}","session_id","$NQ{session_id}","order","");
-                
-                if($QUESTIONS{$next_quest}{mode} == 2) {
+                if($QUESTIONS{$next_quest}{mode} == 2 || $QUESTIONS{$next_quest}{ans_mode} == 2) {
                         &print_eq();
                         }
-                }
-                
-        else { # QST is finished
-                if($NQ{sub_type} == 2) { # mark Survey as submitted
-                        &insert_generic("query","INSERT qst_scores VALUES(\"$ids\",\"$NQ{qst}\",\"0\",\"1\",\"0\",\"$org_id\")");
-                        }
                         
-                print"<BR><P><BR><center><B STYLE=\" font-family\:Arial\; font-size\: 14pt\;\">$LANGUAGE{$set_language}{YouhavefinishedtheQST}</B></center><BR><P>\n";
-                print"<center><TABLE class=\"table2\"><TD><B onClick=\"close_qst()\" STYLE=\"cursor: pointer\" ><font>&nbsp;$LANGUAGE{$set_language}{Close}&nbsp;</font></B></TD></TABLE></center><P><BR><P><DL>\n";
-                
-                &print_form("form_name","form_reload","form_target","orig_Window","input","print_modal_students_screen","class_name","$NQ{class_name}","class_id","$NQ{class_id}","u_id","$NQ{u_id}","session_id","$NQ{session_id}");
-
-                print"<img src =\"\/schools\/blank.gif\" onLoad=\"load_handler\(\)\">\n";
+                print"</DIV>\n";
+                }
+        else {
+		print"<P><BR><center><B>$LANGUAGE{$set_language}{TheQSThasended}</B></center><P><BR><center><P><B> $LANGUAGE{$set_language}{Submitit} </font></B><P>\n";
                 }
         }
+
+
+###########################
+#
+# MODAL_MEM_QUEST3      
+#
+##########################
+sub modal_mem_quest3 {
+        my %NQ = @_;
+        $NQ{quest_no} =~ s/\D//g;
+        $NQ{order} =~ s/\D//g;
+        $NQ{qst} =~ s/\D//g;
+        $NQ{type} =~ s/\D//g;
+        $NQ{prev_quest_no} =~ s/\D//g;
+        $NQ{lquests} =~ s/[^0-9,]//g;
+        $NQ{attempt} =~ s/\D//g;
+        my @quests = split(/\,/,$NQ{lquests});
+        my $next_order = $NQ{order};
+        my $next_quest = $quests[$next_order];
+        my $key;
+	my $viewed = &select_viewed("u_id","$NQ{u_id}","quest_no","$next_quest","qst","$NQ{qst}","attempt","$NQ{attempt}");
+        ++$next_order;
+
+        &print_style_sheet();
+        
+        print"<style>table.table1\{ border-radius:6px\; font-size:10pt\; font-family:Arial\;\}</style>\n";
+        
+        &print_javascript_begin();
+        
+        &modal3_print_javascript_enterMX();
+
+        &modal_print_javascript_activated_this();
+
+	print"function Show_Next\(order,quests\) \{
+        document.next_quest.order.value=order
+        document.next_quest.lquests.value=quests
+        document.next_quest.submit\(\)
+        \}\n";
+        
+        &print_clear_memory_viewed3();
+        
+        &print_stop_F12();
+
+        &print_javascript_end();
+        
+        #check if time has expired
+	my %RETURN1 = &select_qst_attempts_info("query","SELECT qst_no,attempts,end,resume from qst_attempts WHERE qst_no=\"$NQ{qst}\" AND u_id=\"$ids\" and attempts=\"$NQ{attempt}\"");
+	my $time = time;
+	my $time_left = $RETURN1{$NQ{qst}}{end} - $time;		
+	
+        if($NQ{order} <= @quests && $time_left > 3) {
+                my $query = "SELECT * from questions WHERE number=\"$NQ{quest_no}\"";
+                my %QUESTIONS = &select_questions("query","$query");
+                my %QUESTION_ANSWERED = &select_questions_already_answered("query","select answer,quest_no from qsts where u_id=\"$NQ{u_id}\" and quest_no=\"$next_quest\" and attempt=\"$NQ{attempt}\" and qst=\"$NQ{qst}\"");
+                my %ALREADY_ANSWERED = &select_questions_already_answered("query","select answer,quest_no from qsts where u_id=\"$NQ{u_id}\" and quest_no=\"$NQ{prev_quest_no}\" and attempt=\"$NQ{attempt}\" and qst=\"$NQ{qst}\"");
+
+	        if(keys %ALREADY_ANSWERED) { # Just show the same question
+       	 	#	print"QQQQQRR<BR>\n";
+        		}
+        		
+        	
+                my $question_rows = 1;
+                my $question_length = length($QUESTIONS{$NQ{quest_no}}{question});
+ 		
+                # fix display to show new lines in text of question
+                my $content = $QUESTIONS{$NQ{quest_no}}{question};
+                $content =~ s/\r[\n]*/\n/gm;
+                my @number_of_newlines = split(/\n/,$content);
+                my $new_lines = @number_of_newlines;
+                $question_rows = $question_rows + $new_lines;
+
+		print"<DIV oncontextmenu =\"return false\">\n";
+                print"<center>";
+                
+                if($NQ{order} < @quests) {
+                        print"<B STYLE=\"cursor:pointer\; font-family\:Arial\; font-size\: 28pt\;\" OnClick=\"Show_Next('$NQ{order}','$NQ{lquests}')\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{Next}\">\></B>\n";
+                        }
+                else {
+                        print"<B STYLE=\" font-family\:Arial\; font-size\: 28pt\;\">&nbsp\;</B>\n";
+                        }
+                        
+                print"</center><form name=\"q_form\">\n";
+                
+		print"<TABLE><TR><TD valign=\"top\"><B>$NQ{order} \.</b></TD>\n";				
+
+                &print_out_question("question","$QUESTIONS{$NQ{quest_no}}{question}","value","$QUESTIONS{$NQ{quest_no}}{value}","image_id","$QUESTIONS{$NQ{quest_no}}{image_id}","pdf","$QUESTIONS{$NQ{quest_no}}{pdf}","vlink","$QUESTIONS{$NQ{quest_no}}{vlink}","alink","$QUESTIONS{$NQ{quest_no}}{alink}","type","$QUESTIONS{$NQ{quest_no}}{type}","question_rows","$question_rows","mode","$QUESTIONS{$NQ{quest_no}}{mode}");
+										
+                &print_out_question_answers("quest","$NQ{quest_no}","index","$NQ{order}","type","$QUESTIONS{$NQ{quest_no}}{type}","key","$key","answer","$QUESTION_ANSWERED{$NQ{quest_no}}","kolum","$QUESTIONS{$NQ{quest_no}}{kolum}","attempt","$NQ{attempt}","qst","$NQ{qst}","ans_mode","$QUESTIONS{$NQ{quest_no}}{ans_mode}");
+                      
+                print"</FORM>\n";
+                
+                &print_form("form_name","form4","form_target","m3right_top","input","question_done","class_id","$NQ{class_id}","qst","$NQ{qst}","real_quest_no","","quest_no","","answer","","saanswer","","panswer","","answertype","","mxselect","","type","$NQ{type}","u_id","$NQ{u_id}","session_id","$NQ{session_id}");
+        
+                &print_form("form_name","next_quest","input","modal_next_question3","order","","quest_no","","real_quest_no","","prev_quest_no","$NQ{quest_no}","qst","$NQ{qst}","class_id","$NQ{class_id}","qtype","$NQ{type}","type","","lquests","","u_id","$NQ{u_id}","session_id","$NQ{session_id}","attempt","$NQ{attempt}");
+                
+                if($QUESTIONS{$next_quest}{mode} == 2 || $QUESTIONS{$next_quest}{ans_mode} == 2) {
+                        &print_eq();
+                        }
+                        
+                print"</DIV>\n";
+                }
+        else {
+		print"<P><BR><center><B>$LANGUAGE{$set_language}{TheQSThasended}</B></center><P><BR><center><P><B> $LANGUAGE{$set_language}{Submitit} </font></B><P>\n";
+                }
+        }
+
+###########################
+#
+# MODAL_MEM_QUEST2
+#
+##########################
+sub modal_mem_quest2 {
+        my %NQ = @_;
+        $NQ{quest_no} =~ s/\D//g;
+        $NQ{order} =~ s/\D//g;
+        $NQ{qst} =~ s/\D//g;
+        $NQ{type} =~ s/\D//g;
+        $NQ{prev_quest_no} =~ s/\D//g;
+        $NQ{lquests} =~ s/[^0-9,]//g;
+        $NQ{attempt} =~ s/\D//g;
+        my @quests = split(/\,/,$NQ{lquests});
+        my $prev_order = $NQ{order} - 1;
+        my $next_order = $NQ{order};
+        my $next_quest = $quests[$next_order];
+        my $key;
+	my $viewed = &select_viewed("u_id","$NQ{u_id}","quest_no","$next_quest","qst","$NQ{qst}","attempt","$NQ{attempt}");
+        ++$next_order;
+
+        &print_style_sheet();
+        
+        print"<style>table.table1\{ border-radius:6px\; font-size:10pt\; font-family:Arial\;\}</style>\n";
+        
+        &print_javascript_begin();
+        
+        &modal2_print_javascript_enterMX();
+
+        &modal2_print_javascript_activated_this();
+
+	print"function Show_Next\(order,quests\) \{
+        document.next_quest.order.value=order
+        document.next_quest.lquests.value=quests
+        document.next_quest.submit\(\)
+        \}\n";
+        
+        &print_clear_memory_viewed3();
+        
+        &print_stop_F12();
+        
+        &print_javascript_end();
+        
+        #check if time has expired
+	my %RETURN1 = &select_qst_attempts_info("query","SELECT qst_no,attempts,end,resume from qst_attempts WHERE qst_no=\"$NQ{qst}\" AND u_id=\"$ids\" and attempts=\"$NQ{attempt}\"");
+	my $time = time;
+	my $time_left = $RETURN1{$NQ{qst}}{end} - $time;		
+	
+        if($NQ{order} <= @quests && $time_left > 3) {
+                my $query = "SELECT * from questions WHERE number=\"$NQ{quest_no}\"";
+                my %QUESTIONS = &select_questions("query","$query");
+                my %QUESTION_ANSWERED = &select_questions_already_answered("query","select answer,quest_no from qsts where u_id=\"$NQ{u_id}\" and quest_no=\"$next_quest\" and attempt=\"$NQ{attempt}\" and qst=\"$NQ{qst}\"");
+                my %ALREADY_ANSWERED = &select_questions_already_answered("query","select answer,quest_no from qsts where u_id=\"$NQ{u_id}\" and quest_no=\"$NQ{prev_quest_no}\" and attempt=\"$NQ{attempt}\" and qst=\"$NQ{qst}\"");
+
+	        if(keys %ALREADY_ANSWERED) { # Just show the same question
+       	 	#	print"QQQQQRR<BR>\n";
+        		}
+        		
+        	
+                my $question_rows = 1;
+                my $question_length = length($QUESTIONS{$NQ{quest_no}}{question});
+ 		
+                # fix display to show new lines in text of question
+                my $content = $QUESTIONS{$NQ{quest_no}}{question};
+                $content =~ s/\r[\n]*/\n/gm;
+                my @number_of_newlines = split(/\n/,$content);
+                my $new_lines = @number_of_newlines;
+                $question_rows = $question_rows + $new_lines;
+
+		print"<DIV oncontextmenu =\"return false\">\n";
+                print"<center>";
+                
+                # the < >
+                if($prev_order > 0) {
+                        print"<B STYLE=\"cursor:pointer\; font-family\:Arial\; font-size\: 28pt\;\" OnClick=\"Show_Next('$prev_order','$NQ{lquests}')\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{Previous}\">\<</B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;";
+                        }
+                
+                if($NQ{order} < @quests) {
+                        print"<B STYLE=\"cursor:pointer\; font-family\:Arial\; font-size\: 28pt\;\" OnClick=\"Show_Next('$NQ{order}','$NQ{lquests}')\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{Next}\">\></B>\n";
+                        }
+
+#                if($NQ{order} < @quests) {
+#                        print"<B STYLE=\"cursor:pointer\; font-family\:Arial\; font-size\: 28pt\;\" OnClick=\"Show_Next('$NQ{order}','$NQ{lquests}')\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{Next}\">\></B>\n";
+#                        }
+#                else {
+#                        print"<B STYLE=\" font-family\:Arial\; font-size\: 28pt\;\">&nbsp\;</B>\n";
+#                        }
+                        
+                print"</center><form name=\"q_form\">\n";
+                
+		print"<TABLE><TR><TD valign=\"top\"><B>$NQ{order} \.</b></TD>\n";				
+
+                &print_out_question("question","$QUESTIONS{$NQ{quest_no}}{question}","value","$QUESTIONS{$NQ{quest_no}}{value}","image_id","$QUESTIONS{$NQ{quest_no}}{image_id}","pdf","$QUESTIONS{$NQ{quest_no}}{pdf}","vlink","$QUESTIONS{$NQ{quest_no}}{vlink}","alink","$QUESTIONS{$NQ{quest_no}}{alink}","type","$QUESTIONS{$NQ{quest_no}}{type}","question_rows","$question_rows","mode","$QUESTIONS{$NQ{quest_no}}{mode}");
+										
+                &print_out_question_answers("quest","$NQ{quest_no}","index","$NQ{order}","type","$QUESTIONS{$NQ{quest_no}}{type}","key","$key","answer","$QUESTION_ANSWERED{$NQ{quest_no}}","kolum","$QUESTIONS{$NQ{quest_no}}{kolum}","attempt","$NQ{attempt}","qst","$NQ{qst}","ans_mode","$QUESTIONS{$NQ{quest_no}}{ans_mode}");
+                      
+                print"</FORM>\n";
+                
+                &print_form("form_name","form4","form_target","m2right_top","input","question_done","class_id","$NQ{class_id}","qst","$NQ{qst}","real_quest_no","","quest_no","","answer","","saanswer","","panswer","","answertype","","mxselect","","type","$NQ{type}","u_id","$NQ{u_id}","session_id","$NQ{session_id}");
+        
+                &print_form("form_name","next_quest","input","modal_next_question2","order","","quest_no","","real_quest_no","","prev_quest_no","$NQ{quest_no}","qst","$NQ{qst}","class_id","$NQ{class_id}","qtype","$NQ{type}","type","","lquests","","u_id","$NQ{u_id}","session_id","$NQ{session_id}","attempt","$NQ{attempt}");
+                
+                if($QUESTIONS{$next_quest}{mode} == 2 || $QUESTIONS{$next_quest}{ans_mode} == 2) {
+                        &print_eq();
+                        }
+                        
+                print"</DIV>\n";
+                }
+        else {
+		print"<P><BR><center><B>$LANGUAGE{$set_language}{TheQSThasended}</B></center><P><BR><center><P><B> $LANGUAGE{$set_language}{Submitit} </font></B><P>\n";
+                }
+        }
+
+###########################
+#
+# MODAL_MEM_QUEST      
+#
+##########################
+sub modal_mem_quest {
+        my %NQ = @_;
+        $NQ{quest_no} =~ s/\D//g;
+        $NQ{order} =~ s/\D//g;
+        $NQ{qst} =~ s/\D//g;
+        $NQ{type} =~ s/\D//g;
+        $NQ{prev_quest_no} =~ s/\D//g;
+        $NQ{lquests} =~ s/[^0-9,]//g;
+        $NQ{attempt} =~ s/\D//g;
+        my @quests = split(/\,/,$NQ{lquests});
+        my $next_order = $NQ{order};
+        my $next_quest = $quests[$next_order];
+        my $key;
+	my $viewed = &select_viewed("u_id","$NQ{u_id}","quest_no","$next_quest","qst","$NQ{qst}","attempt","$NQ{attempt}");
+        ++$next_order;
+
+        &print_style_sheet();
+        
+        print"<style>table.table1\{ border-radius:6px\; font-size:10pt\; font-family:Arial\;\}</style>\n";
+        
+        &print_javascript_begin();
+        
+        &modal_print_javascript_enterMX();
+
+        &modal_print_javascript_activated_this();
+
+	print"function Show_Next\(order,quests\) \{
+        document.next_quest.order.value=order
+        document.next_quest.lquests.value=quests
+        document.next_quest.submit\(\)
+        \}\n";
+        
+        &print_clear_memory_viewed3();
+        
+        &print_stop_F12();
+        
+        &print_javascript_end();
+        
+        #check if time has expired
+	my %RETURN1 = &select_qst_attempts_info("query","SELECT qst_no,attempts,end,resume from qst_attempts WHERE qst_no=\"$NQ{qst}\" AND u_id=\"$ids\" and attempts=\"$NQ{attempt}\"");
+	my $time = time;
+	my $time_left = $RETURN1{$NQ{qst}}{end} - $time;		
+	
+        if($NQ{order} <= @quests && $time_left > 3) {
+                my $query = "SELECT * from questions WHERE number=\"$NQ{quest_no}\"";
+                my %QUESTIONS = &select_questions("query","$query");
+                my %QUESTION_ANSWERED = &select_questions_already_answered("query","select answer,quest_no from qsts where u_id=\"$NQ{u_id}\" and quest_no=\"$next_quest\" and attempt=\"$NQ{attempt}\" and qst=\"$NQ{qst}\"");
+                my %ALREADY_ANSWERED = &select_questions_already_answered("query","select answer,quest_no from qsts where u_id=\"$NQ{u_id}\" and quest_no=\"$NQ{prev_quest_no}\" and attempt=\"$NQ{attempt}\" and qst=\"$NQ{qst}\"");
+
+	        if(keys %ALREADY_ANSWERED) { # Just show the same question
+       	 	#	print"QQQQQRR<BR>\n";
+        		}
+        		
+        	
+                my $question_rows = 1;
+                my $question_length = length($QUESTIONS{$NQ{quest_no}}{question});
+ 		
+                # fix display to show new lines in text of question
+                my $content = $QUESTIONS{$NQ{quest_no}}{question};
+                $content =~ s/\r[\n]*/\n/gm;
+                my @number_of_newlines = split(/\n/,$content);
+                my $new_lines = @number_of_newlines;
+                $question_rows = $question_rows + $new_lines;
+
+		print"<DIV oncontextmenu =\"return false\">\n";
+                print"<center>";
+                
+                if($NQ{order} < @quests) {
+                        print"<B STYLE=\"cursor:pointer\; font-family\:Arial\; font-size\: 28pt\;\" OnClick=\"Show_Next('$NQ{order}','$NQ{lquests}')\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{Next}\">\></B>\n";
+                        }
+                else {
+                        print"<B STYLE=\" font-family\:Arial\; font-size\: 28pt\;\">&nbsp\;</B>\n";
+                        }
+                        
+                print"</center><form name=\"q_form\">\n";
+                
+		print"<TABLE><TR><TD valign=\"top\"><B>$NQ{order} \.</b></TD>\n";				
+
+                &print_out_question("question","$QUESTIONS{$NQ{quest_no}}{question}","value","$QUESTIONS{$NQ{quest_no}}{value}","image_id","$QUESTIONS{$NQ{quest_no}}{image_id}","pdf","$QUESTIONS{$NQ{quest_no}}{pdf}","vlink","$QUESTIONS{$NQ{quest_no}}{vlink}","alink","$QUESTIONS{$NQ{quest_no}}{alink}","type","$QUESTIONS{$NQ{quest_no}}{type}","question_rows","$question_rows","mode","$QUESTIONS{$NQ{quest_no}}{mode}");
+										
+                &print_out_question_answers("quest","$NQ{quest_no}","index","$NQ{order}","type","$QUESTIONS{$NQ{quest_no}}{type}","key","$key","answer","$QUESTION_ANSWERED{$NQ{quest_no}}","kolum","$QUESTIONS{$NQ{quest_no}}{kolum}","attempt","$NQ{attempt}","qst","$NQ{qst}","ans_mode","$QUESTIONS{$NQ{quest_no}}{ans_mode}");
+                      
+                print"</FORM>\n";
+                
+                &print_form("form_name","form4","form_target","m1right_top","input","question_done","class_id","$NQ{class_id}","qst","$NQ{qst}","real_quest_no","","quest_no","","answer","","saanswer","","panswer","","answertype","","mxselect","","type","$NQ{type}","u_id","$NQ{u_id}","session_id","$NQ{session_id}");
+                &print_form("form_name","next_quest","input","modal_next_question3","order","","quest_no","","real_quest_no","","prev_quest_no","$NQ{quest_no}","qst","$NQ{qst}","class_id","$NQ{class_id}","qtype","$NQ{type}","type","","lquests","","u_id","$NQ{u_id}","session_id","$NQ{session_id}","attempt","$NQ{attempt}");
+                
+                if($QUESTIONS{$next_quest}{mode} == 2 || $QUESTIONS{$next_quest}{ans_mode} == 2) {
+                        &print_eq();
+                        }
+                        
+                print"</DIV>\n";
+                }
+        else {
+		print"<P><BR><center><B>$LANGUAGE{$set_language}{TheQSThasended}</B></center><P><BR><center><P><B> $LANGUAGE{$set_language}{Submitit} </font></B><P>\n";
+                }
+        }
+
 
 ###########################
 #
@@ -52950,6 +55416,10 @@ sub modal_next_question5 {
         self.top.document.form_reload.submit()
         \}\n";
         
+        &print_clear_memory_viewed3();
+	
+	&print_stop_F12();
+	
         &print_javascript_end();
         
         #get displayed question
@@ -53127,7 +55597,6 @@ sub modal_next_question5 {
                 &insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$NQ{qst}\",\"\",\"$next_quest\",\"0\",\"1\",\"0\",\"$org_id\",\"0\",\"$order\",\"$referer\")");
                 
                 &print_form("form_name","form4","form_target","m5right_top","input","modal_question_done5","referer","$referer","class_id","$NQ{class_id}","qst","$NQ{qst}","real_quest_no","","quest_no","","answer","","answertype","","type","$NQ{type}","u_id","$NQ{u_id}","session_id","$NQ{session_id}","attempt","1","marked","0","branch","1");
-        
                 &print_form("form_name","next_quest","input","modal_next_question5","referer","$referer","real_quest_no","","quest_no","$next_quest","qst","$NQ{qst}","class_id","$NQ{class_id}","sub_type","$NQ{sub_type}","type","$QUESTIONS{$next_quest}{type}","lquests","$lquests","u_id","$NQ{u_id}","session_id","$NQ{session_id}","order","");
                 
                 if($QUESTIONS{$next_quest}{mode} == 2) {
@@ -53339,7 +55808,7 @@ sub print_javascript_activated_this_mobile {
 sub modal_print_javascript_activated_this {
         print"var this_in
         var when
-        var frame_url = self.parent.qst_left.location.href
+        var frame_url = self.parent.m3qst_left.location.href
         
         function activated_this\(quest_no,real_quest_no,type,checked_ans,select\) \{
         var this_in = quest_no
@@ -53352,7 +55821,7 @@ sub modal_print_javascript_activated_this {
         document.form4.quest_no.value=quest_no
         document.next_quest.real_quest_no.value=real_quest_no
         if\(type == \"TF\"\ || type == \"MC\" || type == \"AD\" || type == \"YN\") \{
-        self.top.right_bot.s_input\(this_in\)
+        self.parent.m3right_bot.s_input\(this_in\)
         if\(select == \"b\") \{
         next.style.display=\"none\"
         next1.style.display=\"block\"
@@ -53368,7 +55837,7 @@ sub modal_print_javascript_activated_this {
         \}
                 document.form4.answertype.value=type
                 document.form4.answer.value=checked_ans
-                self.top.right_bot.s_input\(this_in\)
+                self.parent.m3right_bot.s_input\(this_in\)
                 document.form4.submit\(\)
                 \}
                 else \{
@@ -53387,7 +55856,7 @@ sub modal_print_javascript_activated_this {
 	\}
 	else \{
       	if\(new_string !=\"\"\)\{
-	self.top.right_bot.s_input\(this_in\)
+	self.parent.m3right_bot.s_input\(this_in\)
 	document.form4.saanswer.value=quest_ans
 	document.form4.submit\(\)
       	\}
@@ -53410,12 +55879,12 @@ sub modal_print_javascript_activated_this {
  	\}
  	else \{
        	if\(new_string !=\"\"\)\{
- 	self.parent.right_bot.s_input\(this_in\)
+ 	self.parent.m3right_bot.s_input\(this_in\)
  	document.form4.panswer.value=quest_ans
  	document.form4.submit\(\)
        	\}
  	else \{
- 	self.parent.right_bot.un_do\(this_in\)
+ 	self.parent.m3right_bot.un_do\(this_in\)
  	document.form4.panswer.value=\"\"
        	\}
        	\}
@@ -53829,7 +56298,12 @@ sub next_question4 {
         document.next_quest.submit\(\)
         \}\n";
         
+	&print_clear_memory_viewed();
+
+	&print_stop_F12();
+	
         &print_javascript_end();
+        
         my $quests_left = @lquests;
         
         if($quests_left > 0) {
@@ -53912,7 +56386,7 @@ sub next_question4 {
 			if ($POSTED_QST{$NQ{qst}}{explanation} == 1) {
 				my $there = length($check);
 				if( $there > 0) {
-					print"<P><TABLE><TR><TD width=\"60\"></TD><TD><TABLE style=\"border:1px solid grey\; border-radius:.3em\;\"><TR style=\"padding-bottom: 4px\;\"><TD><i>&nbsp\;$LANGUAGE{$set_language}{Explanations}:</i><font style=\"font-family:Times New Roman\;\">$QUESTIONS{$NQ{quest_no}}{explanation} </font><BR></TD></TR></TABLE></TD></TR></TABLE>\n";
+					print"<P><TABLE><TR><TD width=\"60\"></TD><TD><TABLE style=\"border:1px solid grey\; border-radius:.3em\;\"><TR style=\"padding-bottom: 4px\;\"><TD style=\"padding-bottom: 4px\;\"><i>&nbsp\;$LANGUAGE{$set_language}{Explanations}:</i><font style=\"font-family:Times New Roman\;\">$QUESTIONS{$NQ{quest_no}}{explanation} </font></TD></TR></TABLE></TD></TR></TABLE>\n";
 					}
 				}
 					
@@ -53931,8 +56405,25 @@ sub next_question4 {
                                 }
                         
                         print"</center><form name=\"q_form\">\n";
-                        print"<TABLE><TR><TD valign=\"top\"><B>$next_order\.</b></TD>\n";
-										
+#                        print"<TABLE><TR><TD valign=\"top\"><B>$next_order\.</b></TD>\n";
+
+			if($QUESTIONS{$next_quest}{memory} ne "") { # MEMORY
+				$QUESTIONS{$next_quest}{memory} =~ s/&quot;/"/g;
+				
+				print"<DIV ID=\"MEMORY\" style=\"display: block\;\">\n";
+				print"<TABLE><TR><TD valign=\"top\"><B>$next_order\.</b></TD><TD NOWRAP valign=\"top\"><font size=\"-2\">($QUESTIONS{$next_quest}{value})</font></td><TD valign=\"top\">\n";
+				print"<TABLE><TR><TD width=\"15\"></TD><TD style=\"border: 1px solid #660616\; padding-left: 7px\; padding-right: 7px\; padding-top: 7px\; padding-bottom: 7px\">$QUESTIONS{$next_quest}{memory}</TD></TR></TABLE><BR><center><B onClick=\"clear_memory_viewed\(\)\" style=\"cursor\:pointer\;\">Continue</B></center><BR>\n";
+				print"</TD></TR></TABLE>\n";
+
+				print"</DIV>\n";
+				print"<DIV ID=\"QUESTION\" style=\"display: none\">\n";
+				print"<TABLE><TR><TD valign=\"top\"><B>$next_order\.</b></TD>\n";				
+				}
+								
+			else {
+				print"<TABLE><TR><TD valign=\"top\"><B>$next_order\.</b></TD>\n";				
+				}
+
                         &print_out_question("question","$QUESTIONS{$next_quest}{question}","value","$QUESTIONS{$next_quest}{value}","image_id","$QUESTIONS{$next_quest}{image_id}","pdf","$QUESTIONS{$next_quest}{pdf}","vlink","$QUESTIONS{$next_quest}{vlink}","alink","$QUESTIONS{$next_quest}{alink}","type","$QUESTIONS{$next_quest}{type}","question_rows","$question_rows","mode","$QUESTIONS{$next_quest}{mode}");
                         
                         &print_out_question_answers("quest","$next_quest","index","$next_order","type","$QUESTIONS{$next_quest}{type}","key","$key","answer","$QUESTION_ANSWERED{$next_quest}","kolum","$QUESTIONS{$next_quest}{kolum}","ans_mode","$QUESTIONS{$next_quest}{ans_mode}");
@@ -53943,10 +56434,14 @@ sub next_question4 {
                 &print_form("form_name","form4","form_target","right_top","input","question_done","class_id","$NQ{class_id}","qst","$NQ{qst}","real_quest_no","$next_quest","quest_no","","answer","","saanswer","","panswer","","answertype","","mxselect","","type","QUESTIONS{$NQ{quest_no}}{type}","u_id","$NQ{u_id}","session_id","$NQ{session_id}");
         
                 &print_form("form_name","next_quest","input","next_question4","answer","0","doo","$NQ{doo}","order","","quest_no","$next_quest","qst","$NQ{qst}","class_id","$NQ{class_id}","type","","lquests","","u_id","$NQ{u_id}","session_id","$NQ{session_id}","attempt","$NQ{attempt}","real_quest_no","");
-                
+
+		&print_form("form_name","form5","form_target","right_top","input","viewed","qst","$NQ{qst}","quest_no","","u_id","$NQ{u_id}","session_id","$NQ{session_id}","attempt","$NQ{attempt}");
+		
                 if($QUESTIONS{$next_quest}{mode} == 2  || $QUESTIONS{$next_quest}{ans_mode} == 2) {
                         &print_eq();
                         }
+                        
+                print"</DIV>\n";
                 }
                 
         else {
@@ -53991,6 +56486,8 @@ sub modal_next_question4 {
         document.next_quest.submit\(\)
         \}\n";
         
+	&print_clear_memory_viewed3();
+
         &print_javascript_end();
         my $quests_left = @lquests;
         
@@ -54073,7 +56570,7 @@ sub modal_next_question4 {
 			if ($POSTED_QST{$NQ{qst}}{explanation} == 1) {
 				my $there = length($check);
 				if( $there > 0) {
-					print"<P><TABLE><TR><TD width=\"60\"></TD><TD><TABLE style=\"border:1px solid grey\; border-radius:.3em\;\"><TR style=\"padding-bottom: 4px\;\"><TD><i>&nbsp\;$LANGUAGE{$set_language}{Explanations}:</i><font style=\"font-family:Times New Roman\;\">$QUESTIONS{$NQ{quest_no}}{explanation} </font><BR></TD></TR></TABLE></TD></TR></TABLE>\n";
+					print"<P><TABLE><TR><TD width=\"60\"></TD><TD><TABLE style=\"border:1px solid grey\; border-radius:.3em\;\"><TR style=\"padding-bottom: 4px\;\"><TD style=\"padding-bottom: 4px\;\"><i>&nbsp\;$LANGUAGE{$set_language}{Explanations}:</i><font style=\"font-family:Times New Roman\;\">$QUESTIONS{$NQ{quest_no}}{explanation} </font></TD></TR></TABLE></TD></TR></TABLE>\n";
 					}
 				}
 					
@@ -54091,17 +56588,135 @@ sub modal_next_question4 {
                                 }
                         
                         print"</center><form name=\"q_form\">\n";
-                        print"<TABLE><TR><TD valign=\"top\"><B>$next_order\.</b></TD>\n";
-										
-                        &print_out_question("question","$QUESTIONS{$next_quest}{question}","value","$QUESTIONS{$next_quest}{value}","image_id","$QUESTIONS{$next_quest}{image_id}","vlink","$QUESTIONS{$next_quest}{vlink}","alink","$QUESTIONS{$next_quest}{alink}","type","$QUESTIONS{$next_quest}{type}","question_rows","$question_rows","mode","$QUESTIONS{$next_quest}{mode}");
                         
-                        &print_out_question_answers("quest","$next_quest","index","$next_order","type","$QUESTIONS{$next_quest}{type}","key","$key","answer","$QUESTION_ANSWERED{$next_quest}","kolum","$QUESTIONS{$next_quest}{kolum}","ans_mode","$QUESTIONS{$next_quest}{ans_mode}");
+			if($QUESTIONS{$next_quest}{memory} ne "" && $QUESTIONS{$next_quest}{viewed}==0 ) { # MEMORY SHOW
+				$QUESTIONS{$next_quest}{memory} =~ s/&quot;/"/g;
+				print"<DIV ID=\"MEMORY\" style=\"display: block\;\" oncontextmenu =\"return false\">\n";
+				print"<TABLE><TR><TD valign=\"top\"><B>$next_order\.</b></TD><TD NOWRAP valign=\"top\"><font size=\"-2\">($QUESTIONS{$next_quest}{value})</td><TD valign=\"top\">\n";
+				print"<TABLE><TR><TD width=\"15\"></TD><TD style=\"border: 1px solid #660616\; padding-left: 7px\; padding-right: 7px\; padding-top: 7px\; padding-bottom: 7px\">$QUESTIONS{$next_quest}{memory}</TD></TR></TABLE><BR><center><B onClick=\"clear_memory_viewed3\(\'$next_quest\'\)\" style=\"cursor\:pointer\;\">Continue</B></center><BR>\n";
+				print"</TD></TR></TABLE>\n";
+				}
+								
+			else {  #QUESTION SHOW
+				print"<TABLE><TR><TD valign=\"top\"><B>$next_order\.</b></TD>\n";
+				&print_out_question("question","$QUESTIONS{$next_quest}{question}","value","$QUESTIONS{$next_quest}{value}","image_id","$QUESTIONS{$next_quest}{image_id}","vlink","$QUESTIONS{$next_quest}{vlink}","alink","$QUESTIONS{$next_quest}{alink}","type","$QUESTIONS{$next_quest}{type}","question_rows","$question_rows","mode","$QUESTIONS{$next_quest}{mode}");
+	                        &print_out_question_answers("quest","$next_quest","index","$next_order","type","$QUESTIONS{$next_quest}{type}","key","$key","answer","$QUESTION_ANSWERED{$next_quest}","kolum","$QUESTIONS{$next_quest}{kolum}","ans_mode","$QUESTIONS{$next_quest}{ans_mode}");
+				}
+                               
+                        print"<DIV>\n";
                         }
+                        
+                print"</FORM>\n";
+                                                        
+                &print_form("form_name","memquest","input","modal_mem_quest4","order","1","doo","0","quest_no","","real_quest_no","","prev_quest_no","0","qst","$NQ{qst}","class_name","","class_id","$NQ{class_id}","qtype","$NQ{type}","type","$QUESTIONS{$NQ{quest_no}}{type}","lquests","$NQ{lquests}","u_id","$NQ{u_id}","session_id","$NQ{session_id}","attempt","$NQ{attempt}");
+
+                &print_form("form_name","form4","form_target","m4right_top","input","question_done","class_id","$NQ{class_id}","qst","$NQ{qst}","real_quest_no","$next_quest","quest_no","","answer","","saanswer","","panswer","","answertype","","mxselect","","type","QUESTIONS{$NQ{quest_no}}{type}","u_id","$NQ{u_id}","session_id","$NQ{session_id}");
+   		&print_form("form_name","form5","form_target","m4right_top","input","viewed","qst","$NQ{qst}","quest_no","","u_id","$NQ{u_id}","session_id","$NQ{session_id}","attempt","$NQ{attempt}");
+       
+                &print_form("form_name","next_quest","input","modal_next_question4","answer","0","doo","$NQ{doo}","order","","quest_no","$next_quest","qst","$NQ{qst}","class_id","$NQ{class_id}","type","","lquests","","u_id","$NQ{u_id}","session_id","$NQ{session_id}","attempt","$NQ{attempt}","real_quest_no","");
+                
+                if($QUESTIONS{$next_quest}{mode} == 2  || $QUESTIONS{$next_quest}{ans_mode} == 2) {
+                        &print_eq();
+                        }
+                }
+                
+        else {
+                print"<BR><P><P><center><font size=\"+1\"><B>$LANGUAGE{$set_language}{TheQSThasended}</font><BR><P><$LANGUAGE{$set_language}{ClicktheSubmitQSTbuttontoseeyourresults}</B></font></center>";
+                }
+        }
+
+###########################
+#
+# MODAL_MEM_QUEST4
+#
+##########################
+sub modal_mem_quest4 {
+        my %NQ = @_;
+        $NQ{quest_no} =~ s/\D//g;
+        $NQ{order} =~ s/\D//g;
+        $NQ{qst} =~ s/\D//g;
+        $NQ{doo} =~ s/\D//g;
+        $NQ{type} =~ s/\D//g;
+        $NQ{lquests} =~ s/[^0-9,]//g;
+        $NQ{attempt} =~ s/\D//g;
+        my %POSTED_QST = {};
+        my %SOURCE = ();
+        my @lquests = split(/\,/,$NQ{lquests});
+        my $next_order = $NQ{order};
+        my $key;
+        my $lquests;
+
+        &print_style_sheet();
+        
+        print"<style>table.table1\{ border-radius:6px\; font-size:10pt\; font-family:Arial\;\}</style>\n";
+        
+        &print_javascript_begin();
+        
+        &modal4_print_javascript_enterMX();
+
+        &modal4_print_javascript_activated_this();
+					
+	&print_clear_memory_viewed3();
+
+	print"function Show_Next\(order,quests\) \{
+        document.next_quest.order.value=order
+        document.next_quest.lquests.value=quests
+        document.next_quest.submit\(\)
+        \}\n";
+        
+        &print_javascript_end();
+        my $quests_left = @lquests;
+      
+        if($quests_left > 0) {
+                my $next_quest;
+                my %QUESTIONS = ();
+                my %QUESTION_ANSWERED = ();
+                        my @lqusts = @lquests;
+                        $next_quest = shift(@lquests);
+
+                        my $query = "SELECT * from questions WHERE number=\"$next_quest\" AND org_id=\"$org_id\"";
+                        
+                        %QUESTIONS = &select_questions("query","$query");
+                        
+                        foreach my $piec(@lqusts) {
+                                $lquests = "$lquests".","."$piec";
+                                }
+                                
+                        $lquests =~ s/^\,//;
+
+                        
+                my $question_rows = 1;
+                my $question_length = length($QUESTIONS{$NQ{quest_no}}{question});
+ 		
+                # fix display to show new lines in text of question
+                my $content = $QUESTIONS{$NQ{quest_no}}{question};
+                $content =~ s/\r[\n]*/\n/gm;
+                my @number_of_newlines = split(/\n/,$content);
+                my $new_lines = @number_of_newlines;
+                $question_rows = $question_rows + $new_lines;
+			
+                        
+                # print out question
+                $NQ{doo} = 1;
+                my $next_order = $NQ{order};
+                print"<center>";
+                        
+               if($quests_left > 0) {
+                     print"<B STYLE=\"cursor:pointer\; font-family\:Arial\; font-size\: 28pt\;\" OnClick=\"Show_Next('$next_order','$lquests')\" data-toggle=\"tooltip\" title=\"$LANGUAGE{$set_language}{Next}\">\></B>\n";
+                     }
+                        
+               print"</center><form name=\"q_form\">\n";
+                        
+               print"<TABLE><TR><TD valign=\"top\"><B>$next_order\.</b></TD>\n";
+										
+               &print_out_question("question","$QUESTIONS{$next_quest}{question}","value","$QUESTIONS{$next_quest}{value}","image_id","$QUESTIONS{$next_quest}{image_id}","vlink","$QUESTIONS{$next_quest}{vlink}","alink","$QUESTIONS{$next_quest}{alink}","type","$QUESTIONS{$next_quest}{type}","question_rows","$question_rows","mode","$QUESTIONS{$next_quest}{mode}");
+                        
+               &print_out_question_answers("quest","$next_quest","index","$next_order","type","$QUESTIONS{$next_quest}{type}","key","$key","answer","$QUESTION_ANSWERED{$next_quest}","kolum","$QUESTIONS{$next_quest}{kolum}","ans_mode","$QUESTIONS{$next_quest}{ans_mode}");
                         
                 print"</FORM>\n";
                 
                 &print_form("form_name","form4","form_target","m4right_top","input","question_done","class_id","$NQ{class_id}","qst","$NQ{qst}","real_quest_no","$next_quest","quest_no","","answer","","saanswer","","panswer","","answertype","","mxselect","","type","QUESTIONS{$NQ{quest_no}}{type}","u_id","$NQ{u_id}","session_id","$NQ{session_id}");
-        
+  		&print_form("form_name","form5","form_target","m4right_top","input","viewed","qst","$NQ{qst}","quest_no","","u_id","$NQ{u_id}","session_id","$NQ{session_id}","attempt","$NQ{attempt}");
                 &print_form("form_name","next_quest","input","modal_next_question4","answer","0","doo","$NQ{doo}","order","","quest_no","$next_quest","qst","$NQ{qst}","class_id","$NQ{class_id}","type","","lquests","","u_id","$NQ{u_id}","session_id","$NQ{session_id}","attempt","$NQ{attempt}","real_quest_no","");
                 
                 if($QUESTIONS{$next_quest}{mode} == 2  || $QUESTIONS{$next_quest}{ans_mode} == 2) {
@@ -54140,7 +56755,7 @@ sub rename_it {
 	$name = &l_spaces("$name","0");
 	$name = &tr_spaces("$name","0");
 	$name = &x_spaces("$name","0");
-	$name = &spec_char("$name","0");
+#	$name = &spec_char("$name","0");
 
 	$RI{name} = "$name";
 	my $name_there = 0;
@@ -54154,7 +56769,8 @@ sub rename_it {
                         if(defined $RI{class} && $u_type == 1 && $error1 !=1) { # from rename class page
 				my $id_count = 0;
 				my $org_count = &is_there_org("table","organization","org_id","$RI{org_id}");
-
+				$RI{name} = &spec_char("$name","0");
+				
 				if($org_count == 1) { # Organization is there
 					if($org_id == 0 || $org_id == $RI{org_id}) { # Check they can do this
 						if(!defined $RI{institution_id} || $RI{institution_id} eq"") { # No institution_id
@@ -54214,7 +56830,7 @@ sub rename_it {
 				
 			elsif (defined $RI{number} && ($RI{from} == 2 || $RI{from} == 4) && $error !=1) { # from quizzes/tests/surveys page
 				if(defined $RI{qst}) { # rename qst
-					$RI{name} = &funny_char("$RI{name}","0");
+					$RI{name} = &funny_char2("$RI{name}","0");
 					&rename_it_quote("query1","qst","query3","name","query2","$RI{number}","quote","$RI{name}","from","$RI{from}");
 					if(defined $RI{expand}) {
                                                 &make_type("expand","$RI{expand}","type","$RI{type}","sub_type","$RI{sub_type}","from","$RI{from}","u_id","$RI{u_id}","session_id","$RI{session_id}");
@@ -54224,6 +56840,7 @@ sub rename_it {
 						}
 					}
 				else { # rename folder
+					$RI{name} = &spec_char("$name","0");
 					&rename_it_quote("query1","categories","query3","cat_name","query2","$RI{number}","quote","$RI{name}","from","$RI{from}");
 					if($RI{type} == 0) {
 						&make_type("expand","$RI{expand}","type","$RI{type}","sub_type","$RI{sub_type}","from","$RI{from}","u_id","$RI{u_id}","session_id","$RI{session_id}");
@@ -54235,22 +56852,26 @@ sub rename_it {
 				}
 				
 			elsif (defined $RI{number} && $RI{from} == 1 && $error !=1) { # questions page
+				$RI{name} = &spec_char("$name","0");
 				&rename_it_quote("query1","question_categories","query3","cat_name","query2","$RI{number}","quote","$RI{name}");
 				&questions("expand","$RI{expand}","sub_type","$RI{sub_type}","u_id","$RI{u_id}","session_id","$RI{session_id}");
 				}
 				
 			elsif (defined $RI{number} && $RI{from} == 5 && $RI{type} == 5 && $error !=1) { # manage_files page
+				$RI{name} = &spec_char("$name","0");
 				&rename_it_quote("query1","file_folders","query3","name","query2","$RI{number}","quote","$RI{name}");
 				&manage_files("expand","$RI{expand}","u_id","$RI{u_id}","session_id","$RI{session_id}");
 				}
 				
 			elsif (defined $RI{number} && $RI{from} == 5 && $RI{type} == 6 && $error !=1) { # manage_files page
+				$RI{name} = &spec_char("$name","0");
 				&rename_it_quote("query1","qst_files","query3","file_name","query2","$RI{number}","quote","$RI{name}");
 				&manage_files("expand","$RI{expand}","u_id","$RI{u_id}","session_id","$RI{session_id}");
 				}
 				
 			elsif ($u_type == 1 && $error1 !=1) {
 				if($org_id == 0 || $org_id == $RI{org_id}) { # Check they can do this
+					$RI{name} = &spec_char("$name","0");
 					&update("table","organization","id","$RI{org_id}","name","$RI{name}","set","org_name");
 					&org("type","6","u_id","$RI{u_id}","session_id","$RI{session_id}");
 					}
@@ -54508,7 +57129,7 @@ sub remove_questions_fromqst {
 ################
 sub rename_assign_page {
 	my %RAP = @_;
-	&javascript_check_input_not_empty("form","form1","error_message","A name was not entered.","fields","name");
+	&javascript_check_input_not_empty("form","form1","error_message","$LANGUAGE{$set_language}{Anamewasnotentered}","fields","name");
   	&print_form_wo_end_tag("form_name","form1","form_target","theright","input","rename_assign","expand","$RAP{expand}","qst_id","$RAP{qst_id}","u_id","$RAP{u_id}","session_id","$RAP{session_id}");
 	print"<center><B>$LANGUAGE{$set_language}{RenameAssignment}</B></center><P>\n";
 	print"<center>$LANGUAGE{$set_language}{AssignmentName} <input type=\"text\" name=\"name\" value=\"$RAP{name}\" size=\"25\"\></center>\n";
@@ -54900,6 +57521,61 @@ sub show_ad {
 	&print_javascript_end();
 	}
 
+##################
+#
+# SHOW_CZ
+#
+##################
+sub show_cz {
+	&print_javascript_begin();
+	
+	print"function show_cz\(\) \{
+	var modee = document.question_form.mode.value
+	if(modee != 1) \{
+		alert\(\"Can only be used with the Advanced Editor.\"\);
+		\}
+	else \{
+	   document.question_form.select.value=\"CZ\"
+           var ans_mod = document.question_form.ans_mode.value
+           document.mc.ans_mode.value=ans_mod\n";
+	
+	   print"var x = document.getElementById(\"anstype9\")\;
+           x.style.display = \"none\"\;
+           var y = document.getElementById(\"anstype9a\")\;
+           y.style.display = \"block\"\;
+           ClearAType('9')
+	   document.cz.submit\(\)
+	   \}
+	\}\n";
+	
+	&print_javascript_end();
+	}
+
+##################
+#
+# SHOW_OR
+#
+##################
+sub show_or {
+	&print_javascript_begin();
+	
+	print"function show_or\(\) \{
+	var modee = document.question_form.mode.value
+	   document.question_form.select.value=\"OR\"
+           var ans_mod = document.question_form.ans_mode.value
+           document.mc.ans_mode.value=ans_mod\n";
+	
+	   print"var x = document.getElementById(\"anstype10\")\;
+           x.style.display = \"none\"\;
+           var y = document.getElementById(\"anstype10a\")\;
+           y.style.display = \"block\"\;
+           ClearAType('10')
+	   document.or.submit\(\)
+	\}\n";
+	
+	&print_javascript_end();
+	}
+
 ###############
 #
 # SAVE_CHANGES
@@ -55034,8 +57710,13 @@ sub show_modal_classes{
 	if(keys %{$USER{$ids}}) {
                 print"<DL>\n";
 		foreach my $key(sort keys %{$USER{$ids}}) {
-			print"<DT><DD><TABLE class=\"table1\" bgcolor=\"#0000FF\"><TD style=\"vertical-align: middle\; padding-bottom: 4px\; padding-top: 4px\;\"><span ID=\"displayqt\" STYLE=\"display:block\;\"><B STYLE=\"cursor: pointer\"><font color=\"white\" onClick=\"document.form_$i.submit\(\)\">&nbsp\;&nbsp\;$USER{$ids}{$key}&nbsp\;&nbsp\;</font></B></TD></TABLE><P>\n";
-			
+			if($language_direction eq"rtl") {
+				print"<DT><DD><TABLE class=\"table1\" bgcolor=\"#0000FF\"><TD style=\"vertical-align: middle\; horizontal-align: right\; padding-bottom: 4px\; padding-top: 4px\;\"><span ID=\"displayqt\" STYLE=\"display:block\;\"><B STYLE=\"cursor: pointer\"><font color=\"white\" onClick=\"document.form_$i.submit\(\)\">&nbsp\;&nbsp\;$USER{$ids}{$key}&nbsp\;&nbsp\;</font></B></TD></TABLE><P>\n";
+				}
+			else {
+				print"<DT><DD><TABLE class=\"table1\" bgcolor=\"#0000FF\"><TD style=\"vertical-align: middle\; padding-bottom: 4px\; padding-top: 4px\;\"><span ID=\"displayqt\" STYLE=\"display:block\;\"><B STYLE=\"cursor: pointer\"><font color=\"white\" onClick=\"document.form_$i.submit\(\)\">&nbsp\;&nbsp\;$USER{$ids}{$key}&nbsp\;&nbsp\;</font></B></TD></TABLE><P>\n";
+				}
+				
 			&print_form("form_name","form_$i","input","print_modal_students_screen","class_id","$key","name","$USER{$ids}{$key}","u_id","$SC{u_id}","session_id","$SC{session_id}","org_id","$SC{org_id}","class_name","$USER{$ids}{$key}");
 			
 			++$i;
@@ -55208,6 +57889,7 @@ sub show_qsts_for_students {
 	document.form1.input.value=\"students_view_qst\"
 	document.form1.submit\(\)
 	 }\n";
+
 
 	print"function reload_sub\(\) \{
 	document.forms\[0\].submit\(\)
@@ -55747,9 +58429,8 @@ sub show_modal_qsts_for_students {
 	print"if \(confirm\(\"$LANGUAGE{$set_language}{Youareabouttobegin} \'\" + name_in + \"\'. \\n $LANGUAGE{$set_language}{Therightsideofthescreenshowsthequestionsyouhaveanswered} \\n - $LANGUAGE{$set_language}{Clickonanumbertojumptothatquestion}\\n\\n$LANGUAGE{$set_language}{AnswersaresubmittedwhenyouselecttheanswerorclickSaveAnswer}\\n\\n$LANGUAGE{$set_language}{ClickSubmitQSTwhenyouaredone}\"\)\)\{\n";
 	
 	print"if\(display == 1\) \{\n";
-	print"doo_modal\(qst,class_id,class_name,questions,marks,name_in\)\n";
+	print"display_modalm1()\n";
 	print"document.form1m.qst.value=qst
-	document.form1m.input.value=\"modal_do_type\"
 	document.form1m.class_id.value=class_id
 	document.form1m.display.value=display
 	document.form1m.class_name.value=class_name
@@ -55761,9 +58442,8 @@ sub show_modal_qsts_for_students {
 
 	print"function openWindow2\(qst,name_in,class_id,type,class_name,display,questions,marks\) \{\n";
 	print"if \(confirm\(\"$LANGUAGE{$set_language}{Youareabouttobegin} \'\" + name_in + \"\'. \\n $LANGUAGE{$set_language}{Therightsideofthescreenshowsthequestionsyouhaveanswered}\\n  -  $LANGUAGE{$set_language}{Clickonanumbertojumptothatquestion}\\n\\n$LANGUAGE{$set_language}{AnswersaresubmittedwhenyouselecttheanswerorclickSaveAnswer}\\n\\n$LANGUAGE{$set_language}{Clickortomovetopreviousornextquestion}\\n\\nClick Submit QST when you are done.\"\)\)\{\n";
-
 	print"if\(display == 1\) \{\n";
-	print"doo_modal2\(qst,class_id,class_name,questions,marks,name_in\)\n";
+	print"display_modalm2()\n";
 	print"document.form2m.qst.value=qst
 	document.form2m.class_id.value=class_id
 	document.form2m.class_name.value=class_name
@@ -55776,8 +58456,8 @@ sub show_modal_qsts_for_students {
 	print"function openWindow3\(qst,name_in,class_id,type,class_name,display,questions,marks\) \{\n";
 	print"if \(confirm\(\"$LANGUAGE{$set_language}{Youareabouttobegin} \'\" + name_in + \"\'. \\n \\n$LANGUAGE{$set_language}{AnswersaresubmittedwhenyouselecttheanswerorclickSaveAnswer}\\n\\n$LANGUAGE{$set_language}{Clicktogotothenextquestion}\\n\\n$LANGUAGE{$set_language}{Questionsareonlyshownonce}\\n\\n$LANGUAGE{$set_language}{ClickSubmitQSTwhenyouaredone}\"\)\)\{\n";
 	print"if\(display == 1\) \{\n";
-	print"doo_modal3\(qst,class_id,class_name,questions,marks,name_in\)\n";
-	print"document.form3m.qst.value=qst
+	print"display_modalm3()
+	document.form3m.qst.value=qst
 	document.form3m.class_id.value=class_id
 	document.form3m.class_name.value=class_name
 	document.form3m.submit\(\)\n";
@@ -55789,8 +58469,8 @@ sub show_modal_qsts_for_students {
 	print"function openWindow4\(qst,name_in,class_id,type,class_name,display,questions,marks\) \{\n";
 	print"if \(confirm\(\"$LANGUAGE{$set_language}{Youareabouttobegin} \'\" + name_in + \"\'. \\n \\n$LANGUAGE{$set_language}{AnswersaresubmittedwhenyouselecttheanswerorclickSaveAnswer}\\n\\n$LANGUAGE{$set_language}{Clicktoseetheanswerormovetothenextquestion}\\n\\n$LANGUAGE{$set_language}{ClickSubmitQSTwhenyouaredone}\"\)\)\{\n";
 	print"if\(display == 1\) \{\n";
-	print"doo_modal4\(qst,class_id,class_name,questions,marks,name_in\)\n";
-	print"document.form4m.qst.value=qst
+	print"display_modalm4()
+	document.form4m.qst.value=qst
 	document.form4m.class_id.value=class_id
 	document.form4m.class_name.value=class_name
 	document.form4m.submit\(\)\n";
@@ -55802,8 +58482,8 @@ sub show_modal_qsts_for_students {
 	print"function openWindow5\(qst,name_in,class_id,type,class_name,display,questions,marks\) \{\n";
 	print"if \(confirm\(\"$LANGUAGE{$set_language}{Youareabouttobegin} \'\" + name_in + \"\'. \\n \\n$LANGUAGE{$set_language}{AnswersaresubmittedwhenyouselecttheanswerorclickSaveAnswer}\\n\\n$LANGUAGE{$set_language}{Clicktomovetothenextquestion}\"\)\)\{\n";
 	print"if\(display == 1\) \{\n";
-	print"doo_modal5\(qst,class_id,class_name,questions,marks,name_in\)\n";
-	print"document.form5m.qst.value=qst
+	print"display_modalm5()
+	document.form5m.qst.value=qst
 	document.form5m.class_id.value=class_id
 	document.form5m.class_name.value=class_name
 	document.form5m.submit\(\)\n";
@@ -55813,11 +58493,11 @@ sub show_modal_qsts_for_students {
 	print"\}\n";
 	
 	print"function display_qst\(qst,class_id,class_name\)\{\n";
-	print"qstWindow = window.open\(\"\",\"qstWindow\",\"top=10,left=40,width=950,height=800\"\)\n";
+	print"qstWindow = window.open\(\"\",\"qstWindow\",\"top=10,left=40,width=975,height=800\"\)\n";
 	print"qstWindow.focus\(\)\n";
-	print"qstWindow.document.writeln\(\'\<html\>\<head\>\'\)\n";
+	print"qstWindow.document.writeln\(\'\<html oncontextmenu=\"return false\"\>\<head\>\'\)\n";
 	print"qstWindow.document.writeln\(\'\<title\>QST\</title\>\</head\>\'\)\n";
-	print"qstWindow.document.writeln\(\'\<FRAMESET COLS=\"78\%,22\%\" onLoad=\"loading_done = true\" border=0>\'\)\n";
+	print"qstWindow.document.writeln\(\'\<FRAMESET COLS=\"80\%,20\%\" onLoad=\"loading_done = true\" border=0>\'\)\n";
 	print"qstWindow.document.writeln\(\'\<FRAME SRC=\"/schools/empty.htm\" name=\"qst_left\" NORESIZE border=0>\'\)\n";
 	print"qstWindow.document.writeln\(\'\<FRAMESET ROWS=\"10%,90\%\" NORESIZE border=0>\'\)\n";
 	print"qstWindow.document.writeln\(\'\<FRAME SRC=\"/schools/empty.htm\" name=\"right_top\" NORESIZE border=0>\'\)\n";
@@ -55834,10 +58514,10 @@ sub show_modal_qsts_for_students {
 	 }\n";
 
         print"function display_qst2\(qst,class_id,class_name\)\{\n";
-	print"qstWindow = window.open\(\"\",\"qstWindow\",\"top=10,left=40,width=950,height=600\"\)\n";
+	print"qstWindow = window.open\(\"\",\"qstWindow\",\"top=10,left=40,width=975,height=600\"\)\n";
 	print"qstWindow.focus\(\)\n";
-	print"qstWindow.document.writeln\(\'\<html\>\<head\>\<title\>QST\</title\>\</head\>\'\)\n";
-	print"qstWindow.document.writeln\(\'\<FRAMESET COLS=\"78\%,22\%\" onLoad=\"loading_done = true\" border=0>\'\)\n";
+	print"qstWindow.document.writeln\(\'\<html oncontextmenu=\"return false\"\>\<head\>\<title\>QST\</title\>\</head\>\'\)\n";
+	print"qstWindow.document.writeln\(\'\<FRAMESET COLS=\"80%,20\%\" onLoad=\"loading_done = true\" border=0>\'\)\n";
 	print"qstWindow.document.writeln\(\'\<FRAME SRC=\"/schools/empty.htm\" name=\"qst_left\" NORESIZE border=0>\'\)\n";
 	print"qstWindow.document.writeln\(\'\<FRAMESET ROWS=\"10%,90\%\" NORESIZE border=0>\'\)\n";
 	print"qstWindow.document.writeln\(\'\<FRAME SRC=\"/schools/empty.htm\" name=\"right_top\" NORESIZE border=0>\'\)\n";
@@ -55854,10 +58534,10 @@ sub show_modal_qsts_for_students {
 	 }\n";
 	 
         print"function display_qst3\(qst,class_id,class_name\)\{\n";
-	print"qstWindow = window.open\(\"\",\"qstWindow\",\"top=10,left=40,width=950,height=600\"\)\n";
+	print"qstWindow = window.open\(\"\",\"qstWindow\",\"top=10,left=40,width=975,height=600\"\)\n";
 	print"qstWindow.focus\(\)\n";
-	print"qstWindow.document.writeln\(\'\<html\>\<head\>\<title\>QST\</title\>\</head\>\'\)\n";
-	print"qstWindow.document.writeln\(\'\<FRAMESET COLS=\"78\%,22\%\" onLoad=\"loading_done = true\" border=0>\'\)\n";
+	print"qstWindow.document.writeln\(\'\<html oncontextmenu=\"return false\"\>\<head\>\<title\>QST\</title\>\</head\>\'\)\n";
+	print"qstWindow.document.writeln\(\'\<FRAMESET COLS=\"80\%,20\%\" onLoad=\"loading_done = true\" border=0>\'\)\n";
 	print"qstWindow.document.writeln\(\'\<FRAME SRC=\"/schools/empty.htm\" name=\"qst_left\" NORESIZE border=0>\'\)\n";
 	print"qstWindow.document.writeln\(\'\<FRAMESET ROWS=\"10%,90\%\" NORESIZE border=0>\'\)\n";
 	print"qstWindow.document.writeln\(\'\<FRAME SRC=\"/schools/empty.htm\" name=\"right_top\" NORESIZE border=0>\'\)\n";
@@ -55874,10 +58554,10 @@ sub show_modal_qsts_for_students {
 	 }\n";
 
         print"function display_qst4\(qst,class_id,class_name\)\{\n";
-	print"qstWindow = window.open\(\"\",\"qstWindow\",\"top=10,left=40,width=950,height=600\"\)\n";
+	print"qstWindow = window.open\(\"\",\"qstWindow\",\"top=10,left=40,width=975,height=600\"\)\n";
 	print"qstWindow.focus\(\)\n";
-	print"qstWindow.document.writeln\(\'\<html\>\<head\>\<title\>QST\</title\>\</head\>\'\)\n";
-	print"qstWindow.document.writeln\(\'\<FRAMESET COLS=\"78\%,22\%\" onLoad=\"loading_done = true\" border=0>\'\)\n";
+	print"qstWindow.document.writeln\(\'\<html oncontextmenu=\"return false\"\>\<head\>\<title\>QST\</title\>\</head\>\'\)\n";
+	print"qstWindow.document.writeln\(\'\<FRAMESET COLS=\"80\%,20\%\" onLoad=\"loading_done = true\" border=0>\'\)\n";
 	print"qstWindow.document.writeln\(\'\<FRAME SRC=\"/schools/empty.htm\" name=\"qst_left\" NORESIZE border=0>\'\)\n";
 	print"qstWindow.document.writeln\(\'\<FRAMESET ROWS=\"10%,90\%\" NORESIZE border=0>\'\)\n";
 	print"qstWindow.document.writeln\(\'\<FRAME SRC=\"/schools/empty.htm\" name=\"right_top\" NORESIZE border=0>\'\)\n";
@@ -55894,10 +58574,10 @@ sub show_modal_qsts_for_students {
 	 }\n";
 	 
         print"function display_qst5\(qst,class_id,class_name\)\{\n";
-	print"qstWindow = window.open\(\"\",\"qstWindow\",\"top=10,left=40,width=950,height=600\"\)\n";
+	print"qstWindow = window.open\(\"\",\"qstWindow\",\"top=10,left=40,width=975,height=600\"\)\n";
 	print"qstWindow.focus\(\)\n";
-	print"qstWindow.document.writeln\(\'\<html\>\<head\>\<title\>QST\</title\>\</head\>\'\)\n";
-	print"qstWindow.document.writeln\(\'\<FRAMESET COLS=\"78\%,22\%\" onLoad=\"loading_done = true\" border=0>\'\)\n";
+	print"qstWindow.document.writeln\(\'\<html oncontextmenu=\"return false\"\>\<head\>\<title\>QST\</title\>\</head\>\'\)\n";
+	print"qstWindow.document.writeln\(\'\<FRAMESET COLS=\"80\%,20\%\" onLoad=\"loading_done = true\" border=0>\'\)\n";
 	print"qstWindow.document.writeln\(\'\<FRAME SRC=\"/schools/empty.htm\" name=\"qst_left\" NORESIZE border=0>\'\)\n";
 	print"qstWindow.document.writeln\(\'\<FRAMESET ROWS=\"10%,90\%\" NORESIZE border=0>\'\)\n";
 	print"qstWindow.document.writeln\(\'\<FRAME SRC=\"/schools/empty.htm\" name=\"right_top\" NORESIZE border=0>\'\)\n";
@@ -55913,24 +58593,25 @@ sub show_modal_qsts_for_students {
 	document.form1.submit\(\)
 	 }\n";
 	 
-	print"function view_qst\(qst,name_in,class_id,type\) \{\n";
-	print"qstWindow = window.open\(\"\",\"qstWindow\",\"top=10,left=40,width=900,height=800\"\)\n";
-	print"qstWindow.focus\(\)\n";
-	print"qstWindow.document.writeln\(\'\<html\>\<head\>\<title\>QST\</title\>\</head\>\'\)\n";
-	print"qstWindow.document.writeln\(\'\<FRAMESET COLS=\"80\%,20\%\" onLoad=\"loading_done = true\" border=0>\'\)\n";
-	print"qstWindow.document.writeln\(\'\<FRAME SRC=\"/schools/empty.htm\" name=\"qst_left\" NORESIZE border=0>\'\)\n";
-	print"qstWindow.document.writeln\(\'\<FRAMESET ROWS=\"10%,90\%\" NORESIZE border=0>\'\)\n";
-	print"qstWindow.document.writeln\(\'\<FRAME SRC=\"/schools/empty.htm\" name=\"right_top\" NORESIZE border=0>\'\)\n";
-	print"qstWindow.document.writeln\(\'\<FRAME SRC=\"/schools/empty.htm\" name=\"right_bot\" NORESIZE border=0>\'\)\n";
-	print"qstWindow.document.writeln\(\'\</FRAMESET\>\'\)\n";
-	print"qstWindow.document.writeln\(\'\</FRAMESET\>\'\)\n";
-	print"qstWindow.document.writeln\(\'\<html\>\'\)\n";
-	print"qstWindow.document.close()\n";
-	print"document.form1.qst.value=qst
-	document.form1.class_id.value=class_id
-	document.form1.input.value=\"students_view_qst\"
-	document.form1.submit\(\)
-	 }\n";
+	 # HERE FOR POSSIBLE LATER USE
+#	print"function view_qst\(qst,name_in,class_id,type\) \{\n";
+#	print"qstWindow = window.open\(\"\",\"qstWindow\",\"top=10,left=40,width=900,height=800\"\)\n";
+#	print"qstWindow.focus\(\)\n";
+#	print"qstWindow.document.writeln\(\'\<html oncontextmenu=\"return false\"\>\<head\>\<title\>QST\</title\>\</head\>\'\)\n";
+#	print"qstWindow.document.writeln\(\'\<FRAMESET COLS=\"80\%,20\%\" onLoad=\"loading_done = true\" border=0>\'\)\n";
+#	print"qstWindow.document.writeln\(\'\<FRAME SRC=\"/schools/empty.htm\" name=\"qst_left\" NORESIZE border=0>\'\)\n";
+#	print"qstWindow.document.writeln\(\'\<FRAMESET ROWS=\"10%,90\%\" NORESIZE border=0>\'\)\n";
+#	print"qstWindow.document.writeln\(\'\<FRAME SRC=\"/schools/empty.htm\" name=\"right_top\" NORESIZE border=0>\'\)\n";
+#	print"qstWindow.document.writeln\(\'\<FRAME SRC=\"/schools/empty.htm\" name=\"right_bot\" NORESIZE border=0>\'\)\n";
+#	print"qstWindow.document.writeln\(\'\</FRAMESET\>\'\)\n";
+#	print"qstWindow.document.writeln\(\'\</FRAMESET\>\'\)\n";
+#	print"qstWindow.document.writeln\(\'\<html\>\'\)\n";
+#	print"qstWindow.document.close()\n";
+#	print"document.form1.qst.value=qst
+#	document.form1.class_id.value=class_id
+#	document.form1.input.value=\"students_view_qst\"
+#	document.form1.submit\(\)
+#	 }\n";
 
 	print"function reload_sub\(\) \{
 	document.forms\[0\].submit\(\)
@@ -55948,7 +58629,7 @@ sub show_modal_qsts_for_students {
 	if(exists $USER{$ids}{$SQFS{class_id}}) {
 		my %RETURN = &select_posted_qst("query","select * from posted_qst WHERE class_id=\"$SQFS{class_id}\" and posted=\"1\"");
                 my %RETURN1 = &select_qst_attempts_info("query","SELECT qst_no,attempts,end,resume from qst_attempts WHERE u_id=\"$ids\"");
-                
+
 		if(keys %RETURN) { # && $attempts_left > 0) {
 			print"&nbsp\;<U>$LANGUAGE{$set_language}{Attempts}</U><BR>\n";
 			foreach my $key1(sort keys %RETURN) {
@@ -55972,6 +58653,9 @@ sub show_modal_qsts_for_students {
 					if($RETURN{$key1}{forall} == 1) { # posted for all students in class
 						if($attempts != 0 || ($RETURN1{$key1}{resume} == 1 && $RETURN{$key1}{attempts} == 1)) {
 							my %RETURN4 = &select_qst("query","select number,name,questions,marks,random_q,random_order,type from qst WHERE number=\"$key1\"");
+							my $fixed_name = $RETURN4{$key1}{name};
+							$fixed_name =~ s/\'/\\u0027/g;
+
 
                                                         if($RETURN4{$key1}{type} != 2) { # quizzes/tests
                                                                 if($RETURN{$key1}{branching} == 1) {
@@ -56016,7 +58700,7 @@ sub show_modal_qsts_for_students {
                                                                                 print"openWindow5";
                                                                                 }
                                                                                         
-									print"\(\'$key1\',\'$RETURN4{$key1}{name}\',\'$SQFS{class_id}\',\'$assign[$RETURN4{$key1}{type}]\',\'$SQFS{class_name}\',\'$RETURN{$key1}{display}\',\'$RETURN4{$key1}{questions}\',\'$RETURN4{$key1}{marks}\'\)\" size=\"-1\">&nbsp\;&nbsp\;&nbsp\;&nbsp\; $LANGUAGE{$set_language}{Start} </font></td></TR></TABLE></span>\n";
+									print"\(\'$key1\',\'$fixed_name\',\'$SQFS{class_id}\',\'$assign[$RETURN4{$key1}{type}]\',\'$SQFS{class_name}\',\'$RETURN{$key1}{display}\',\'$RETURN4{$key1}{questions}\',\'$RETURN4{$key1}{marks}\'\)\" size=\"-1\">&nbsp\;&nbsp\;&nbsp\;&nbsp\; $LANGUAGE{$set_language}{Start} </font></td></TR></TABLE></span>\n";
 									}
 								else {
 									print"<span ID=\"display$dis\" style=\"display\:none\"><table ><tr><TD width=\"150\"></TD><TD align=\"center\"><font STYLE=\"cursor: pointer\" onClick=\"";
@@ -56037,7 +58721,7 @@ sub show_modal_qsts_for_students {
 									         print"openWindow5";
                                                                                  }
 										
-									print"\(\'$key1\',\'$RETURN4{$key1}{name}\',\'$SQFS{class_id}\',\'$assign[$RETURN4{$key1}{type}]\',\'$SQFS{class_name}\',\'$RETURN{$key1}{display}\',\'$RETURN4{$key1}{questions}\',\'$RETURN4{$key1}{marks}\'\)\" size=\"-1\">&nbsp\;&nbsp\;&nbsp\;&nbsp\; $LANGUAGE{$set_language}{Start} </font></td></TR></TABLE></span>\n";
+									print"\(\'$key1\',\'$fixed_name\',\'$SQFS{class_id}\',\'$assign[$RETURN4{$key1}{type}]\',\'$SQFS{class_name}\',\'$RETURN{$key1}{display}\',\'$RETURN4{$key1}{questions}\',\'$RETURN4{$key1}{marks}\'\)\" size=\"-1\">&nbsp\;&nbsp\;&nbsp\;&nbsp\; $LANGUAGE{$set_language}{Start} </font></td></TR></TABLE></span>\n";
 									}
 								}
 									
@@ -56057,7 +58741,7 @@ sub show_modal_qsts_for_students {
                                                                                 print"openWindow5";
                                                                                 }
                                                                                         
-                                                                        print"\(\'$key1\',\'$RETURN4{$key1}{name}\',\'$SQFS{class_id}\',\'$assign[$RETURN4{$key1}{type}]\',\'$SQFS{name}\',\'$RETURN{$key1}{display}\',\'$RETURN4{$key1}{questions}\',\'$RETURN4{$key1}{marks}\'\)\" size=\"-1\">&nbsp\;&nbsp\;&nbsp\;&nbsp\; $LANGUAGE{$set_language}{Start} </font></td></TR></TABLE></span>";
+                                                                        print"\(\'$key1\',\'$fixed_name\',\'$SQFS{class_id}\',\'$assign[$RETURN4{$key1}{type}]\',\'$SQFS{name}\',\'$RETURN{$key1}{display}\',\'$RETURN4{$key1}{questions}\',\'$RETURN4{$key1}{marks}\'\)\" size=\"-1\">&nbsp\;&nbsp\;&nbsp\;&nbsp\; $LANGUAGE{$set_language}{Start} </font></td></TR></TABLE></span>";
 									}
 										
 								else { # QUIZZES TESTS
@@ -56078,7 +58762,7 @@ sub show_modal_qsts_for_students {
                                                                                 print"openWindow5";
                                                                                 }
                                                                                         
-                                                                        print"\(\'$key1\',\'$RETURN4{$key1}{name}\',\'$SQFS{class_id}\',\'$assign[$RETURN4{$key1}{type}]\',\'$SQFS{class_name}\',\'$RETURN{$key1}{display}\',\'$RETURN4{$key1}{questions}\',\'$RETURN4{$key1}{marks}\'\)\" size=\"-1\">&nbsp\;&nbsp\;&nbsp\;&nbsp\; $LANGUAGE{$set_language}{Start} </font></td></TR>";
+                                                                        print"\(\'$key1\',\'$fixed_name\',\'$SQFS{class_id}\',\'$assign[$RETURN4{$key1}{type}]\',\'$SQFS{class_name}\',\'$RETURN{$key1}{display}\',\'$RETURN4{$key1}{questions}\',\'$RETURN4{$key1}{marks}\'\)\" size=\"-1\">&nbsp\;&nbsp\;&nbsp\;&nbsp\; $LANGUAGE{$set_language}{Start} </font></td></TR>";
                                                                                 
 									print"</TABLE></span>\n";
 									}
@@ -56092,7 +58776,9 @@ sub show_modal_qsts_for_students {
 							my %RETURN2 = &select5("query","select qst_no,u_id from access_to_qst WHERE qst_no=\"$key1\" AND u_id=\"$ids\"");
 							if(keys %RETURN2) {
 								my %RETURN3 = &select_qst("query","select number,name,questions,marks,random_q,random_order,type,weight,branching from qst WHERE number=\"$key1\"");
-								
+								my $fixed_name = $RETURN3{$key1}{name};
+								$fixed_name =~ s/\'/\\u0027/g;
+
 								if($RETURN3{$key1}{type} != 2) { # quizzes/tests
 									if($attempts == 10) { 
 										print"<TABLE><TR><TD width=\"75\" align=\"center\">10</TD><TD><font align=\"top\" size=\"-1\"> &nbsp\;&nbsp\;&nbsp\;<B>$RETURN3{$key1}{questions} <font color=\"#FF3300\">\?</font> $RETURN3{$key1}{marks} $image15</B> </font> <font STYLE=\"cursor: pointer\" onClick=\"Show_Stuff\(document.getElementById\(\'display$dis\'\)\)\">$RETURN3{$key1}{name}</font></TD></TR></TABLE>\n";
@@ -56115,7 +58801,7 @@ sub show_modal_qsts_for_students {
                                                                                         print"openWindow5";
                                                                                         }
                                                                                         
-                                                                                print"\(\'$key1\',\'$RETURN3{$key1}{name}\',\'$SQFS{class_id}\',\'$assign[$RETURN3{$key1}{type}]\',\'$SQFS{class_name}\',\'$RETURN{$key1}{display}\',\'$RETURN3{$key1}{questions}\',\'$RETURN3{$key1}{marks}\'\)\" size=\"-1\">&nbsp\;&nbsp\;&nbsp\;&nbsp\; $LANGUAGE{$set_language}{Start} </font></td></TR></TABLE></span>\n";
+                                                                                print"\(\'$key1\',\'$fixed_name',\'$SQFS{class_id}\',\'$assign[$RETURN3{$key1}{type}]\',\'$SQFS{class_name}\',\'$RETURN{$key1}{display}\',\'$RETURN3{$key1}{questions}\',\'$RETURN3{$key1}{marks}\'\)\" size=\"-1\">&nbsp\;&nbsp\;&nbsp\;&nbsp\; $LANGUAGE{$set_language}{Start} </font></td></TR></TABLE></span>\n";
 										}
 									else {
                                                                                 if($RETURN3{$key1}{branching} == 1) {
@@ -56143,7 +58829,7 @@ sub show_modal_qsts_for_students {
                                                                                         print"openWindow5";
                                                                                         }
                                                                                         
-                                                                                print"\(\'$key1\',\'$RETURN3{$key1}{name}\',\'$SQFS{class_id}\',\'$assign[$RETURN3{$key1}{type}]\',\'$SQFS{class_name}\',\'$RETURN{$key1}{display}\',\'$RETURN3{$key1}{questions}\',\'$RETURN3{$key1}{marks}\'\)\" size=\"-1\">&nbsp\;&nbsp\;&nbsp\;&nbsp\; $LANGUAGE{$set_language}{Start} </font></td></TR></TABLE></span>";
+                                                                                print"\(\'$key1\',\'$fixed_name\',\'$SQFS{class_id}\',\'$assign[$RETURN3{$key1}{type}]\',\'$SQFS{class_name}\',\'$RETURN{$key1}{display}\',\'$RETURN3{$key1}{questions}\',\'$RETURN3{$key1}{marks}\'\)\" size=\"-1\">&nbsp\;&nbsp\;&nbsp\;&nbsp\; $LANGUAGE{$set_language}{Start} </font></td></TR></TABLE></span>";
 										}
 									}
 									
@@ -56164,7 +58850,7 @@ sub show_modal_qsts_for_students {
                                                                                 print"openWindow5";
                                                                                 }
                                                                         
-                                                                        print"\(\'$key1\',\'$RETURN3{$key1}{name}\',\'$SQFS{class_id}\',\'$assign[$RETURN3{$key1}{type}]\',\'$SQFS{class_name}\',\'$RETURN{$key1}{display}\',\'$RETURN3{$key1}{questions}\',\'$RETURN3{$key1}{marks}\'\)\" size=\"-1\">&nbsp\;&nbsp\;&nbsp\;&nbsp\; $LANGUAGE{$set_language}{Start} </font></td></TR></TABLE></span>\n";
+                                                                        print"\(\'$key1\',\'$fixed_name\',\'$SQFS{class_id}\',\'$assign[$RETURN3{$key1}{type}]\',\'$SQFS{class_name}\',\'$RETURN{$key1}{display}\',\'$RETURN3{$key1}{questions}\',\'$RETURN3{$key1}{marks}\'\)\" size=\"-1\">&nbsp\;&nbsp\;&nbsp\;&nbsp\; $LANGUAGE{$set_language}{Start} </font></td></TR></TABLE></span>\n";
 									}
 									
 								if($attempts <= 0) {
@@ -56191,15 +58877,15 @@ sub show_modal_qsts_for_students {
                                                                                         print"openWindow5";
                                                                                         }
                                                                                 
-                                                                                    print"\(\'$key1\',\'$RETURN3{$key1}{name}\',\'$SQFS{class_id}\',\'$assign[$RETURN3{$key1}{type}]\',\'$SQFS{class_name}\',\'$RETURN{$key1}{display}\',\'$RETURN3{$key1}{questions}\',\'$RETURN3{$key1}{marks}\'\)\" size=\"-1\">&nbsp\;&nbsp\;&nbsp\;&nbsp\; $LANGUAGE{$set_language}{Start} </font></td></TR></TABLE></span>\n";
+                                                                                    print"\(\'$key1\',\'$fixed_name\',\'$SQFS{class_id}\',\'$assign[$RETURN3{$key1}{type}]\',\'$SQFS{class_name}\',\'$RETURN{$key1}{display}\',\'$RETURN3{$key1}{questions}\',\'$RETURN3{$key1}{marks}\'\)\" size=\"-1\">&nbsp\;&nbsp\;&nbsp\;&nbsp\; $LANGUAGE{$set_language}{Start} </font></td></TR></TABLE></span>\n";
                                                                                     }
                                                                                 else {
-                                                                                    print"<span ID=\"display$dis\" style=\"display\:none\"><table ><tr><TD width=\"150\"></TD><TD align=\"center\"><font STYLE=\"cursor: pointer\" onClick=\"openWindow1\(\'$key1\',\'$RETURN3{$key1}{name}\',\'$SQFS{class_id}\',\'$assign[$RETURN3{$key1}{type}]\',\'$SQFS{class_name}\'\)\" size=\"-1\">&nbsp\;&nbsp\;&nbsp\;&nbsp\; $LANGUAGE{$set_language}{Start} </font></td></TR></TABLE></span>\n";
+                                                                                    print"<span ID=\"display$dis\" style=\"display\:none\"><table ><tr><TD width=\"150\"></TD><TD align=\"center\"><font STYLE=\"cursor: pointer\" onClick=\"openWindow1\(\'$key1\',\'$fixed_name\',\'$SQFS{class_id}\',\'$assign[$RETURN3{$key1}{type}]\',\'$SQFS{class_name}\'\)\" size=\"-1\">&nbsp\;&nbsp\;&nbsp\;&nbsp\; $LANGUAGE{$set_language}{Start} </font></td></TR></TABLE></span>\n";
                                                                                     }
 
 										}
 									else {
-										print"<span ID=\"display$dis\" style=\"display\:none\"><table ><tr><TD width=\"150\"></TD><TD align=\"center\"><a href=\"javascript\:void\(0\)\"  onClick=\"\"><font STYLE=\"text-decoration:none\" onClick=\"openWindow1\(\'$key1\',\'$RETURN3{$key1}{name}\',\'$SQFS{class_id}\',\'$assign[$RETURN3{$key1}{type}]\'\)\" size=\"-1\">&nbsp\;&nbsp\;&nbsp\;&nbsp\; $LANGUAGE{$set_language}{Start} </font></a></td></TR></TABLE></span>\n";
+										print"<span ID=\"display$dis\" style=\"display\:none\"><table ><tr><TD width=\"150\"></TD><TD align=\"center\"><a href=\"javascript\:void\(0\)\"  onClick=\"\"><font STYLE=\"text-decoration:none\" onClick=\"openWindow1\(\'$key1\',\'$fixed_name\',\'$SQFS{class_id}\',\'$assign[$RETURN3{$key1}{type}]\'\)\" size=\"-1\">&nbsp\;&nbsp\;&nbsp\;&nbsp\; $LANGUAGE{$set_language}{Start} </font></a></td></TR></TABLE></span>\n";
 										}
 									}
                         
@@ -56215,7 +58901,6 @@ sub show_modal_qsts_for_students {
 			}
 		}
 		
-	print"</DL>\n";
 	
 	&help;
 	print"<B>$LANGUAGE{$set_language}{Oncethequizsurveytestisbegunitcountsasanattempt}</B><P>
@@ -56223,7 +58908,7 @@ sub show_modal_qsts_for_students {
 	
   	&print_form("form_name","form1","form_target","qst_left","input","","qst","","class_id","","class_name","","display","","u_id","$SQFS{u_id}","session_id","$SQFS{session_id}","org_id","$SQFS{org_id}");
 
-        &print_form("form_name","form1m","form_target","m1qst_left","input","","qst","","class_id","","class_name","","display","","u_id","$SQFS{u_id}","session_id","$SQFS{session_id}","org_id","$SQFS{org_id}");
+        &print_form("form_name","form1m","form_target","m1qst_left","input","modal_do_type","qst","","class_id","","class_name","","display","","u_id","$SQFS{u_id}","session_id","$SQFS{session_id}","org_id","$SQFS{org_id}");
 
   	&print_form("form_name","form2m","form_target","m2qst_left","input","modal2_do_type2","qst","","class_id","","class_name","","display","","u_id","$SQFS{u_id}","session_id","$SQFS{session_id}","org_id","$SQFS{org_id}");
   	
@@ -56232,6 +58917,8 @@ sub show_modal_qsts_for_students {
         &print_form("form_name","form4m","form_target","m4qst_left","input","modal4_do_type4","qst","","class_id","","class_name","","display","","u_id","$SQFS{u_id}","session_id","$SQFS{session_id}","org_id","$SQFS{org_id}");
         
         &print_form("form_name","form5m","form_target","m5qst_left","input","modal5_do_type5","qst","","class_id","","class_name","","display","","u_id","$SQFS{u_id}","session_id","$SQFS{session_id}","org_id","$SQFS{org_id}");
+
+	print"</DL>\n";
 	}
 
 ######################
@@ -56752,7 +59439,8 @@ sub stats{
 		}
 
 
-	print"<TABLE width=\"100%\" $action_bar><TR><TD style=\"padding-top: 5px\; padding-bottom: 5px\;\"><font color=\"white\"><B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{STATS} &nbsp\;&nbsp\;&nbsp\;&nbsp\; $STAT{assign_name}</font> &nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; </b></TD><TD width=\"40\"></TD><TD>&nbsp\;&nbsp\;&nbsp\;&nbsp\;<B><font color=\"white\" onClick=\"self.parent.close\(\)\" STYLE=\"cursor:pointer\">$LANGUAGE{$set_language}{Close}</font> </B></TD></TABLE><BR>\n";
+	print"<TABLE width=\"100%\" $action_bar><TR><TD style=\"padding-top: 5px\; padding-bottom: 5px\;\"><font color=\"white\"><B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{STATS} &nbsp\;&nbsp\;&nbsp\;&nbsp\; $STAT{assign_name}</font> &nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\; </b></TD><TD width=\"40\"></TD><TD>&nbsp\;&nbsp\;&nbsp\;&nbsp\;";
+	print"<img src=\"/schools/x-icon.png\" align=\"middle\" data-toggle=\"tooltip\" title=\" Close \" onClick=\"self.parent.close\(\)\" STYLE=\"cursor: pointer\"></font> </B></TD></TABLE><BR>\n";
 
 	### Nothing to print as no HASHES get built if user has no access
 	
@@ -58993,7 +61681,7 @@ sub upload_file_users_and_classes {
 		<center>*$LANGUAGE{$set_language}{Classnamesmax80characters}</center>
 		<center>*$LANGUAGE{$set_language}{Theremustbesomethingineachcolumn}</center>
 		<center>*$LANGUAGE{$set_language}{IfusingLDAPsetpasswordto0}</center>
-		<center>*$LANGUAGE{$set_language}{ForsecuritythisfileisparsedinmemoryontheserverAllpasswordsareencrypted}</center>\n";
+		<center>*$LANGUAGE{$set_language}{ForsecuritythisfileisparsedinMemoryontheserverAllpasswordsareencrypted}</center>\n";
 		}
 		
 	else {	
@@ -59028,7 +61716,7 @@ sub upload_file_users_and_classes {
 		<center>*$LANGUAGE{$set_language}{Classnamesmax80characters}</center>
 		<center>*$LANGUAGE{$set_language}{Theremustbesomethingineachcolumn}</center>
 		<center>*$LANGUAGE{$set_language}{IfusingLDAPsetpasswordto0}</center>\n";
-		print"<center>*$LANGUAGE{$set_language}{ForsecuritythisfileisparsedinmemoryontheserverAllpasswordsareencrypted}</center>\n";
+		print"<center>*$LANGUAGE{$set_language}{ForsecuritythisfileisparsedinMemoryontheserverAllpasswordsareencrypted}</center>\n";
 		}
 	}
 
@@ -59322,6 +62010,7 @@ sub view_students_in_class {
 	$VSIC{qst_no} =~ s/\D//g;
 	$VSIC{type} =~ s/\D//g;
 	$VSIC{sub_type} =~ s/\D//g;
+	$VSIC{memori} =~ s/\D//g;
 
 	my %RETURN = ();
 	my %RETURN1 = ();
@@ -59363,7 +62052,7 @@ sub view_students_in_class {
 
 	print"<P><center><TABLE style=\"font-family\:Arial\; font-size\: 9pt\;\"><TR><TD><B STYLE=\"cursor: pointer\" onClick=\"select_all\(1\)\"> $LANGUAGE{$set_language}{SelectAllStudents} </B></TD><TD width=\"20\"></TD><TD><B STYLE=\"cursor: pointer\" onClick=\"un_select_all\(1\)\"> $LANGUAGE{$set_language}{UnselectAllStudents}</B></TD></TR></TABLE></center>\n";
 
-  	&print_form_wo_end_tag("form_name","post_qst","form_target","theright","input","post_qst","submissions","","result","","attempts","","class_id","$VSIC{class_id}","qst_no","$VSIC{qst_no}","class_open","1","open_class","$VSIC{class_id}","type","$VSIC{type}","sub_type","$VSIC{sub_type}","unpost","","rhm","","forall","","from","$VSIC{from}","avail","","start_month","","start_day","","start_hour","","finish_month","","finish_day","","finish_hour","","qtime","","delivery","$VSIC{delivery}","display","$VSIC{display}","u_id","$VSIC{u_id}","session_id","$VSIC{session_id}","shuffle","$VSIC{shuffle}","shuffle_ans","$VSIC{shuffle_ans}","source","$VSIC{source}","explanations","$VSIC{explanations}");
+  	&print_form_wo_end_tag("form_name","post_qst","form_target","theright","input","post_qst","submissions","","result","","attempts","","class_id","$VSIC{class_id}","qst_no","$VSIC{qst_no}","class_open","1","open_class","$VSIC{class_id}","type","$VSIC{type}","sub_type","$VSIC{sub_type}","unpost","","rhm","","forall","","from","$VSIC{from}","avail","","start_month","","start_day","","start_hour","","finish_month","","finish_day","","finish_hour","","qtime","","delivery","$VSIC{delivery}","display","$VSIC{display}","u_id","$VSIC{u_id}","session_id","$VSIC{session_id}","shuffle","$VSIC{shuffle}","shuffle_ans","$VSIC{shuffle_ans}","source","$VSIC{source}","explanations","$VSIC{explanations}","memori","$VSIC{memori}");
   	
 	print"<DL><DL>\n";
 	
@@ -59657,6 +62346,8 @@ sub down_load {
                                 if($QSTS{$qstt} == 2) { # survey
                                         }
                                 else { #quizzes/tests
+                                	$QST_NAMES{$qstt}{name} =~ s/\\u0027/\'/g;
+                                	
                                         $box = "$box".",$QST_NAMES{$qstt}{name}";
                                         $total_marks = "$total_marks".","."$QST_NAMES{$qstt}{marks}";
                                         ++$columns;
@@ -59669,6 +62360,8 @@ sub down_load {
 					
                 if(keys %ASSIGNMENTS) { # assignments
                         foreach my $assign(sort {$a<=>$b} keys %ASSIGNMENTS) {
+                        	$ASSIGNMENTS{$assign}{web_name} =~ s/&\\#39/\'/g;
+                        	
                                 $box = "$box".",$ASSIGNMENTS{$assign}{web_name}";
                                  $total_marks = "$total_marks".","."$ASSIGNMENTS{$assign}{marks}";
                                 ++$columns;
@@ -59823,10 +62516,10 @@ sub down_load {
     	            	                                        elsif($QSTS{$qst_id} == 4) { #assignment
     	            	                                                my $n_qst_id = $qst_id;
     	            	                                                $qst_id =~ s/\D//;
-                                                                
+                                                                	
     	            	                                                if(exists $STUDENTS_ASSIGN_MARKS{$key1}{qst}{$qst_id}{mark} && $STUDENTS_ASSIGN_MARKS{$key1}{qst}{$qst_id}{mark} >= 0) {
     	            	                                                        my $divider = $ASSIGNMENTS{$qst_id}{weight};
-                                                                        
+                                                                        	
     	            	                                                        if($divider > 0 && $ASSIGNMENTS{$qst_id}{marks} > 0) {
     	            	                                                                $json = "$json".",\"$ASSIGNMENTS{$qst_id}{name}\":\"$STUDENTS_ASSIGN_MARKS{$keyy}{qst}{$qst_id}{mark}\"";
     	            	                                                                }
@@ -60124,11 +62817,11 @@ sub print_do_type_resume_qst {
 					        }
 
                                         if($QUESTIONS{$real_no}{vlink} && $QUESTIONS{$real_no}{vlink} ne "0") {
-                                                print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" controls><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video</td></table><P>\n";
+                                                print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" oncontextmenu=\"return false\" controlslist=\"nodownload\" controls=\"\"><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video></td></table><P>\n";
                                                 }
                                         
                                         if($QUESTIONS{$real_no}{alink} && $QUESTIONS{$real_no}{alink} ne "0") {
-                                                print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video</td></table><P>\n";
+                                                print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video></td></table><P>\n";
                                                 }
                                         }
                                 else {
@@ -60147,11 +62840,11 @@ sub print_do_type_resume_qst {
 						}
 
                                         if($QUESTIONS{$real_no}{vlink} && $QUESTIONS{$real_no}{vlink} ne "0") {
-                                                print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" controls><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video</td></table><P>\n";
+                                                print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" oncontextmenu=\"return false\" controlslist=\"nodownload\" controls=\"\"><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video></td></table><P>\n";
                                                 }
                                         
                                         if($QUESTIONS{$real_no}{alink} && $QUESTIONS{$real_no}{alink} ne "0") {
-                                                print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video</td></table><P>\n";
+                                                print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video></td></table><P>\n";
                                                 }
                                         }
 				} 
@@ -61168,15 +63861,18 @@ sub gradebook {
 					%QST_NAMES = &select_short_qst("query","$query1");
 					
 					foreach my $assign(sort {$a<=>$b} keys %QSTS) {
+						my $fixed_name = $QST_NAMES{$assign}{name};
+						$fixed_name =~ s/\'/\\u0027/g;
+
 						if($QSTS{$assign} == 2) { # SURVEY
-							print"<Th valign=\"top\" align=\"left\" nowrap><B STYLE=\"cursor: pointer\" data-toggle=\"tooltip\" title=\"$QST_NAMES{$assign}{name}\" onClick=\"Show_Stuff(document.getElementById\(\'display$i_ndex\'\))\">$i_ndex</B><font size=\"-1\"><sup>S</sup></font><DIV ID=\"display$i_ndex\" style=\"display\:none\"><font STYLE=\"text-decoration:none\" color=\"\#888888\" size=\"-1\" onClick=\"Show_Stuff(display$dis)\"><B>$QST_NAMES{$assign}{name}</B></font><BR>&nbsp\;&nbsp\;<font onClick=\"click_handler\(\'1\',\'$assign\',\'0\',\'$VSBC{expand}\',\'$QST_NAMES{$assign}{name}\',\'$QSTS{$assign}\'\)\" STYLE=\"cursor:pointer\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{Delete}</font><BR>&nbsp\;&nbsp\;";
+							print"<Th valign=\"top\" align=\"left\" nowrap><B STYLE=\"cursor: pointer\" data-toggle=\"tooltip\" title=\"$QST_NAMES{$assign}{name}\" onClick=\"Show_Stuff(document.getElementById\(\'display$i_ndex\'\))\">$i_ndex</B><font size=\"-1\"><sup>S</sup></font><DIV ID=\"display$i_ndex\" style=\"display\:none\"><font STYLE=\"text-decoration:none\" color=\"\#888888\" size=\"-1\" onClick=\"Show_Stuff(display$dis)\"><B>$QST_NAMES{$assign}{name}</B></font><BR>&nbsp\;&nbsp\;<font onClick=\"click_handler\(\'1\',\'$assign\',\'0\',\'$VSBC{expand}\',\'$fixed_name\',\'$QSTS{$assign}\'\)\" STYLE=\"cursor:pointer\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{Delete}</font><BR>&nbsp\;&nbsp\;";
                                                         
                                                         if($BRANCHING_QSTS{$assign} == 1) {
                                                                  print"<font onClick=\"click_handler\(\'14\',\'$assign\',\'$USER{$ids}{$key}\',\'$VSBC{expand}\',\'$QST_NAMES{$assign}{name}\',\'$QSTS{$assign}\'\)\" STYLE=\"cursor:pointer\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{Stats}</font></DIV><P></TD><TD>&nbsp\;</TD>";
                                                                 }
                                                         else {
                                                                 print"<font onClick=\"click_handler\(\'9\',\'$assign\',\'0\',\'$key\',\'\',\'2\'\)\" STYLE=\"cursor:pointer\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{View}</font><BR>&nbsp\;&nbsp\;";
-                                                                print"<font onClick=\"click_handler\(\'11\',\'$assign\',\'$USER{$ids}{$key}\',\'$VSBC{expand}\',\'$QST_NAMES{$assign}{name}\',\'$QSTS{$assign}\'\)\" STYLE=\"cursor:pointer\;\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{Stats}</font></DIV><P></TD><TD>&nbsp\;</TD>\n";
+                                                                print"<font onClick=\"click_handler\(\'11\',\'$assign\',\'$USER{$ids}{$key}\',\'$VSBC{expand}\',\'$fixed_name\',\'$QSTS{$assign}\'\)\" STYLE=\"cursor:pointer\;\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{Stats}</font></DIV><P></TD><TD>&nbsp\;</TD>\n";
                                                                 }
                                                                 
 							++$columns;
@@ -61185,17 +63881,17 @@ sub gradebook {
 							}
 							
 						else { # QUIZZES/TESTS
-							print"<Th valign=\"top\" align=\"left\" nowrap><B STYLE=\"cursor: pointer\"  data-toggle=\"tooltip\" title=\"$QST_NAMES{$assign}{name}\" onClick=\"Show_Stuff(document.getElementById\(\'display$i_ndex\'\))\">$i_ndex</B><font size=\"-1\"><sub>$QST_NAMES{$assign}{weight}</sub></font>&nbsp\;<DIV ID=\"display$i_ndex\" style=\"display\:none\"><font STYLE=\"text-decoration:none\" size=\"-1\" onClick=\"Show_Stuff(display$dis)\"><B>$QST_NAMES{$assign}{name}</B></font><BR>&nbsp\;&nbsp\;<font onClick=\"click_handler\(\'1\',\'$assign\',\'0\',\'$VSBC{expand}\',\'$QST_NAMES{$assign}{name}\',\'$QSTS{$assign}\'\)\" STYLE=\"cursor:pointer\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{Delete}</font><BR>";
+							print"<Th valign=\"top\" align=\"left\" nowrap><B STYLE=\"cursor: pointer\"  data-toggle=\"tooltip\" title=\"$QST_NAMES{$assign}{name}\" onClick=\"Show_Stuff(document.getElementById\(\'display$i_ndex\'\))\">$i_ndex</B><font size=\"-1\"><sub>$QST_NAMES{$assign}{weight}</sub></font>&nbsp\;<DIV ID=\"display$i_ndex\" style=\"display\:none\"><font STYLE=\"text-decoration:none\" size=\"-1\" onClick=\"Show_Stuff(display$dis)\"><B>$QST_NAMES{$assign}{name}</B></font><BR>&nbsp\;&nbsp\;<font onClick=\"click_handler\(\'1\',\'$assign\',\'0\',\'$VSBC{expand}\',\'$fixed_name\',\'$QSTS{$assign}\'\)\" STYLE=\"cursor:pointer\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{Delete}</font><BR>";
 							
 							if($BRANCHING_QSTS{$assign} != 1) {
                                                                 print"&nbsp\;&nbsp\;<font onClick=\"click_handler\(\'9\',\'$assign\',\'0\',\'$key\',\'\',\'1\'\)\" STYLE=\"cursor:pointer\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{View}</font><BR>";
                                                                 }
                                                                 
                                                         if($BRANCHING_QSTS{$assign} == 1) {
-                                                                print"&nbsp\;&nbsp\;<font onClick=\"click_handler\(\'13\',\'$assign\',\'$USER{$ids}{$key}\',\'$VSBC{expand}\',\'$QST_NAMES{$assign}{name}\',\'$QSTS{$assign}\'\)\" STYLE=\"cursor:pointer\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{Stats}</font><BR>";
+                                                                print"&nbsp\;&nbsp\;<font onClick=\"click_handler\(\'13\',\'$assign\',\'$USER{$ids}{$key}\',\'$VSBC{expand}\',\'$fixed_name\',\'$QSTS{$assign}\'\)\" STYLE=\"cursor:pointer\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{Stats}</font><BR>";
                                                                 }
                                                         else {
-                                                                print"&nbsp\;&nbsp\;<font onClick=\"click_handler\(\'11\',\'$assign\',\'$USER{$ids}{$key}\',\'$VSBC{expand}\',\'$QST_NAMES{$assign}{name}\',\'$QSTS{$assign}\'\)\" STYLE=\"cursor:pointer\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{Stats}</font><BR>";
+                                                                print"&nbsp\;&nbsp\;<font onClick=\"click_handler\(\'11\',\'$assign\',\'$USER{$ids}{$key}\',\'$VSBC{expand}\',\'$fixed_name\',\'$QSTS{$assign}\'\)\" STYLE=\"cursor:pointer\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{Stats}</font><BR>";
                                                                 }
                                                                 
                                                         if($BRANCHING_QSTS{$assign} != 1) {
@@ -61316,6 +64012,9 @@ sub gradebook {
 									elsif($QSTS{$qst_id} == 1) { # QUIZZES/TESTS
 										my $started = 0;
 										my $submitted = 0;
+										my $fixed_names = $QST_NAMES{$qst_id}{name};
+										$fixed_names =~ s/\'/\\u0027/g;
+
 										
 										if(exists $STUDENTS_QST_ATTEMPTS{$keyy}{qst}{$qst_id}) {
 											if($STUDENTS_QST_ATTEMPTS{$keyy}{qst}{$qst_id}{start_time} != 0) { # have they started a qst
@@ -61348,7 +64047,7 @@ sub gradebook {
 														print"<B><font color=\"green\">*</font>\n";
 														}
 													
-													print"</B><DIV ID=\"displayb$i\" style=\"display\:none\; padding-bottom: 5px\"><a href=\"javascript\:click_handler\(\'2\',\'$qst_id\',\'$keyy\',\'$key\',\'0\',\'$QSTS{$qst_id}\',\'\',\'$STUDENTS_NAMES{$keyy}{name}\',\'$QST_NAMES{$qst_id}{name}\'\)\"><font STYLE=\"text-decoration:none\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{Delete}</a><BR><a href=\"javascript\:click_handler\(\'3\',\'$qst_id\',\'$keyy\',\'$key\',\'$STUDENTS_QST_SCORES{$keyy}{qst}{$qst_id}{mark}\',\'$QSTS{$qst_id}\',\'$STUDENTS_QST_SCORES{$keyy}{qst}{$qst_id}{bonus}\',\'$STUDENTS_NAMES{$keyy}{name}\',\'$QST_NAMES{$qst_id}{name}\'\)\"><font STYLE=\"text-decoration:none\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{Bonus}</a></font><BR><a href=\"javascript\:click_handler\(\'10\',\'$qst_id\',\'$keyy\',\'$key\',\'$STUDENTS_QST_SCORES{$keyy}{qst}{$qst_id}{mark}\',\'$QSTS{$qst_id}\'\)\"><font STYLE=\"text-decoration:none\;\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{ViewMark}</a></font></DIV>\n";
+													print"</B><DIV ID=\"displayb$i\" style=\"display\:none\; padding-bottom: 5px\"><a href=\"javascript\:click_handler\(\'2\',\'$qst_id\',\'$keyy\',\'$key\',\'0\',\'$QSTS{$qst_id}\',\'\',\'$STUDENTS_NAMES{$keyy}{name}\',\'$fixed_names\'\)\"><font STYLE=\"text-decoration:none\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{Delete}</a><BR><a href=\"javascript\:click_handler\(\'3\',\'$qst_id\',\'$keyy\',\'$key\',\'$STUDENTS_QST_SCORES{$keyy}{qst}{$qst_id}{mark}\',\'$QSTS{$qst_id}\',\'$STUDENTS_QST_SCORES{$keyy}{qst}{$qst_id}{bonus}\',\'$STUDENTS_NAMES{$keyy}{name}\',\'$fixed_names\'\)\"><font STYLE=\"text-decoration:none\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{Bonus}</a></font><BR><a href=\"javascript\:click_handler\(\'10\',\'$qst_id\',\'$keyy\',\'$key\',\'$STUDENTS_QST_SCORES{$keyy}{qst}{$qst_id}{mark}\',\'$QSTS{$qst_id}\'\)\"><font STYLE=\"text-decoration:none\;\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{ViewMark}</a></font></DIV>\n";
 													}
 													
 												elsif($STUDENTS_QST_SCORES{$keyy}{qst}{$qst_id}{marked} == 0) { # marked
@@ -61404,21 +64103,21 @@ sub gradebook {
 												}
 												
 											if($QSTS_POSTED{$qst_id} == 0 && $BRANCHING_QSTS{$qst_id} != 1) { # NOT BRANCHING
-												print"<DIV ID=\"displayb$i\" style=\"display\:none\"><font onClick=\"click_handler\(\'2\',\'$qst_id\',\'$keyy\',\'$key\',\'0\',\'$QSTS{$qst_id}\',\'\',\'$STUDENTS_NAMES{$keyy}{name}\',\'$QST_NAMES{$qst_id}{name}\'\)\" STYLE=\"cursor:pointer\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{Delete}</font></DIV>\n";
+												print"<DIV ID=\"displayb$i\" style=\"display\:none\"><font onClick=\"click_handler\(\'2\',\'$qst_id\',\'$keyy\',\'$key\',\'0\',\'$QSTS{$qst_id}\',\'\',\'$STUDENTS_NAMES{$keyy}{name}\',\'$fixed_names\'\)\" STYLE=\"cursor:pointer\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{Delete}</font></DIV>\n";
 												}
 											else {
-												print"<DIV ID=\"displayb$i\" style=\"display\:none\; padding-bottom: 5px\"><font onClick=\"click_handler\(\'2\',\'$qst_id\',\'$keyy\',\'$key\',\'0\',\'$QSTS{$qst_id}\',\'\',\'$STUDENTS_NAMES{$keyy}{name}\',\'$QST_NAMES{$qst_id}{name}\'\)\" STYLE=\"cursor:pointer\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{Delete}</font><BR>";
+												print"<DIV ID=\"displayb$i\" style=\"display\:none\; padding-bottom: 5px\"><font onClick=\"click_handler\(\'2\',\'$qst_id\',\'$keyy\',\'$key\',\'0\',\'$QSTS{$qst_id}\',\'\',\'$STUDENTS_NAMES{$keyy}{name}\',\'$fixed_names\'\)\" STYLE=\"cursor:pointer\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{Delete}</font><BR>";
 												
 												# PRINT + TIME and RESUME
 												if($BRANCHING_QSTS{$qst_id} != 1) { # NOT BRANCHING
-                                                                                                        print"<font onClick=\"click_handler\(\'3\',\'$qst_id\',\'$keyy\',\'$key\',\'$STUDENTS_QST_SCORES{$keyy}{qst}{$qst_id}{mark}\',\'$QSTS{$qst_id}\',\'$STUDENTS_QST_SCORES{$keyy}{qst}{$qst_id}{bonus}\',\'$STUDENTS_NAMES{$keyy}{name}\',\'$QST_NAMES{$qst_id}{name}\'\)\" STYLE=\"cursor:pointer\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{Bonus}</font><BR><font onClick=\"click_handler\(\'10\',\'$qst_id\',\'$keyy\',\'$key\',\'$STUDENTS_QST_SCORES{$keyy}{qst}{$qst_id}{mark}\',\'$QSTS{$qst_id}\'\)\" STYLE=\"cursor:pointer\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{ViewMark}</font>\n";
+                                                                                                        print"<font onClick=\"click_handler\(\'3\',\'$qst_id\',\'$keyy\',\'$key\',\'$STUDENTS_QST_SCORES{$keyy}{qst}{$qst_id}{mark}\',\'$QSTS{$qst_id}\',\'$STUDENTS_QST_SCORES{$keyy}{qst}{$qst_id}{bonus}\',\'$STUDENTS_NAMES{$keyy}{name}\',\'$fixed_names\'\)\" STYLE=\"cursor:pointer\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{Bonus}</font><BR><font onClick=\"click_handler\(\'10\',\'$qst_id\',\'$keyy\',\'$key\',\'$STUDENTS_QST_SCORES{$keyy}{qst}{$qst_id}{mark}\',\'$QSTS{$qst_id}\'\)\" STYLE=\"cursor:pointer\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{ViewMark}</font>\n";
 
                                            								if($submitted == 0 ) { # NOT SUBMITTED
-                                           									print"<BR><font onClick=\"click_handler\(\'15\',\'$qst_id\',\'$keyy\',\'$key\',\'$STUDENTS_QST_SCORES{$keyy}{qst}{$qst_id}{mark}\',\'$QSTS{$qst_id}\',\'$STUDENTS_QST_SCORES{$keyy}{qst}{$qst_id}{bonus}\',\'$STUDENTS_NAMES{$keyy}{name}\',\'$QST_NAMES{$qst_id}{name}\'\)\" STYLE=\"cursor:pointer\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{AdTime}</font>\n";
-														print"<BR><font onClick=\"click_handler\(\'16\',\'$qst_id\',\'$keyy\',\'$key\',\'$STUDENTS_QST_SCORES{$keyy}{qst}{$qst_id}{mark}\',\'$QSTS{$qst_id}\',\'$STUDENTS_QST_SCORES{$keyy}{qst}{$qst_id}{bonus}\',\'$STUDENTS_NAMES{$keyy}{name}\',\'$QST_NAMES{$qst_id}{name}\'\)\" STYLE=\"cursor:pointer\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{Resume}</font>\n";
+                                           									print"<BR><font onClick=\"click_handler\(\'15\',\'$qst_id\',\'$keyy\',\'$key\',\'$STUDENTS_QST_SCORES{$keyy}{qst}{$qst_id}{mark}\',\'$QSTS{$qst_id}\',\'$STUDENTS_QST_SCORES{$keyy}{qst}{$qst_id}{bonus}\',\'$STUDENTS_NAMES{$keyy}{name}\',\'$fixed_names\'\)\" STYLE=\"cursor:pointer\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{AdTime}</font>\n";
+														print"<BR><font onClick=\"click_handler\(\'16\',\'$qst_id\',\'$keyy\',\'$key\',\'$STUDENTS_QST_SCORES{$keyy}{qst}{$qst_id}{mark}\',\'$QSTS{$qst_id}\',\'$STUDENTS_QST_SCORES{$keyy}{qst}{$qst_id}{bonus}\',\'$STUDENTS_NAMES{$keyy}{name}\',\'$fixed_names\'\)\" STYLE=\"cursor:pointer\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{Resume}</font>\n";
 														}
 													# DO NOT WANT TO RESUME A QST that has been submitted
-						                                           		#print"<BR><font onClick=\"click_handler\(\'16\',\'$qst_id\',\'$keyy\',\'$key\',\'$STUDENTS_QST_SCORES{$keyy}{qst}{$qst_id}{mark}\',\'$QSTS{$qst_id}\',\'$STUDENTS_QST_SCORES{$keyy}{qst}{$qst_id}{bonus}\',\'$STUDENTS_NAMES{$keyy}{name}\',\'$QST_NAMES{$qst_id}{name}\'\)\" STYLE=\"cursor:pointer\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{Resume}</font>\n";
+						                                           		#print"<BR><font onClick=\"click_handler\(\'16\',\'$qst_id\',\'$keyy\',\'$key\',\'$STUDENTS_QST_SCORES{$keyy}{qst}{$qst_id}{mark}\',\'$QSTS{$qst_id}\',\'$STUDENTS_QST_SCORES{$keyy}{qst}{$qst_id}{bonus}\',\'$STUDENTS_NAMES{$keyy}{name}\',\'$fixed_names\'\)\" STYLE=\"cursor:pointer\" color=\"\#888888\" size=\"-1\">$LANGUAGE{$set_language}{Resume}</font>\n";
 													print"</DIV>\n";
                                                  							}
                                                                                                 else {
@@ -61650,6 +64349,7 @@ sub view_mark_type {
 	\}\n";
 	
 	print"function load_handler\(\) \{
+	score_handler\(\)
 	document.form1.submit\(\)
 	\}\n";
 	
@@ -61658,6 +64358,8 @@ sub view_mark_type {
 	\}\n";
 
 	&javascript_show_source();
+	
+	&javascript_show_memory();
 	
 	&print_javascript_end();
 		
@@ -61672,7 +64374,7 @@ sub view_mark_type {
 		my @results;
 		my %BEGUN_SUBMITTED = ();
 
-		print"<span class=\"sticky\" style=\"width:100%\; display: inline-block\;\"><TABLE width=\"100%\" $action_bar><TR><TD style=\"padding-top: 4px\; padding-bottom: 4px\"><font color=\"white\"><B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$QST_INFO{$qst}{name} &nbsp\;&nbsp\;-&nbsp\;&nbsp\; $STUDENTS_NAME{$s_id}{name} </font></b></TD><TD  align=\"right\"><font color=\"white\" STYLE=\"font-size:11pt; font-family:Arial;\"><B STYLE=\"cursor:pointer\" onClick=\"print_handler()\">$LANGUAGE{$set_language}{Print} / PDF &nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;</B></font</TD></TR></TABLE></span><P> \n";
+		print"<span class=\"sticky\" style=\"width:100%\; display: inline-block\;\"><TABLE width=\"100%\" $action_bar><TR><TD style=\"padding-top: 4px\; padding-bottom: 4px\"><font color=\"white\"><B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$QST_INFO{$qst}{name} &nbsp\;&nbsp\;-&nbsp\;&nbsp\; $STUDENTS_NAME{$s_id}{name} </font></b></TD><TD  align=\"right\"><font color=\"white\" STYLE=\"font-size:11pt; font-family:Arial;\"><B STYLE=\"cursor:pointer\" onClick=\"print_handler()\">$LANGUAGE{$set_language}{Print} / PDF &nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;</B></font</TD></TR></TABLE></span><BR> \n";
 		
 		my %STARTED_SUBMITTED = &select_started_submitted("qst_no","$qst","u_id","$s_id");
 		my $start_month = $STARTED_SUBMITTED{$s_id}{start_month} - 1;
@@ -61748,7 +64450,7 @@ sub view_mark_type {
                         $student_finish_time = "$student_finish_time".":"."$finish_end"." "."pm";
                         }
                         
-		print"<i><B>$LANGUAGE{$set_language}{Started}</B></i>\: @months[$start_month] $STARTED_SUBMITTED{$s_id}{start_day}, $student_start_time  &nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;\n";
+		print"<DIV style=\"border-radius: 5px\; border-style: dashed\; border-width: thin\; padding-top: 7px\; padding-bottom: 0px\; padding-left: 13px\;\"><i><B>$LANGUAGE{$set_language}{Started}</B></i>\: @months[$start_month] $STARTED_SUBMITTED{$s_id}{start_day}, $student_start_time  &nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;\n";
 		
 		if($STARTED_SUBMITTED{$s_id}{finish_time} == 0) {
 			print"&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<font color=\"brown\"><B STYLE=\"cursor: pointer\" onClick=\"submit_qst_for_student\(\'$s_id\',\'$qst\'\)\">$LANGUAGE{$set_language}{SubmitQSTforstudent}</B></font>\n";
@@ -61756,13 +64458,15 @@ sub view_mark_type {
 		else {
 			print"<i><B>$LANGUAGE{$set_language}{Submitted}</B></i>\: \n";
 			if($STARTED_SUBMITTED{$s_id}{finish_month} == -1) {
-				print"&nbsp\;by Instructor \n";
+				print"&nbsp\;by Instructor &nbsp\;&nbsp\;\n";
 				}
 			else {
-				print"@months[$finish_month] $STARTED_SUBMITTED{$s_id}{finish_day}, $student_finish_time \n";
+				print"@months[$finish_month] $STARTED_SUBMITTED{$s_id}{finish_day}, $student_finish_time &nbsp\;&nbsp\;\n";
 				}
 			}
 
+		print"<P><form name=\"score_form\"><B>$LANGUAGE{$set_language}{Marks}: <input type=\"text\" name=\"score\" style=\"border: none\; text-align: left\;\" size=\"6\" value=\"\" disabled>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$LANGUAGE{$set_language}{Bonus}: <input type=\"text\" name=\"bonus\" style=\"border: none\" size=\"3\" value=\"\" disabled></B></form></div>\n";
+		
 		# get students saved qst
 		my %STUDENTS_QST = &select_users_qst("query","SELECT quest_no,answer,mark,marked,time_stamp,quest_order from qsts WHERE u_id=\"$s_id\" AND qst=\"$qst\"");
 		
@@ -61799,7 +64503,10 @@ sub view_mark_type {
 		print"\}\n";
 		&print_javascript_end();
 		
-		print"<center> <TABLE><TR><TD><span ID=\"showon\" style=\"cursor: pointer\; display\:block\" onClick=\"show_source\(\'1\'\)\"><font size=\"-1\">$LANGUAGE{$set_language}{ShowSource}</font></span><span ID=\"hideon\" style=\"cursor: pointer\; display\:none\" onClick=\"show_source\(\'2\'\)\"><font size=\"-1\">$LANGUAGE{$set_language}{HideSource}</font></span></TD></TR></TABLE></center><P>\n";
+		print"<center> <TABLE><TR><TD><span ID=\"showon\" style=\"cursor: pointer\; display\:block\" onClick=\"show_source\(\'1\'\)\"><font size=\"-1\">$LANGUAGE{$set_language}{ShowSource}</font></span><span ID=\"hideon\" style=\"cursor: pointer\; display\:none\" onClick=\"show_source\(\'2\'\)\"><font size=\"-1\">$LANGUAGE{$set_language}{HideSource}</font></span></TD>";
+		print"<TD>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;</TD><TD><span ID=\"memon\" style=\"cursor: pointer\; display\:block\" onClick=\"show_memory\(\'1\'\)\"><font size=\"-1\">$LANGUAGE{$set_language}{ShowMemory}</font></span><span ID=\"memhideon\" style=\"cursor: pointer\; display\:none\" onClick=\"show_memory\(\'2\'\)\"><font size=\"-1\">$LANGUAGE{$set_language}{HideMemory}</font></span></TD>";
+		
+		print"</TR></TABLE></center><P>\n";
 
 		print"<P><TABLE><FORM name=\"qst_form\">\n";
 
@@ -61813,6 +64520,14 @@ sub view_mark_type {
 			
                     #### print out question
                  	print"<TABLE><TR><TD valign=\"top\"><B><A NAME=\"$index_pt2\">$index_pt2</a>\.</b></TD><TD valign=\"top\" NOWRAP><font size=\"-1\"><i>\($QUESTIONS_IN_QST{$real_no}{value}\)</i></font></TD><TD valign=\"top\">";
+
+	        	### MEMORY
+			if($QUESTIONS{$real_no}{memory} ne "") {
+				$QUESTIONS{$real_no}{memory} =~ s/&quot;/"/g;
+				print"<span ID=\"memory$num\" class=\"memory\" style=\"display\: none\"><TABLE><TR><TD width=\"5\"></TD><TD style=\"border: 1px solid #660616; padding-left: 7px; padding-right: 7px; padding-top: 7px; padding-bottom: 7px\">$QUESTIONS{$real_no}{memory}</TD></TR></TABLE><BR></span>\n";
+				}
+
+
              		my $question_rows = 1;
  			my $question_length = length($QUESTIONS{$real_no}{question});
  		
@@ -61855,11 +64570,11 @@ sub view_mark_type {
 					        }
 
                                         if($QUESTIONS{$real_no}{vlink} && $QUESTIONS{$real_no}{vlink} ne "0") {
-                                                print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" controls><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video</td></table><P>\n";
+                                                print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" oncontextmenu=\"return false\" controlslist=\"nodownload\" controls=\"\"><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video></td></table><P>\n";
                                                 }
                                         
                                         if($QUESTIONS{$real_no}{alink} && $QUESTIONS{$real_no}{alink} ne "0") {
-                                                print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video</td></table><P>\n";
+                                                print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video></td></table><P>\n";
                                                 }
                                         }
                                 else {
@@ -61878,11 +64593,11 @@ sub view_mark_type {
 						}
 
                                         if($QUESTIONS{$real_no}{vlink} && $QUESTIONS{$real_no}{vlink} ne "0") {
-                                                print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" controls><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video</td></table><P>\n";
+                                                print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" oncontextmenu=\"return false\" controlslist=\"nodownload\" controls=\"\"><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video></td></table><P>\n";
                                                 }
                                         
                                         if($QUESTIONS{$real_no}{alink} && $QUESTIONS{$real_no}{alink} ne "0") {
-                                                print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video</td></table><P>\n";
+                                                print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video></td></table><P>\n";
                                                 }
                                         }
 				} 
@@ -62263,9 +64978,27 @@ sub view_mark_type {
 
            	print "</TABLE></FORM>\n";
 
+		my $show_score = "$score"." "."/"." $QST_INFO{$qst}{marks}";
+		
 		print"<P><center><B style=\"cursor: pointer\" onClick=\"show_comments()\">$LANGUAGE{$set_language}{Comments}</b></center><BR>\n";
 		print"<center><span ID=\"comments\" style=\"display:none;\"><textarea rows=\"10\" cols=\"80\"></textarea></span></center>\n";
+		
+		&print_javascript_begin();
+		
+		print"function score_handler\(\) \{
+			document.score_form.score.value=\"$show_score\"
+			document.score_form.bonus.value=\"$bonus\"
+			\}\n";
 
+		
+		&print_javascript_end();
+
+		print"<P><center><B> Mark: $score / $QST_INFO{$qst}{marks}</B></center>\n";
+
+		if($bonus > 0) {
+			print"<P><center><B> Bonus: $bonus</B></center>\n";
+			}
+			
                 &print_form("form_name","form1","form_target","qst_right","input","qst_mark_ins","class_id","$class_id","s_id","$s_id","type","$type","qst","$qst","qst_total","$QST_INFO{$qst}{marks}","score","$score","bonus","$bonus","pass","$pass","correct","$correct","wrong","$wrong","na","$na","to_mark","$number_to_mark","questions","$QST_INFO{$qst}{questions}","value_to_mark","$valu_of_quests_to_be_marked","index_to_quest_no","$index_to_quest_no","u_id","$VMT{u_id}","session_id","$VMT{session_id}");
   		&print_form("form_name","form3","form_target","qst_right","input","update_qst_question_mark","class_id","$class_id","s_id","$s_id","type","$type","qst","$qst","qst_total","$QST_INFO{$qst}{marks}","score","$score","bonus","$bonus","pass","$pass","old_pass","$pass","correct","$correct","wrong","$wrong","na","$na","to_mark","$number_to_mark","question","","value_to_mark","$valu_of_quests_to_be_marked","chosen_question","","fake_quest_no","","index_to_quest_no","$index_to_quest_no","u_id","$VMT{u_id}","session_id","$VMT{session_id}");
 
@@ -62405,11 +65138,11 @@ sub view_indiv_branch_qst {
                                                 }
 					
                                         if($QUESTIONS{$real_no}{vlink} && $QUESTIONS{$real_no}{vlink} ne "0") {
-                                                print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" controls><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video</td></table><P>\n";
+                                                print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" oncontextmenu=\"return false\" controlslist=\"nodownload\" controls=\"\"><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video></td></table><P>\n";
                                                 }
                                         
                                         if($QUESTIONS{$real_no}{alink} && $QUESTIONS{$real_no}{alink} ne "0") {
-                                                print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video</td></table><P>\n";
+                                                print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video></td></table><P>\n";
                                                 }
                                         }
 	            		
@@ -62424,11 +65157,11 @@ sub view_indiv_branch_qst {
                                                 }
 					
                                         if($QUESTIONS{$real_no}{vlink} && $QUESTIONS{$real_no}{vlink} ne "0") {
-                                                print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" controls><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video</td></table><P>\n";
+                                                print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" oncontextmenu=\"return false\" controlslist=\"nodownload\" controls=\"\"><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$real_no}{vlink}\" type=\"video/webm\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}</video></td></table><P>\n";
                                                 }
                                         
                                         if($QUESTIONS{$real_no}{alink} && $QUESTIONS{$real_no}{alink} ne "0") {
-                                                print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video</td></table><P>\n";
+                                                print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$real_no}{alink}\" type=\"audio/wav\">$LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}</video></td></table><P>\n";
                                                 }
                                         }
 				} 
@@ -63204,8 +65937,10 @@ sub get_the_folder_name {
 	my %CAT_NAME = {};
 	my $query = "SELECT number,question from categories_to_questions WHERE ";
 	my $query1 = "SELECT number,cat_name from question_categories WHERE ";
+	my $questions = $GTFN{questions};
+	$questions =~ s/^\,//;
 	
-	my @quests = split(/\,/,$GTFN{questions});
+	my @quests = split(/\,/,$questions);
 	
 	foreach my $key(@quests) {
 		if($order == 0) {
@@ -63888,6 +66623,31 @@ sub resume_qst1 {
 	
 #####################
 #
+# VIEWED
+#
+####################
+sub viewed {
+	my %VWD = @_;
+	&update_qsts_viewed("u_id","$VWD{u_id}","qst","$VWD{qst}","quest_no","$VWD{quest_no}","attempt","$VWD{attempt}");
+	
+	&print_javascript_begin();
+		
+	print"document.onkeydown = function (event) \{
+	event = (event || window.event);
+	return keyFunction(event);
+	\}\n";
+								
+	print"function keyFunction(event)\{
+	if (event.keyCode == 123) \{
+	return false;
+	\}
+	\}\n";
+	    					
+	&print_javascript_end();				
+	}
+	
+#####################
+#
 # VIEW_QST
 #
 ####################
@@ -63946,6 +66706,8 @@ sub view_qst {
 	
 	&javascript_show_source();
 	
+	&print_clear_memory_many();
+
 	&print_javascript_end();
 	
 	&print_sticky_style();
@@ -64058,12 +66820,12 @@ sub view_qst {
                         		}
 
                                 if($QUESTIONS{$key1}{vlink} && $QUESTIONS{$key1}{vlink} ne "0") {
-                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" controls>
+                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" oncontextmenu=\"return false\" controlslist=\"nodownload\" controls=\"\">
                                         <source src=\"$QUESTIONS{$key1}{vlink}\" type=\"video/mp4\">
                                         <source src=\"$QUESTIONS{$key1}{vlink}\" type=\"video/ogg\">
                                         <source src=\"$QUESTIONS{$key1}{vlink}\" type=\"video/webm\">
                                         $LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}
-                                        </video</td></table><P>\n";
+                                        </video></td></table><P>\n";
                                         }
                                         
                                 if($QUESTIONS{$key1}{alink} && $QUESTIONS{$key1}{alink} ne "0") {
@@ -64072,7 +66834,7 @@ sub view_qst {
                                         <source src=\"$QUESTIONS{$key1}{alink}\" type=\"audio/ogg\">
                                         <source src=\"$QUESTIONS{$key1}{alink}\" type=\"audio/wav\">
                                         $LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}
-                                        </video</td></table><P>\n";
+                                        </video></td></table><P>\n";
                                         }
                                         
             			if ($QUESTIONS{$key1}{type} eq"TF") {
@@ -64145,11 +66907,25 @@ sub view_qst {
 			
         	########### NORMAL QUESTIONS
         	
-		else { 
+		else {
 			print"<TABLE><TR><TD valign=\"top\"><B>$index\.</b></TD>\n";
              		my $question_rows = 1;
  			my $question_length = length($QUESTIONS{$ORDER{$key}}{question});
+                        
+                        if ($VQST{type} != 2) {
+                        	print"<TD NOWRAP valign=\"top\"><font size=\"-1\">$QUESTIONS{$ORDER{$key}}{value}</font></TD><TD valign=\"top\">";
+				}
                                 
+                        if($QUESTIONS{$ORDER{$key}}{memory} ne "") { # MEMORY
+                        	$QUESTIONS{$ORDER{$key}}{memory} =~ s/&quot;/"/g;
+                        	
+				print"<DIV ID=\"MEMORY$index\" style=\"display: block\" >\n";
+				print"<TABLE><TR><TD width=\"15\"></TD><TD style=\"border: 1px solid #660616\; padding-left: 7px\; padding-right: 7px\; padding-top: 7px\; padding-bottom: 7px\">$QUESTIONS{$ORDER{$key}}{memory}</TD></TR></TABLE><BR><center><B onClick=\"clear_memory_many\(\'$index\'\)\" style=\"cursor\:pointer\;\">Continue</B></center><BR>\n";
+				print"</DIV>\n";
+								
+				print"<DIV ID=\"QUESTION$index\" style=\"display: none\" >\n";
+				}
+
  			# fix display to show new lines in text of question
  			if($QUESTIONS{$ORDER{$key}}{question} =~ /\r\n/g) {
  				my @number_of_newlines = split(/\r\n/,$QUESTIONS{$ORDER{$key}}{question});
@@ -64157,7 +66933,7 @@ sub view_qst {
  				$question_rows = $question_rows + $new_lines;
  				}
 
-            		if($VQST{type} == 2 || $RETURN{$VQST{quiz_no}}{branching} == 1) { # surveys or branching
+            		if($VQST{type} == 2 || $RETURN{$VQST{quiz_no}}{branching} == 1) { # SURVEYS OR BRANCHING
 				print"<TD NOWRAP valign=\"top\"></TD><TD valign=\"top\">";
 				
 				if($QUESTIONS{$ORDER{$key}}{ans_mode} == 2) {
@@ -64179,15 +66955,13 @@ sub view_qst {
                                         }
             			}
             			
-            		else { # quizzes/tests
-				print"<TD NOWRAP valign=\"top\"><font size=\"-1\">$QUESTIONS{$ORDER{$key}}{value}</font></TD><TD valign=\"top\">";
-				
+            		else { # quizzes/tests				
 				if($QUESTIONS{$ORDER{$key}}{ans_mode} == 2) {
 					$show_eq = 2;
 					}
 					
 				if($QUESTIONS{$ORDER{$key}}{mode} == 1) {
-                                        print"$QUESTIONS{$ORDER{$key}}{question}</TD></TR></TABLE>";
+                                        print"$QUESTIONS{$ORDER{$key}}{question}";
                                         }
                                         
                                 elsif($QUESTIONS{$ORDER{$key}}{mode} == 2) { # EQUATION EDITOR
@@ -64215,12 +66989,12 @@ sub view_qst {
 				        }
 
                                 if($QUESTIONS{$ORDER{$key}}{vlink} && $QUESTIONS{$ORDER{$key}}{vlink} ne "0") {
-                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" controls>
+                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" oncontextmenu=\"return false\" controlslist=\"nodownload\" controls=\"\">
                                         <source src=\"$QUESTIONS{$ORDER{$key}}{vlink}\" type=\"video/mp4\">
                                         <source src=\"$QUESTIONS{$ORDER{$key}}{vlink}\" type=\"video/ogg\">
                                         <source src=\"$QUESTIONS{$ORDER{$key}}{vlink}\" type=\"video/webm\">
                                         $LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}
-                                        </video</td></table><P>\n";
+                                        </video></td></table><P>\n";
                                         }
                                         
                                 if($QUESTIONS{$ORDER{$key}}{alink} && $QUESTIONS{$ORDER{$key}}{alink} ne "0") {
@@ -64229,7 +67003,7 @@ sub view_qst {
                                         <source src=\"$QUESTIONS{$ORDER{$key}}{alink}\" type=\"audio/ogg\">
                                         <source src=\"$QUESTIONS{$ORDER{$key}}{alink}\" type=\"audio/wav\">
                                         $LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}
-                                        </video</td></table><P>\n";
+                                        </video></td></table><P>\n";
                                         }
                                 }
                                 
@@ -64312,7 +67086,7 @@ sub view_qst {
 			++$num;
 			
 			print"<P><span ID=\"$sourcestate\" class=\"sourc\" style=\"display:none\"><TABLE><TR><TD width=\"40\"></TD><TD><TABLE style=\"border:1px solid grey\; border-radius:.3em\;\"><TR style=\"padding-bottom: 4px\;\"><TD><i>&nbsp\;$LANGUAGE{$set_language}{SOURCE}:</i> <font style=\"font-family:Times New Roman\;\" >$SOURCE{$ORDER{$key}} &nbsp\;</font><BR></TD></TR></TABLE></span></TD></TR></TABLE>\n";
-
+			print"</TD></TR></TABLE></DIV>\n";
 			print"<HR width=85\%>\n";
 			}
 		}
@@ -64362,6 +67136,8 @@ sub view_quest {
 		print"\}\n";		
 		}
 		
+	&print_clear_memory();
+	
 	&print_javascript_end();
 
 		print <<"EOP";
@@ -64388,7 +67164,7 @@ sub view_quest {
    		 
 EOP
    		 
-	
+
 	if ($VQ{from} == 1) { #from questions page
 		print "<center><P><button TYPE=\"button\" STYLE=\"cursor: pointer\;\" OnClick=\"enlarge\(\)\" >$LANGUAGE{$set_language}{ActualSize}</button> &nbsp\;&nbsp\;&nbsp\;&nbsp\; <button TYPE=\"button\"   STYLE=\"cursor: pointer\;\" OnClick=\"document.closewin.submit\(\)\" >$LANGUAGE{$set_language}{Close}</button></center> \n";
 		}
@@ -64402,7 +67178,7 @@ EOP
                         print"$image1 $LANGUAGE{$set_language}{ViewQuestion} <font color=\"red\">$VQ{num} </b></font></TD></table><P> \n";
                         }
                 else {
-                    print"$image1 $LANGUAGE{$set_language}{ViewQuestion} <font color=\"red\">$VQ{num} </b></font></TD><TD>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<input TYPE=\"button\" STYLE=\"cursor: pointer\;\" OnClick=\"window.self.close\(\)\" VALUE=\"$LANGUAGE{$set_language}{Close}\"></TD></table><P> \n";
+                    	print"$image1 $LANGUAGE{$set_language}{ViewQuestion} <font color=\"red\">$VQ{num} </b></font></TD><TD>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<input TYPE=\"button\" STYLE=\"cursor: pointer\;\" OnClick=\"window.self.close\(\)\" VALUE=\"$LANGUAGE{$set_language}{Close}\"></TD></table><P> \n";
                         }
                 }
         else {
@@ -64427,7 +67203,16 @@ EOP
 
         
     ### PRINT OUT QUESTION
-    
+    	if($QUESTION{$VQ{number}}{memory} ne "") { # MEMORY
+    		$QUESTION{$VQ{number}}{memory} =~ s/&quot;/"/g;
+    		
+    		print"<DIV ID=\"MEMORY\" style=\"display: block\" >\n";
+    		print"<TABLE><TR><TD width=\"15\"></TD><TD style=\"border: 1px solid #660616\; padding-left: 7px\; padding-right: 7px\; padding-right: 7px\; padding-top: 7px\; padding-bottom: 7px\">$QUESTION{$VQ{number}}{memory}</TD></TR></TABLE><BR><center><B onClick=\"clear_memory\(\)\" style=\"cursor\:pointer\;\">Continue</B></center><BR>\n";
+    		print"</DIV>\n";
+    			
+    		print"<DIV ID=\"QUESTION\" style=\"display: none\" >\n";
+    		}
+
         if($QUESTION{$VQ{number}}{mode} == 1) { # Advanced Editor
                 print"<TABLE><TR><TD>$QUESTION{$VQ{number}}{question}</TD></TR></TABLE>\n";
                 }
@@ -64455,12 +67240,12 @@ EOP
                         }
                         
                 if($QUESTION{$VQ{number}}{vlink} && $QUESTION{$VQ{number}}{vlink} ne "0") {
-                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" controls>
+                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" oncontextmenu=\"return false\" controlslist=\"nodownload\" controls=\"\">
                         <source src=\"$QUESTION{$VQ{number}}{vlink}\" type=\"video/mp4\">
                         <source src=\"$QUESTION{$VQ{number}}{vlink}\" type=\"video/ogg\">
                         <source src=\"$QUESTION{$VQ{number}}{vlink}\" type=\"video/webm\">
                         $LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}
-                        </video</td></table><P>\n";
+                        </video></td></table><P>\n";
                         }
 		
                 if($QUESTION{$VQ{number}}{alink} && $QUESTION{$VQ{number}}{alink} ne "0") {
@@ -64469,7 +67254,7 @@ EOP
                         <source src=\"$QUESTION{$VQ{number}}{alink}\" type=\"audio/ogg\">
                         <source src=\"$QUESTION{$VQ{number}}{alink}\" type=\"audio/wav\">
                         $LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}
-                        </video</td></table><P>\n";
+                        </video></td></table><P>\n";
                         }
 		}
 		
@@ -64978,9 +67763,11 @@ EOP
 	
 		my $there = length($check);
 		if( $there > 0) {
-			print"<P><TABLE><TR><TD width=\"40\"></TD><TD><TABLE style=\"border:1px solid grey\; border-radius:.3em\;\"><TR style=\"padding-bottom: 4px\;\"><TD><i>&nbsp\;Explanation:</i><font style=\"font-family:Times New Roman\;\">$QUESTION{$VQ{number}}{explanation} </font><BR></TD></TR></TABLE></TD></TR></TABLE>\n";
+			$QUESTION{$VQ{number}}{explanation} =~ s/&quot;/"/g;
+			print"<P><TABLE><TR><TD width=\"40\"></TD><TD><TABLE style=\"border:1px solid grey\; border-radius:.3em\;\"><TR style=\"padding-bottom: 4px\;\"><TD style=\"padding-bottom: 4px\;\"><i>&nbsp\;Explanation:</i><font style=\"font-family:Times New Roman\;\">$QUESTION{$VQ{number}}{explanation} </font></TD></TR></TABLE></TD></TR></TABLE>\n";
 		}
-		
+	
+	print"</DIV>\n";
   	&print_form("form_name","form1","form_target","viewenlarge","input","view_quest","number","$VQ{number}","type","$VQ{type}","from","","u_id","$VQ{u_id}","session_id","$VQ{session_id}");
   	
   	&print_form("form_name","closewin","input","print_instructors_screen","from","$VQ{from}","u_id","$VQ{u_id}","session_id","$VQ{session_id}");
@@ -65072,12 +67859,12 @@ sub stats_view_quest {
                         }
 		
                 elsif($QUESTION{$VQ{number}}{vlink} && $QUESTION{$VQ{number}}{vlink} ne "0") {
-                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" controls>
+                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" oncontextmenu=\"return false\" controlslist=\"nodownload\" controls=\"\">
                         <source src=\"$QUESTION{$VQ{number}}{vlink}\" type=\"video/mp4\">
                         <source src=\"$QUESTION{$VQ{number}}{vlink}\" type=\"video/ogg\">
                         <source src=\"$QUESTION{$VQ{number}}{vlink}\" type=\"video/webm\">
                         $LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}
-                        </video</td></table><P>\n";
+                        </video></td></table><P>\n";
                         }
 		
                 elsif($QUESTION{$VQ{number}}{alink} && $QUESTION{$VQ{number}}{alink} ne "0") {
@@ -65086,7 +67873,7 @@ sub stats_view_quest {
                         <source src=\"$QUESTION{$VQ{number}}{alink}\" type=\"audio/ogg\">
                         <source src=\"$QUESTION{$VQ{number}}{alink}\" type=\"audio/wav\">
                         $LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}
-                        </video</td></table><P>\n";
+                        </video></td></table><P>\n";
                         }
 		}
 		
@@ -65413,6 +68200,8 @@ sub view_bank_quest {
 	$VQ{image_number} =~ s/\D//g;
 	my %QUESTION = ();
 
+	&print_input_style_larger();
+
 	&print_style_sheet();
 		
 	&print_javascript_begin();
@@ -65440,7 +68229,35 @@ sub view_bank_quest {
 		print"\}\n";		
 		}
 		
+	&print_clear_memory();
+		
 	&print_javascript_end();
+	
+		print <<"EOP";
+		<style type="text/css">
+		      button {
+		        display: inline-block;
+		        background-color: blue;
+		        background-image: linear-gradient(blue, black);
+		        border-radius: 10px;
+		        border: 4px double #cccccc;
+		        color: #eeeeee;
+		        text-align: center;
+		        font-size: 14px;
+		        padding: 3px;
+		        width: 110px;
+		        -webkit-transition: all 0.5s;
+		        -moz-transition: all 0.5s;
+		        -o-transition: all 0.5s;
+		        transition: all 0.5s;
+		        cursor: pointer;
+		        margin: 5px;
+		      }
+   		 </style>
+   		 
+EOP
+   		 
+
 	
 	if ($VQ{from} == 1) { #from questions page
 		print"<FORM>";
@@ -65460,7 +68277,8 @@ sub view_bank_quest {
 		}
 		
 	print"$image1 $LANGUAGE{$set_language}{ViewQuestion} <font color=\"red\">$VQ{num} </b></font></TD></table><P> \n";
-	%QUESTION = &select_question("query","SELECT * from questions WHERE number=\"$VQ{number}\" AND org_id=\"$org_id\"");
+	
+	%QUESTION = &select_question("query","SELECT * from questions WHERE number=\"$VQ{number}\" AND org_id=\"$org_id\" AND u_id=\"0\"");
 
 	my $question_rows = 1;
 	my $question_length = length("$QUESTION{$VQ{number}}{question}");
@@ -65474,6 +68292,17 @@ sub view_bank_quest {
         
         
     #### PRINT THE QUESTION
+    
+    	if($QUESTION{$VQ{number}}{memory} ne "") { # MEMORY
+    		$QUESTION{$VQ{number}}{memory} =~ s/&quot;/"/g;
+    		
+    		print"<DIV ID=\"MEMORY\" style=\"display: block\" >\n";
+    		print"<TABLE><TR><TD width=\"15\"></TD><TD style=\"border: 1px solid #660616\; padding-left: 7px\; padding-right: 7px\; padding-right: 7px\; padding-top: 7px\; padding-bottom: 7px\">$QUESTION{$VQ{number}}{memory}</TD></TR></TABLE><BR><center><B onClick=\"clear_memory\(\)\" style=\"cursor\:pointer\;\">Continue</B></center><BR>\n";
+    		print"</DIV>\n";
+    			
+    		print"<DIV ID=\"QUESTION\" style=\"display: none\" >\n";
+    		}
+
         if($QUESTION{$VQ{number}}{mode} == 1) { # Advanced Editor
                 print"<TABLE><TR><TD>$QUESTION{$VQ{number}}{question}</TD></TABLE>\n";
                 }
@@ -65495,22 +68324,27 @@ sub view_bank_quest {
                         print"<table><td WIDTH=\"60\"></td><td><img src=\"$image\"></td></table><P>\n";
                         }
 		
-                elsif($QUESTION{$VQ{number}}{vlink} && $QUESTION{$VQ{number}}{vlink} ne "0") {
-                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" controls>
+		if(defined $QUESTION{$VQ{number}}{pdf} && $QUESTION{$VQ{number}}{pdf} > 0) {
+		        my $pdf = "\/schools\/qst_files\/"."$QUESTION{$VQ{number}}{pdf}"."\."."pdf";
+		        print"<table><td WIDTH=\"60\"></td><td STYLE=\"cursor: pointer\;\" onclick=\"window.open('$pdf','pdf_windo','width=700,height=800')\"><i>$LANGUAGE{$set_language}{ViewPDF}</i></td></table><P>\n";
+                        }
+
+                if($QUESTION{$VQ{number}}{vlink} && $QUESTION{$VQ{number}}{vlink} ne "0") {
+                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" oncontextmenu=\"return false\" controlslist=\"nodownload\" controls=\"\">
                         <source src=\"$QUESTION{$VQ{number}}{vlink}\" type=\"video/mp4\">
                         <source src=\"$QUESTION{$VQ{number}}{vlink}\" type=\"video/ogg\">
                         <source src=\"$QUESTION{$VQ{number}}{vlink}\" type=\"video/webm\">
                         $LANGUAGE{$set_language}{Yourbrowserdoesnotsupportthevideotag}
-                        </video</td></table><P>\n";
+                        </video></td></table><P>\n";
                         }
 		
-                elsif($QUESTION{$VQ{number}}{alink} && $QUESTION{$VQ{number}}{alink} ne "0") {
+                if($QUESTION{$VQ{number}}{alink} && $QUESTION{$VQ{number}}{alink} ne "0") {
                         print"<table><td WIDTH=\"60\"></td><td><audio controls>
                         <source src=\"$QUESTION{$VQ{number}}{alink}\" type=\"audio/mpeg\">
                         <source src=\"$QUESTION{$VQ{number}}{alink}\" type=\"audio/ogg\">
                         <source src=\"$QUESTION{$VQ{number}}{alink}\" type=\"audio/wav\">
                         $LANGUAGE{$set_language}{Yourbrowserdoesnotsupporttheaudiotag}
-                        </video</td></table><P>\n";
+                        </video></td></table><P>\n";
                         }
                 }
 		
@@ -65976,7 +68810,7 @@ sub view_bank_quest {
 	
 		my $there = length($check);
 		if( $there > 0) {
-			print"<P><TABLE><TR><TD width=\"40\"></TD><TD><TABLE style=\"border:1px solid grey\; border-radius:.3em\;\"><TR style=\"padding-bottom: 4px\;\"><TD><i>&nbsp\;Explanation:</i><font style=\"font-family:Times New Roman\;\">$QUESTION{$VQ{number}}{explanation} </font><BR></TD></TR></TABLE></TD></TR></TABLE>\n";
+			print"<P><TABLE><TR><TD width=\"40\"></TD><TD><TABLE style=\"border:1px solid grey\; border-radius:.3em\;\"><TR style=\"padding-bottom: 4px\;\"><TD style=\"padding-bottom: 4px\;\"><i>&nbsp\;Explanation:</i><font style=\"font-family:Times New Roman\;\">$QUESTION{$VQ{number}}{explanation} </font></TD></TR></TABLE></TD></TR></TABLE>\n";
 		}
 
   	&print_form("form_name","form1","form_target","viewenlarge","input","view_bank_quest","number","$VQ{number}","type","$VQ{type}","from","","u_id","$VQ{u_id}","session_id","$VQ{session_id}");
@@ -66176,6 +69010,29 @@ sub print_function_ma_image_delete_handler {
 	self.parent.quest1.document.question_form.elements[nam].value=\"\"
         Show_Im(displ)
         \}\n";
+	}
+
+########################
+#
+# PRINT_STOP_F12
+#
+########################
+sub print_stop_F12 {
+	print"document.onkeydown = function (event) \{
+	event = (event || window.event);
+	return keyFunction(event);
+	\}\n";
+							
+	print"function keyFunction(event)\{
+	if (event.keyCode == 123) \{
+	return false;
+	\}
+	if (event.keyCode == 17) \{
+	return false;
+	\}
+    	\}\n";
+    	
+    	print"history.forward()\n";
 	}
 
 ########################
@@ -67312,10 +70169,11 @@ sub insert_mx_question_answers_quote {
 ###########
 sub insert_import_question_return {
 	my %I = @_;
+
 	my $return;
-        my $query1 = "INSERT INTO questions(u_id,question,type,value,org_id,sub_type,image_id,vlink,alink,kolum,mode,descrip,ans_mode,pdf,explanation) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        my $query1 = "INSERT INTO questions(u_id,question,type,value,org_id,sub_type,image_id,vlink,alink,kolum,mode,descrip,ans_mode,pdf,explanation,memory) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         my $sth1 = $dbh->prepare($query1);
-        $sth1->execute($I{u_id},$I{question},$I{type},$I{value},$I{org_id},$I{sub_type},$I{image_id},$I{vlink},$I{alink},$I{kolum},$I{mode},$I{descrip},$I{ans_mode},$I{pdf},$I{explanation});
+        $sth1->execute($I{u_id},$I{question},$I{type},$I{value},$I{org_id},$I{sub_type},$I{image_id},$I{vlink},$I{alink},$I{kolum},$I{mode},$I{descrip},$I{ans_mode},$I{pdf},$I{explanation},$I{memory});
 
 	my $query = qq{SELECT LAST_INSERT_ID()};
 	my $sth = $dbh->prepare($query);
@@ -67335,9 +70193,9 @@ sub insert_question_quote_return {
 	my $cmd1 = "$I{query1}";
 	my $cmd2 = "$I{query2}";
 
-        my $query1 = "INSERT INTO questions(u_id,question,type,value,org_id,sub_type,image_id,vlink,alink,kolum,mode,descrip,ans_mode,pdf,explanation) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        my $query1 = "INSERT INTO questions(u_id,question,type,value,org_id,sub_type,image_id,vlink,alink,kolum,mode,descrip,ans_mode,pdf,explanation,memory) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         my $sth1 = $dbh->prepare($query1);
-        $sth1->execute($ids,$I{query},$cmd1,$cmd2,$org_id,$I{sub_type},$I{image_id},$I{vlink},$I{alink},$I{kolum},$I{mode},$I{descrip},$I{ans_mode},$I{pdf},$I{explanation});
+        $sth1->execute($ids,$I{query},$cmd1,$cmd2,$org_id,$I{sub_type},$I{image_id},$I{vlink},$I{alink},$I{kolum},$I{mode},$I{descrip},$I{ans_mode},$I{pdf},$I{explanation},$I{memory});
 
 	my $query = qq{SELECT LAST_INSERT_ID()};
 	my $sth = $dbh->prepare($query);
@@ -67357,9 +70215,9 @@ sub insert_bank_question_quote_return {
 	my $cmd1 = "$I{query1}";
 	my $cmd2 = "$I{query2}";
 	
-        my $query1 = "INSERT INTO questions(u_id,question,type,value,org_id,sub_type,image_id,vlink,alink,kolum,mode,descrip,ans_mode,pdf,explanation) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        my $query1 = "INSERT INTO questions(u_id,question,type,value,org_id,sub_type,image_id,vlink,alink,kolum,mode,descrip,ans_mode,pdf,explanation,memory) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         my $sth1 = $dbh->prepare($query1);
-        $sth1->execute(0,$I{query},$cmd1,$cmd2,$org_id,$I{sub_type},$I{image_id},$I{vlink},$I{alink},$I{kolum},$I{mode},$I{descrip},$I{ans_mode},$I{pdf},$I{explanation});
+        $sth1->execute(0,$I{query},$cmd1,$cmd2,$org_id,$I{sub_type},$I{image_id},$I{vlink},$I{alink},$I{kolum},$I{mode},$I{descrip},$I{ans_mode},$I{pdf},$I{explanation},$I{memory});
 
 	my $query = qq{SELECT LAST_INSERT_ID()};
 	my $sth = $dbh->prepare($query);
@@ -67376,7 +70234,7 @@ sub insert_bank_question_quote_return {
 ############
 sub insert_qst {
 	my %IQ = @_;
-	my $query = qq{INSERT posted_qst VALUES("$IQ{qst}","$IQ{attempts}","$IQ{start}","$IQ{end}","$IQ{class_id}","$IQ{result}","$IQ{submissions}","$IQ{rhm}","$IQ{forall}","$ids","1","$org_id","$IQ{avail}","$IQ{start_month}","$IQ{start_day}","$IQ{start_hour}","$IQ{finish_month}","$IQ{finish_day}","$IQ{finish_hour}","$IQ{qtime}","$IQ{delivery}","$IQ{branching}","$IQ{shuffle}","$IQ{display}","$IQ{shuffle_ans}","$IQ{explanations}","$IQ{source}")};
+	my $query = qq{INSERT posted_qst VALUES("$IQ{qst}","$IQ{attempts}","$IQ{start}","$IQ{end}","$IQ{class_id}","$IQ{result}","$IQ{submissions}","$IQ{rhm}","$IQ{forall}","$ids","1","$org_id","$IQ{avail}","$IQ{start_month}","$IQ{start_day}","$IQ{start_hour}","$IQ{finish_month}","$IQ{finish_day}","$IQ{finish_hour}","$IQ{qtime}","$IQ{delivery}","$IQ{branching}","$IQ{shuffle}","$IQ{display}","$IQ{shuffle_ans}","$IQ{explanations}","$IQ{source}","$IQ{memori}")};
 	my $sth = $dbh->prepare($query);
 	$sth->execute();
 	}
@@ -68079,6 +70937,21 @@ sub get_the_number_of_ma_answers {
 
 ###########
 #
+# SELECT_VIEWED
+#
+###########
+sub select_viewed {
+	my %SV = @_;
+	my $return;
+	my $query = qq{SELECT viewed from qsts WHERE quest_no="$SV{quest_no}" AND u_id="$SV{u_id}" AND qst="$SV{qst}" AND attempt="$SV{attempt}"};
+	my $sth = $dbh->prepare($query);
+	$sth->execute();
+	$return = $sth->fetchrow_array();
+	return($return);
+	}
+
+###########
+#
 # SELECT_ALL_QST_QUESTIONS
 #
 ###########
@@ -68356,7 +71229,7 @@ sub select_posted_qst {
 	my $sth = $dbh->prepare($query);
 	$sth->execute();
 	while(my @row = $sth->fetchrow_array()) {
-		$RETURN{$row[0]} = {qst => "$row[0]", attempts => "$row[1]",start => "$row[2]",end => "$row[3]",class_id => "$row[4]",result => "$row[5]",submissions => "$row[6]",rhm => "$row[7]",forall => "$row[8]",u_id => "$row[9]",posted => "$row[10]",org_id=> "$row[11]",avail => "$row[12]",start_month => "$row[13]",start_day => "$row[14]",start_hour => "$row[15]",finish_month => "$row[16]",finish_day => "$row[17]",finish_hour => "$row[18]",qtime => "$row[19]",delivery=>"$row[20]",branching=>"$row[21]",shuffle=>"$row[22]",display=>"$row[23]",shuffle_ans=>"$row[24]",explanation=>"$row[25]",source=>"$row[26]"};
+		$RETURN{$row[0]} = {qst => "$row[0]", attempts => "$row[1]",start => "$row[2]",end => "$row[3]",class_id => "$row[4]",result => "$row[5]",submissions => "$row[6]",rhm => "$row[7]",forall => "$row[8]",u_id => "$row[9]",posted => "$row[10]",org_id=> "$row[11]",avail => "$row[12]",start_month => "$row[13]",start_day => "$row[14]",start_hour => "$row[15]",finish_month => "$row[16]",finish_day => "$row[17]",finish_hour => "$row[18]",qtime => "$row[19]",delivery=>"$row[20]",branching=>"$row[21]",shuffle=>"$row[22]",display=>"$row[23]",shuffle_ans=>"$row[24]",explanation=>"$row[25]",source=>"$row[26]",memori=>"$row[27]"};
 		}
 	return(%RETURN);
 	}
@@ -68565,7 +71438,7 @@ sub select_question {
 	my $sth = $dbh->prepare($query);
 	$sth->execute();
 	while(my @row = $sth->fetchrow_array()) {
-		$RETURN{$row[0]} = {number=>"$row[0]", question => "$row[2]", type => "$row[3]", value=> "$row[4]", org_id=> "$row[5]", sub_type=> "$row[6]", image_id=> "$row[7]",vlink=> "$row[8]",alink=> "$row[9]",kolum=> "$row[10]",mode=> "$row[11]",descrip=>"$row[12]",ans_mode=>"$row[13]",pdf=>"$row[14]",explanation=>"$row[15]"};
+		$RETURN{$row[0]} = {number=>"$row[0]", question => "$row[2]", type => "$row[3]", value=> "$row[4]", org_id=> "$row[5]", sub_type=> "$row[6]", image_id=> "$row[7]",vlink=> "$row[8]",alink=> "$row[9]",kolum=> "$row[10]",mode=> "$row[11]",descrip=>"$row[12]",ans_mode=>"$row[13]",pdf=>"$row[14]",explanation=>"$row[15]",memory=>"$row[16]"};
 		}
 
 	return(%RETURN);
@@ -68584,7 +71457,7 @@ sub select_questions {
 	my $sth = $dbh->prepare($query);
 	$sth->execute();
 	while(my @row = $sth->fetchrow_array()) {
-                $RETURN{$row[0]} = {number=>"$row[0]", question => "$row[2]", type => "$row[3]", value=> "$row[4]", org_id=> "$row[5]", sub_type=> "$row[6]", image_id=> "$row[7]",vlink=> "$row[8]",alink=> "$row[9]",kolum=> "$row[10]",mode=> "$row[11]",descrip=>"$row[12]",ans_mode=>"$row[13]",pdf=>"$row[14]",explanation=>"$row[15]"};
+                $RETURN{$row[0]} = {number=>"$row[0]", question => "$row[2]", type => "$row[3]", value=> "$row[4]", org_id=> "$row[5]", sub_type=> "$row[6]", image_id=> "$row[7]",vlink=> "$row[8]",alink=> "$row[9]",kolum=> "$row[10]",mode=> "$row[11]",descrip=>"$row[12]",ans_mode=>"$row[13]",pdf=>"$row[14]",explanation=>"$row[15]",memory=>"$row[16]"};
 		}
 	return(%RETURN);
 	}
@@ -69125,6 +71998,18 @@ sub update_qst_mark {
 
 ###########
 #
+# UPDATE_QSTS_VIEWED
+#
+###########
+sub update_qsts_viewed {
+	my %UQV = @_;
+	my $query = qq{UPDATE qsts SET viewed=1 WHERE u_id=$UQV{u_id} AND qst=$UQV{qst} AND quest_no=$UQV{quest_no} AND attempt=$UQV{attempt}};
+	my $sth = $dbh->prepare($query);
+	$sth->execute();
+	}
+
+###########
+#
 # UPDATE
 #
 ###########
@@ -69196,7 +72081,7 @@ sub update_demo_qsts_quote {
 ###########
 sub update_quote_question {
 	my %UQ = @_;
-        my $query = qq{UPDATE questions SET question= ?, type= ?,value= ?,image_id= ?,vlink= ?,alink= ?,kolum= ?,mode= ?,descrip=?,ans_mode=?,pdf=?,explanation=? WHERE number="$UQ{number}"};
+        my $query = qq{UPDATE questions SET question= ?, type= ?,value= ?,image_id= ?,vlink= ?,alink= ?,kolum= ?,mode= ?,descrip=?,ans_mode=?,pdf=?,explanation=?,memory=? WHERE number="$UQ{number}"};
         my $sth = $dbh->prepare($query);
         $sth->bind_param( 1, $UQ{question});
         $sth->bind_param( 2, $UQ{type});
@@ -69210,6 +72095,7 @@ sub update_quote_question {
         $sth->bind_param( 10, $UQ{ans_mode});
         $sth->bind_param( 11, $UQ{pdf});
         $sth->bind_param( 12, $UQ{explanation});
+        $sth->bind_param( 13, $UQ{memory});
         $sth->execute();
 	}
 
@@ -69904,6 +72790,18 @@ sub funny_char {
 
 ######################################
 #
+# remove funny_char2
+#
+######################################
+sub funny_char2 {
+	my @in = @_;
+#	$in[0] =~ tr/A-Za-z0-9 :\/\(\)-_=+&%$?//cd;
+	$in[0] =~ s/[\"\/|\\<>+=,\;\(\)]//g;
+	return ($in[0]);
+	}
+
+######################################
+#
 # remove non word
 #
 ######################################
@@ -70075,7 +72973,7 @@ sub top_heading33 {
 #
 # top_head
 #
-######################
+######################bcline
 sub top_head {
         my %TH = @_;
         print"<TABLE width=\"100%\" $action_bar><TD>&nbsp\;&nbsp\&nbsp\;<font   color=\"white\"><b> $TH{head}</B></TD></TABLE>";
@@ -70091,9 +72989,18 @@ sub header {
 #	print"<\!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http\://www.w3.org/TR/html4/loose.dtd\">\n";
 #	print"<\!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Frameset//EN\" \"http\://www.w3.org/TR/html4/frameset.dtd\">\n";
 #        print"<!DOCTYPE html>\n";
-	print"<HTML><HEAD>\n";
+
+	if ($u_type == 3) { # STUDENTS BLOCK RIGHT CLICK
+		print"<HTML oncontextmenu=\"return false\" lang=\"$lang\"><HEAD>\n";
+#		print"<HTML><HEAD>\n";
+		}
+	else {
+		print"<HTML><HEAD>\n";
+		}
+		
 	print"<meta http-equiv=\"Content-Type\" content=\"text/html\; charset=UTF-8\">\n";
 	print"<meta http-equiv='cache-control' content='no-cache'>\n";
+	print"<meta http-equiv='cache-control' content='no-store'>\n";
 	print"<meta http-equiv='expires' content='0'>\n";
 	print"<meta http-equiv='pragma' content='no-cache'>\n";
 	print"<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n";
@@ -70107,11 +73014,12 @@ sub header {
 #########################################
 sub body {
 	my %B = @_;
-	if ($B{body} == 2) {
-		print"</HEAD><BODY onClick=\"Collapse_The_Display\(\)\" style=\"font-family:Arial\; font-size:11pt\;\" oncontextmenu=\"return false\">\n";
+	if ($u_type == 3) { # STUDENT SET LANGUAGE DIRECTION
+		print"</HEAD><BODY onClick=\"Collapse_The_Display\(\)\" style=\"font-family:Arial\; font-size:11pt\; direction: $language_direction\;\">\n";
+#		print"</HEAD><BODY onClick=\"Collapse_The_Display\(\)\" style=\"font-family:Arial\; font-size:11pt\;\">\n";
 		}
 	else {
-		print"</HEAD><BODY onClick=\"Collapse_The_Display\(\)\" style=\"font-family:Arial\; font-size:11pt\; \">\n"; #background: #fffbee\;
+		print"</HEAD><BODY onClick=\"Collapse_The_Display\(\)\" style=\"font-family:Arial\; font-size:11pt\;\">\n"; #background: #fffbee\;
 		}
 	}
 
@@ -70388,6 +73296,28 @@ sub javascript_cancel_handler {
 
 #####################
 #
+# JAVASCRIPT_OPEN_FULL_SCREEN
+#
+########################
+sub javascript_open_full_screen {
+	print"function open_full_screen()\{
+	if(elem.requestFullscreen) {
+		elem.requestFullscreen();
+		}
+	elsif ((elem.mozRequestFullscreen) {
+		elem.mozRequestFullscreen();
+		}
+	elsif ((elem.webkitRequestFullscreen) {
+		elem.webkitRequestFullscreen();
+		}
+	elsif ((elem.msRequestFullscreen) {
+		elem.msRequestFullscreen();
+		}\n";
+	print"\}\n";
+	}
+
+#####################
+#
 # JAVASCRIPT_SELECT_ALL
 #
 ########################
@@ -70483,6 +73413,34 @@ sub javascript_show_source {
 		for (let u = 0; u < collect2.length; u++) \{
 			var sourceques = 'sour'+u
 			document.getElementById\(sourceques\).style.display = \"none\";
+			\}
+		\}
+	\}\n";
+	}
+
+#####################
+#
+# JAVASCRIPT_SHOW_MEMORY
+#
+########################
+sub javascript_show_memory {
+	print"function show_memory\(i_n\)\{
+	if(i_n == 1) \{
+		memon.style.display = \"none\"\;
+		memhideon.style.display = \"block\"\;
+		const collect1 = document.getElementsByClassName(\"memory\")
+		for (let i = 0; i < collect1.length; i++) \{
+			var memques = 'memory'+i
+			document.getElementById(memques).style.display = \"inline-block\";
+			\}
+		\}
+	if(i_n == 2) \{
+		memon.style.display = \"block\"\;
+		memhideon.style.display = \"none\"\;
+		const collect2 = document.getElementsByClassName(\"memory\")
+		for (let u = 0; u < collect2.length; u++) \{
+			var memques = 'memory'+u
+			document.getElementById(memques).style.display = \"none\";
 			\}
 		\}
 	\}\n";

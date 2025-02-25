@@ -10,7 +10,7 @@ version: '3'
 services:
   app:
     container_name: qst
-    image: elquimista/qst:3.11.01
+    image: elquimista/qst:3.12.07
     restart: unless-stopped
     depends_on:
       - db
@@ -97,7 +97,13 @@ my $dbh = DBI->connect("DBI:mysql:database=$ENV{DB_NAME};host=$ENV{DB_HOST}",$EN
 And then build a new Docker image:
 
 ```sh
-docker-compose build
-docker tag qst-app:latest elquimista/qst:<new_version>
-docker push elquimista/qst:<new_version>
+docker buildx create --use --platform=linux/amd64,linux/arm64
+docker buildx build --platform linux/amd64,linux/arm64 --push -t elquimista/qst:<new_version> .
+```
+
+Or simply make a new git tag and make a new release on GitHub accordingly and deployment to Docker Hub will be automatically done.
+
+```sh
+git tag 3.12.07
+git push --tags origin main
 ```

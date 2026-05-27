@@ -27,11 +27,11 @@ We release versions of QST on a irregular basis.
 
   *****************
   
-Version 3.12.07 is our latest release.
+Version 3.12.09 is our latest release.
 
 Upgrading:
 
-- Windows versions before 3.12.05 should be upgraded with the following replacing what is there at the end of the httpd.conf file         found under C:\Apache24\conf\:
+- Windows versions before 3.12.05 should be upgraded with the following replacing what is there at the end of the httpd.conf file found under C:\Apache24\conf\:
 
         <ifModule mpm_winnt_module>
 	ThreadStackSize  16888888

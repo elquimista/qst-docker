@@ -3,7 +3,7 @@ FROM ubuntu:20.04
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive \
     apt-get install -y \
-      build-essential apache2 libapache2-mod-perl2 perl-doc libcrypt-pbkdf2-perl libdbd-mysql-perl mysql-client
+      build-essential apache2 libapache2-mod-perl2 perl-doc libcrypt-pbkdf2-perl libdbd-mysql-perl mysql-client mysql-server
 
 WORKDIR /var/www/qst
 COPY qst_linux/qst ./
@@ -30,17 +30,8 @@ RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'install Bundle::DBI' && \
     perl -MCPAN -e 'install Apache::DBI'
 
 COPY qst_linux/qst.sql /temp/
-ENV DB_HOST=db
-ENV DB_ROOT_PASSWORD=Qst#captain2root
-ENV DB_USER=qst
-ENV DB_PASSWORD=Qst#captain2
-ENV DB_NAME=qst
-
 WORKDIR /home/MyApache2
 
-COPY init-db.sh /usr/local/sbin/init-db
-COPY dump-db.sh /usr/local/sbin/dump-db
-COPY restore-db.sh /usr/local/sbin/restore-db
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]
 

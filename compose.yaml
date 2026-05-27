@@ -1,0 +1,10 @@
+services:
+  app:
+    container_name: qst
+    build:
+      context: .
+    restart: unless-stopped
+    volumes:
+      - ./db_data:/var/lib/mysql
+    ports:
+      - 127.0.0.1:8080:80

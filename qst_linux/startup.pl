@@ -22,9 +22,9 @@ use Exporter 'import';
 use Apache::DBI;
 DBI->install_driver("mysql");
 Apache::DBI->connect_on_init
- ("DBI:mysql:$ENV{DB_NAME}:$ENV{DB_HOST}",
-   $ENV{DB_USER},
-   $ENV{DB_PASSWORD},
+ ("DBI:mysql:qst:localhost",
+   "qst",
+   "Qst#captain2",
    {
     PrintError => 1, # warn() on errors
     RaiseError => 0, # don't die on error

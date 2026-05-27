@@ -17,7 +17,7 @@ package QST;
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 # ====================
 #
-# version 3.12.07    English
+# version 3.12.09    English
 #
 #  In Memory of Patricia Herchek. R.I.P. November 29, 1954 - July 21, 2020.
 #
@@ -28,16 +28,8 @@ package QST;
 
 use File::Path qw(rmtree);
 
-#Uncomment below for Windows QST. Only uncomment Net::LDAP if you are using it.
-#use strict;
-#use File::Path;
+#Only uncomment Net::LDAP if you are using it.
 #use Net::LDAP;
-#use POSIX qw(strftime);
-#use Crypt::PBKDF2;
-#use MIME::Base64;
-#use Archive::Zip qw(:ERROR_CODES :CONSTANTS);
-#use Exporter 'import';
-#use DBI;
 
 # Debug database. Only uncomment if there are database issues on linux
 #$Apache::DBI::DEBUG = 2;
@@ -1840,12 +1832,12 @@ sub handler {
 			#CHECK VALIDITY AND LENGTH OF INPUT
 			foreach my $key_name(keys %INPUT) {
 				if( !defined $IMPORT_VALUES{$key_name}) {
-					delete($INPUT{$key_name});
+					delete($INPUT{key_name});
 					}
 				else {
-			                $import_error = &check_many_length_return("$key_name","$IMPORT_VALUES{$key_name}");
+			                $import_error = &check_many_length_return("$INPUT{$key_name}","$IMPORT_VALUES{$key_name}");
 			                if($import_error == 1) {
-			                	delete($INPUT{key_name});
+			                	delete($INPUT{$key_name});
 			                	$import_error = 0;
 			                	}
 			                }
@@ -10287,7 +10279,6 @@ sub do_mobile {
 	$DT{screen_width} =~ s/\D//g;
 	my $qst = $DT{qst};
 	my $class_id = $DT{class_id};
-	my $class_name = $DT{class_name};
 	my $type;
 	my $submissions;
 	my $results; 
@@ -10307,7 +10298,6 @@ sub do_mobile {
 
 	# check whether in class, if posted, attempts, if qst is for class
 	if(exists $USER{$ids}{$class_id}) {
-	
 		my %POSTED_QST = &select_posted_qst("query","select * from posted_qst WHERE qst=\"$qst\" AND org_id=\"$org_id\"");
 		                
 		if(keys %POSTED_QST && $POSTED_QST{$qst}{posted} == 1) {
@@ -10450,6 +10440,10 @@ sub do_mobile {
                                         }
                                 print"\}\n";
 
+		      		&print_clear_memory_many();
+		      			
+		      		&print_stop_F12();
+
                                 &print_javascript_end();
                                         
                                 &print_form_wo_end_tag("form_name","q_form","input","mark_type","class_id","$class_id","type","$type","qst","$qst","qst_name","$name","u_id","$ids}","session_id","$DT{session_id}");
@@ -10461,7 +10455,7 @@ sub do_mobile {
                                 if($index >= 1) {
                                         my $question_rows = 1;
  		
-                                        # fix display to show new lines in text of question
+                                        # fix display to show new lines in text of BASIC question
                                         my $content = $QUESTIONS{$question_to_display}{question};
                                         $content =~ s/\r[\n]*/\n/gm;
                                         my @number_of_newlines = split(/\n/,$content);
@@ -10644,7 +10638,7 @@ sub do_mobile {
                                          
                                         &print_form("form_name","form4","form_target","mobile","input","question_done","class_id","$class_id","qst","$qst","real_quest_no","","quest_no","","answer","","saanswer","","panswer","","mxselect","","answertype","","type","$type","u_id","$DT{u_id}","session_id","$DT{session_id}","mobile","1","iphone","$DT{iphone}");
 						
-                                        &print_form("form_name","next_quest","input","mobile_next_question","order","","quest_no","","real_quest_no","","qst","$qst","class_name","$class_name","class_id","$class_id","qtype","$DT{type}","type","","lquests","","u_id","$DT{u_id}","session_id","$DT{session_id}","attempt","$current_attempt","mobile","1","screen_width","$DT{screen_width}","iphone","$DT{iphone}","qst_name","$name","show_time","");
+                                        &print_form("form_name","next_quest","input","mobile_next_question","order","","quest_no","","real_quest_no","","qst","$qst","class_name","$name","class_id","$class_id","qtype","$DT{type}","type","","lquests","","u_id","$DT{u_id}","session_id","$DT{session_id}","attempt","$current_attempt","mobile","1","screen_width","$DT{screen_width}","iphone","$DT{iphone}","qst_name","$name","show_time","");
                                         
                                         &print_javascript_begin();
                                         print"load_next()\n";
@@ -10677,6 +10671,7 @@ sub do_mobile {
                                 my %TIMEZONE = ();
                                 my $org_time1;
                                 my $adjusted_time;
+                                
                                 my $queryt = qq{SELECT org_id,time_zone FROM organization WHERE org_id=\"$DT{org_id}\"};
                                 my $sth = $dbh->prepare($queryt);
                                 $sth->execute();
@@ -10784,7 +10779,6 @@ sub do_mobile {
 						}
 
                                         $list_of_questions =~ s/^\,//;
-
 					%QUESTIONS = &select_questions("query","$query");
 					
 					
@@ -10828,7 +10822,7 @@ sub do_mobile {
 
 		   	   		print"var this_in
 					var when
-					var frame_url = self.parent.qst_left.location.href
+					
 					
             				function activated_this\(quest_no,real_quest_no,type,checked_ans\) \{
 					var this_in = quest_no
@@ -10896,6 +10890,10 @@ sub do_mobile {
        					\}
 				      	\}\n";
 				      	
+		      			&print_clear_memory_many();
+		      			
+		      			&print_stop_F12();
+
 		      			&print_javascript_end();
 		      			                                       
                                         &print_form_wo_end_tag("form_name","q_form","input","mark_type","class_id","$class_id","type","$type","qst","$qst","qst_name","$name","u_id","$DT{u_id}","session_id","$DT{session_id}");
@@ -10915,19 +10913,35 @@ sub do_mobile {
                                                 if($index == 1 && $printed == 0) {
                                                         my $question_rows = 1;
  		
-                                                        # fix display to show new lines in text of question
+                                                        # fix display to show new lines in text of BASIC question
                                                         my $content = $QUESTIONS{$quest}{question};
                                                         $content =~ s/\r[\n]*/\n/gm;
                                                         my @number_of_newlines = split(/\n/,$content);
                                                         my $new_lines = @number_of_newlines;
                                                         $question_rows = $question_rows + $new_lines;
                                                                         
-                                                        my $next_quest = $RE_ORDERED_QUESTIONS{2};;
+                                                        my $next_quest = $RE_ORDERED_QUESTIONS{2};
                                                                         
-                                                        print"<center><span id=\"shownn\" style=\"display:none\;\"><B STYLE=\"cursor:pointer\; font-family\:Arial\; font-size\:28pt\;\" OnClick=\"Show_Next('$next_quest','1','$list_of_questions')\" data-toggle=\"tooltip\" title=\"Next\">\></B></span></center>\n";
+							if($QUESTIONS{$quest}{memory} ne "") { # MEMORY
+								$QUESTIONS{$quest}{memory} =~ s/&quot;/"/g;
+		                                                print"<center><span id=\"shownn\" style=\"display:none\;\"><B STYLE=\"cursor:pointer\; font-family\:Arial\; font-size\:28pt\;\" OnClick=\"Show_Next('$next_quest','1','$list_of_questions')\" data-toggle=\"tooltip\" title=\"Next\">\></B></span></center>\n";
+					
+								print"<DIV ID=\"MEMORY$quest\" style=\"display: block\;\">\n";
+								print"<TABLE><TR><TD valign=\"top\"><B><A NAME=\"$index\">$index\.</b></TD><TD NOWRAP valign=\"top\"><font size=\"-2\">($QUESTIONS{$quest}{value})</font></td><TD valign=\"top\">\n";
+								print"<TABLE><TR><TD width=\"15\"></TD><TD style=\"border: 1px solid #660616\; padding-left: 7px\; padding-right: 7px\; padding-top: 7px\; padding-bottom: 7px\">$QUESTIONS{$quest}{memory}</TD></TR></TABLE><BR><center><B onClick=\"clear_memory_many\(\'$quest\'\)\" style=\"cursor\:pointer\;\">Continue</B></center><P><HR width=\"90%\">\n";
+								print"</TD></TR></TABLE>\n";
+
+								print"</DIV>\n";
+								print"<DIV ID=\"QUESTION$quest\" style=\"display: none\">\n";
+								print"<TABLE><TR><TD valign=\"top\"><B>$index\.</b></TD>\n";				
+								}
+								
+							else {
+                                                        	print"<center><span id=\"shownn\" style=\"display:none\;\"><B STYLE=\"cursor:pointer\; font-family\:Arial\; font-size\:28pt\;\" OnClick=\"Show_Next('$next_quest','1','$list_of_questions')\" data-toggle=\"tooltip\" title=\"Next\">\></B></span></center>\n";
                                                         
-                                                        print"<TABLE><TR><TD valign=\"top\"><B>$index\.</b></TD>\n";
-										
+                                                        	print"<TABLE><TR><TD valign=\"top\"><B>$index\.</b></TD>\n";
+								}
+							
                                                         &print_out_question("question","$QUESTIONS{$quest}{question}","value","$QST_QUESTIONS{$quest}{value}","image_id","$QUESTIONS{$quest}{image_id}","vlink","$QUESTIONS{$quest}{vlink}","alink","$QUESTIONS{$quest}{alink}","pdf","$QUESTIONS{$quest}{pdf}","type","$QUESTIONS{$quest}{type}","question_rows","$question_rows","mode","$QUESTIONS{$quest}{mode}","mobile","1","screen_width","$DT{screen_width}");
 										
                                                         &print_out_question_answers("quest","$quest","index","$index","type","$QUESTIONS{$quest}{type}","key","$key","kolum","$QUESTIONS{$quest}{kolum}","ans_mode","$QUESTIONS{$quest}{ans_mode}","mobile","1","screen_width","$DT{screen_width}");
@@ -10951,7 +10965,7 @@ sub do_mobile {
 
                                         &print_form("form_name","form4","form_target","mobile","input","question_done","class_id","$class_id","qst","$qst","real_quest_no","","quest_no","","answer","","saanswer","","panswer","","mxselect","","answertype","","type","$type","u_id","$DT{u_id}","session_id","$DT{session_id}","mobile","1","iphone","$DT{iphone}");
 						
-                                        &print_form("form_name","next_quest","input","mobile_next_question","order","","quest_no","","real_quest_no","","qst","$qst","class_name","$class_name","class_id","$class_id","qtype","$DT{type}","type","","lquests","","u_id","$DT{u_id}","session_id","$DT{session_id}","attempt","$current_attempt","mobile","1","screen_width","$DT{screen_width}","iphone","$DT{iphone}","qst_name","$name","show_time","");
+                                        &print_form("form_name","next_quest","input","mobile_next_question","order","","quest_no","","real_quest_no","","qst","$qst","class_name","$name","class_id","$class_id","qtype","$DT{type}","type","","lquests","","u_id","$DT{u_id}","session_id","$DT{session_id}","attempt","$current_attempt","mobile","1","screen_width","$DT{screen_width}","iphone","$DT{iphone}","qst_name","$name","show_time","");
 	                  		}
 	                  		
 				++$attempt;
@@ -10963,12 +10977,11 @@ sub do_mobile {
 
 				#add to qsts all the questions for the qst for that attempt for the user
 				foreach my $keyyy(keys %QUESTIONS_IN_QUIZ) {
-
 					if($QUESTIONS{$QUESTIONS_IN_QUIZ{$keyyy}}{type} =~ /SA/ ||  $QUESTIONS{$QUESTIONS_IN_QUIZ{$keyyy}}{type} =~ /P/) {
-						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\")");
+						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\",\"0\")");
 						}
 					else {
-						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\")");
+						&insert_generic("query","INSERT qsts VALUES(\"$ids\",\"$qst\",\"\",\"$QUESTIONS_IN_QUIZ{$keyyy}\",\"0\",\"$attempt\",\"0\",\"$org_id\",\"0\",\"$keyyy\",\"0\",\"0\")");
 						}
 					}
 				}
@@ -11429,7 +11442,7 @@ sub do_type{
                                                                 
                                                 my $question_rows = 1;
  		
-                                                # fix display to show new lines in text of question
+                                                # fix display to show new lines in text of BASIC question
                                                 my $content = $QUESTIONS{$quest}{question};
                                                 $content =~ s/\r[\n]*/\n/gm;
                                                 my @number_of_newlines = split(/\n/,$content);
@@ -11844,7 +11857,7 @@ sub modal_do_type{
                                                                 
                                                 my $question_rows = 1;
  		
-                                                # fix display to show new lines in text of question
+                                                # fix display to show new lines in text of BASIC question
                                                 my $content = $QUESTIONS{$quest}{question};
                                                 $content =~ s/\r[\n]*/\n/gm;
                                                 my @number_of_newlines = split(/\n/,$content);
@@ -12189,7 +12202,7 @@ sub do_type2{
                                                 if($index == 1 && $printed == 0) {
                                                         my $question_rows = 1;
  		
-                                                        # fix display to show new lines in text of question
+                                                        # fix display to show new lines in text of BASIC question
                                                         my $content = $QUESTIONS{$quest}{question};
                                                         $content =~ s/\r[\n]*/\n/gm;
                                                         my @number_of_newlines = split(/\n/,$content);
@@ -12476,7 +12489,7 @@ sub print_do_type2_resume_qst {
 			my $key = $STUDENTS_QST{$index}{answer};
 
 					
-                        # fix display to show new lines in text of question
+                        # fix display to show new lines in text of BASIC question
                         my $content = $QUESTION_TO_DISPLAY{$question_to_display}{question};
                         $content =~ s/\r[\n]*/\n/gm;
                         my @number_of_newlines = split(/\n/,$content);
@@ -12940,7 +12953,7 @@ sub modal2_do_type2{
                                                 if($index == 1 && $printed == 0) {
                                                         my $question_rows = 1;
  		
-                                                        # fix display to show new lines in text of question
+                                                        # fix display to show new lines in text of BASIC question
                                                         my $content = $QUESTIONS{$quest}{question};
                                                         $content =~ s/\r[\n]*/\n/gm;
                                                         my @number_of_newlines = split(/\n/,$content);
@@ -13305,7 +13318,7 @@ sub do_type3{
 								}
 							else {	
 								
-                                                        	# fix display to show new lines in text of question
+                                                        	# fix display to show new lines in text of BASIC question
                                                         	my $content = $QUESTIONS{$quest}{question};
                                                         	$content =~ s/\r[\n]*/\n/gm;
                                                         	my @number_of_newlines = split(/\n/,$content);
@@ -13672,7 +13685,7 @@ sub modal3_do_type3{
                                                 if($index == 1 && $printed == 0) {
                                                         my $question_rows = 1;
  		
-                                                        # fix display to show new lines in text of question
+                                                        # fix display to show new lines in text of BASIC question
                                                         my $content = $QUESTIONS{$quest}{question};
                                                         $content =~ s/\r[\n]*/\n/gm;
                                                         my @number_of_newlines = split(/\n/,$content);
@@ -13920,7 +13933,7 @@ sub print_do_type3_resume_qst{
                         if($index >= 1) {
                         	my $question_rows = 1;
  		
-                                # fix display to show new lines in text of question
+                                # fix display to show new lines in text of BASIC question
                                 my $content = $QUESTIONS{$question_to_display}{question};
                                 $content =~ s/\r[\n]*/\n/gm;
                                 my @number_of_newlines = split(/\n/,$content);
@@ -14391,7 +14404,7 @@ sub do_type4{
                                                 if($index == 1) {
                                                         my $question_rows = 1;
  		
-                                                        # fix display to show new lines in text of question
+                                                        # fix display to show new lines in text of BASIC question
                                                         my $content = $QUESTIONS{$quest}{question};
                                                         $content =~ s/\r[\n]*/\n/gm;
                                                         my @number_of_newlines = split(/\n/,$content);
@@ -14655,7 +14668,7 @@ sub print_do_type4_resume_qst{
                         if($index >= 1) {
                         	my $question_rows = 1;
  		
-                                # fix display to show new lines in text of question
+                                # fix display to show new lines in text of BASIC question
                                 my $content = $QUESTIONS{$question_to_display}{question};
                                 $content =~ s/\r[\n]*/\n/gm;
                                 my @number_of_newlines = split(/\n/,$content);
@@ -15100,7 +15113,7 @@ sub modal4_do_type4{
                                                 if($index == 1) {
                                                         my $question_rows = 1;
  		
-                                                        # fix display to show new lines in text of question
+                                                        # fix display to show new lines in text of BASIC question
                                                         my $content = $QUESTIONS{$quest}{question};
                                                         $content =~ s/\r[\n]*/\n/gm;
                                                         my @number_of_newlines = split(/\n/,$content);
@@ -15335,7 +15348,7 @@ sub do_type5{
                                         
                                 my $question_rows = 1;
  		
-                                # fix display to show new lines in text of question
+                                # fix display to show new lines in text of BASIC question
                                 my $content = $QUESTION{$first_question}{question};
                                 $content =~ s/\r[\n]*/\n/gm;
                                 my @number_of_newlines = split(/\n/,$content);
@@ -15537,7 +15550,7 @@ sub modal5_do_type5{
                                         
                                 my $question_rows = 1;
  		
-                                # fix display to show new lines in text of question
+                                # fix display to show new lines in text of BASIC question
                                 my $content = $QUESTION{$first_question}{question};
                                 $content =~ s/\r[\n]*/\n/gm;
                                 my @number_of_newlines = split(/\n/,$content);
@@ -15641,7 +15654,7 @@ sub print_out_question {
                         }
                         
                 else { #BASIC EDITOR
-                        print"<textarea class=\"show_quest\" style=\"resize\:none\; overflow:auto\; font-weight:bold\" readonly rows=\"$QUESTIONS{question_rows}\" cols=\"60\">$QUESTIONS{question}</textarea></b>\n";
+                        print"<textarea class=\"show_quest\" style=\"resize\:none\; overflow:auto\;\" readonly rows=\"$QUESTIONS{question_rows}\" cols=\"60\">$QUESTIONS{question}</textarea></b>\n";
                         print"</TD></TR></TABLE>\n";
           									
                         if(defined $QUESTIONS{image_id} && $QUESTIONS{image_id} > 0) {
@@ -21492,11 +21505,14 @@ sub mobile_mark_type {
 	$u_id =~ s/\D//g;
 	my $session_id = $MT{session_id};
 	$session_id =~ s/\D//g;
+	
 	my $qst_name = $MT{qst_name};
 	my $number_to_mark = 0;
 	my $valu_of_quests_to_be_marked = 0;
 	my %QUESTIONS = ();
 	my %ANSWERS = ();
+	my %SOURCE = ();
+	my $questionsource;
      	my $score = 0;
      	my $index_pt2 = 1;
 	my $na = 0;
@@ -21505,9 +21521,8 @@ sub mobile_mark_type {
 	my %TO_BE_MARKED = ();
 	my $index_to_quest_no;
         my %MA = (); # for MA questions
+        my %MX = (); # for Matching questions
         my $show_eq = 1;
-	my %SOURCE = ();
-	my $questionsource;
 
         &print_style_sheet();
 
@@ -21516,6 +21531,7 @@ sub mobile_mark_type {
 	print"function c_window\(\)\{
 	top.close\(\)\}\n";
 	
+        &print_stop_F12();
         
 	&print_javascript_end();
 
@@ -21536,8 +21552,14 @@ sub mobile_mark_type {
 	#get their answers to the qst questions
 	my %THEIR_ANSWERS = &select4("query","SELECT quest_no,answer from qsts WHERE qst=\"$qst\" AND u_id=\"$ids\" AND attempt=\"$attempt\"");
 	
+	#check there is still time
+	my %END_TIME = &select4("query","SELECT u_id,end from qst_attempts WHERE qst_no=\"$qst\" AND u_id=\"$ids\"");
+	my $now_time = time;
+	my $good_time = 0;
+
+
 	#QUIZZES/TESTS BELOW HERE ########
-	if (keys %POSTED_QST && $QST_INFO{$qst}{type} == 1 && ($POSTED_QST{$qst}{forall} == 1 || keys %ACCESS)) { #quizzes/tests
+	if (keys %POSTED_QST && $QST_INFO{$qst}{type} == 1 && ($POSTED_QST{$qst}{forall} == 1 || keys %ACCESS)) { #quizzes/tests		
 		my @results;
 		my $questions_in_student_qst = 0;
 		my %QUESTIONS_IN_QST = ();
@@ -21597,10 +21619,16 @@ sub mobile_mark_type {
                   		print"<TABLE><TR><TD valign=\"top\"><B><A NAME=\"$index_pt2\">$index_pt2</a>\.</b></TD>
 	        		<TD NOWRAP valign=\"top\"><font size=\"-1\">\($QUESTIONS_IN_QST{$quest_no}{value}\)</font></TD><TD valign=\"top\">";
 	        		
+	        		 ### MEMORY SHOW
+				 if($POSTED_QST{$qst}{memori} == 1  && $QUESTIONS{$quest_no}{memory} ne "") {
+				 	$QUESTIONS{$quest_no}{memory} =~ s/&quot\;/\"/g;
+					print"<TABLE><TR><TD width=\"5\"></TD><TD style=\"border: 1px solid #660616; padding-left: 7px; padding-right: 7px; padding-top: 7px; padding-bottom: 7px\">$QUESTIONS{$quest_no}{memory}</TD></TR></TABLE><BR>\n";
+				 	}
+
              			my $question_rows = 1;
  				my $question_length = length($QUESTIONS{$quest_no}{question});
  				
- 				# fix display to show new lines in text of question
+ 				# fix display to show new lines in text of BASIC question
                                 my $content = $QUESTIONS{$quest_no}{question};
                                 $content =~ s/\r[\n]*/\n/gm;
                                 my @lines = split(/\n/,$content);
@@ -21649,7 +21677,7 @@ sub mobile_mark_type {
                                                 
                                         else { # text in question
                                                 if($MT{mobile} == 1) {
-                                                        &print_mobile_textarea_p_question("screen_width","$screen_width","question","$QUESTIONS{$quest_no}{question}");
+                                                        &print_mobile_textarea_p_question("screen_width","$screen_width","question","$QUESTIONS{$quest_no}{question}","question_rows","$question_rows");
                                                         }
                                                 else {
                                                         print"<textarea class=\"show_quest\" style=\"resize\:none\; font-weight:bold\" readonly rows=\"$question_rows\" cols=\"60\">$QUESTIONS{$quest_no}{question}</textarea></b></TD></TR></TABLE>\n";
@@ -22392,7 +22420,7 @@ sub mark_type {
              			my $question_rows = 1;
  				my $question_length = length($QUESTIONS{$quest_no}{question});
  		
- 				# fix display to show new lines in text of question
+ 				# fix display to show new lines in text of BASIC question
                                 my $content = $QUESTIONS{$quest_no}{question};
                                 $content =~ s/\r[\n]*/\n/gm;
                                 my @lines = split(/\n/,$content);
@@ -23360,7 +23388,7 @@ sub modal_mark_type {
 					print"<TABLE><TR><TD width=\"10\"></TD><TD style=\"border: 1px solid #660616; padding-left: 7px; padding-right: 7px; padding-top: 7px; padding-bottom: 7px\">$QUESTIONS{$quest_no}{memory}</TD></TR></TABLE><BR>\n";
  					}
  					
- 				# fix display to show new lines in text of question
+ 				# fix display to show new lines in text of BASIC question
                                 my $content = $QUESTIONS{$quest_no}{question};
                                 $content =~ s/\r[\n]*/\n/gm;
                                 my @lines = split(/\n/,$content);
@@ -24297,7 +24325,7 @@ sub mark_type2 {
              			my $question_rows = 1;
  				my $question_length = length($QUESTIONS{$quest_no}{question});
  				
- 				# fix display to show new lines in text of question
+ 				# fix display to show new lines in text of BASIC question
                                 my $content = $QUESTIONS{$quest_no}{question};
                                 $content =~ s/\r[\n]*/\n/gm;
                                 my @lines = split(/\n/,$content);
@@ -25057,7 +25085,7 @@ sub modal2_mark_type2 {
              			my $question_rows = 1;
  				my $question_length = length($QUESTIONS{$quest_no}{question});
  				
- 				# fix display to show new lines in text of question
+ 				# fix display to show new lines in text of BASIC question
                                 my $content = $QUESTIONS{$quest_no}{question};
                                 $content =~ s/\r[\n]*/\n/gm;
                                 my @lines = split(/\n/,$content);
@@ -25810,7 +25838,7 @@ sub modal3_mark_type3 {
              			my $question_rows = 1;
  				my $question_length = length($QUESTIONS{$quest_no}{question});
  				
- 				# fix display to show new lines in text of question
+ 				# fix display to show new lines in text of BASIC question
                                 my $content = $QUESTIONS{$quest_no}{question};
                                 $content =~ s/\r[\n]*/\n/gm;
                                 my @lines = split(/\n/,$content);
@@ -26571,7 +26599,7 @@ sub modal4_mark_type4 {
              			my $question_rows = 1;
  				my $question_length = length($QUESTIONS{$quest_no}{question});
  				
- 				# fix display to show new lines in text of question
+ 				# fix display to show new lines in text of BASIC question
                                 my $content = $QUESTIONS{$quest_no}{question};
                                 $content =~ s/\r[\n]*/\n/gm;
                                 my @lines = split(/\n/,$content);
@@ -29214,6 +29242,7 @@ sub post_qst {
         delete($PQ{explanations});
         delete($PQ{memori});
         delete($PQ{memory});
+        delete($PQ{user});
         
 	my %RETURN = &select1("query","select qst from posted_qst WHERE qst=\"$qst_no\" AND class_id=\"$class_id\" AND u_id=\"$ids\"");
  
@@ -29272,6 +29301,7 @@ sub post_qst {
 									delete($RETURN4{$key});
 									}
 								}
+								
 							$query =~ s/,$//;
 
 							&insert_generic("query","$query");
@@ -32164,19 +32194,19 @@ sub print_mobile_textarea_p_question_mark {
         my %PMTAPQM = @_;
   
         if($PMTAPQM{screen_width} < 321) {
-                print"<TR><TD width=\"1\"></TD><TD valign=\"top\"><textarea class=\"show_panswer\" style=\"resize\:none\; font-weight:bold\" readonly rows=\"5\" cols=\"25\">$PMTAPQM{question}</textarea></b></TD></TR>\n";
+                print"<TR><TD width=\"1\"></TD><TD valign=\"top\"><textarea class=\"show_panswer\" style=\"resize\:none\;\" readonly rows=\"5\" cols=\"25\">$PMTAPQM{question}</textarea></b></TD></TR>\n";
                 }
                 
         elsif($PMTAPQM{screen_width} < 481) {
-                print"<TR><TD width=\"1\"></TD><TD valign=\"top\"><textarea class=\"show_panswer\" style=\"resize\:none\; font-weight:bold\" readonly rows=\"5\" cols=\"35\">$PMTAPQM{question}</textarea></b></TD></TR>\n";
+                print"<TR><TD width=\"1\"></TD><TD valign=\"top\"><textarea class=\"show_panswer\" style=\"resize\:none\;\" readonly rows=\"5\" cols=\"35\">$PMTAPQM{question}</textarea></b></TD></TR>\n";
                 }
                 
         elsif($PMTAPQM{screen_width} < 641) {
-                print"<TR><TD width=\"1\"></TD><TD valign=\"top\"><textarea class=\"show_panswer\" style=\"resize\:none\; font-weight:bold\" readonly rows=\"5\" cols=\"50\">$PMTAPQM{question}</textarea></b></TD></TR>\n";
+                print"<TR><TD width=\"1\"></TD><TD valign=\"top\"><textarea class=\"show_panswer\" style=\"resize\:none\;\" readonly rows=\"5\" cols=\"50\">$PMTAPQM{question}</textarea></b></TD></TR>\n";
                 }
                 
         else {
-                print"<TR><TD width=\"1\"></TD><TD valign=\"top\"><textarea class=\"show_panswer\" style=\"resize\:none\; font-weight:bold\" readonly rows=\"5\" cols=\"60\">$PMTAPQM{question}</textarea></b></TD></TR>\n";
+                print"<TR><TD width=\"1\"></TD><TD valign=\"top\"><textarea class=\"show_panswer\" style=\"resize\:none\; \" readonly rows=\"5\" cols=\"60\">$PMTAPQM{question}</textarea></b></TD></TR>\n";
                 }                             
         }
 
@@ -32187,21 +32217,21 @@ sub print_mobile_textarea_p_question_mark {
 #################
 sub print_mobile_textarea_p_question {
         my %PMTA = @_;
-       
+
         if($PMTA{screen_width} < 321) {
-                print"<textarea class=\"show_quest\" style=\"resize\:none\; font-weight:bold\" readonly rows=\"5\" cols=\"25\">$PMTA{question}</textarea></b>\n";
+                print"<textarea class=\"show_quest\" style=\"resize\:none\;\" readonly rows=\"5\" cols=\"25\">$PMTA{question}</textarea></b>\n";
                 }
                 
         elsif($PMTA{screen_width} < 481) {
-                print"<textarea class=\"show_quest\" style=\"resize\:none\; font-weight:bold\" readonly rows=\"5\" cols=\"35\">$PMTA{question}</textarea></b>\n";
+                print"<textarea class=\"show_quest\" style=\"resize\:none\;\" readonly rows=\"5\" cols=\"35\">$PMTA{question}</textarea></b>\n";
                 }
                 
         elsif($PMTA{screen_width} < 641) {
-                print"<textarea class=\"show_quest\" style=\"resize\:none\; font-weight:bold\" readonly rows=\"5\" cols=\"50\">$PMTA{question}</textarea></b>\n";
+                print"<textarea class=\"show_quest\" style=\"resize\:none\;\" readonly rows=\"5\" cols=\"50\">$PMTA{question}</textarea></b>\n";
                 }
                 
         else {
-                print"<textarea class=\"show_quest\" style=\"resize\:none\; font-weight:bold\" readonly rows=\"5\" cols=\"60\">$PMTA{question}</textarea></b>\n";
+                print"<textarea class=\"show_quest\" style=\"resize\:none\;\" readonly rows=\"$PMTA{question_rows}\" cols=\"60\">$PMTA{question}</textarea></b>\n";
                 }                             
         }
 
@@ -32253,7 +32283,7 @@ sub print_mobile_textarea_sa_answer_mark {
                 }
                 
         else {
-                print"<TR><TD width=\"1\" ></TD><TD><input type=\"text\" style=\"resize:none\;\" readonly size=\"60\" value=\"$PMTA{answer}\"></TD></TR><TR><TD width=\"1\" ></TD><TD><font style=\"font-family:Arial\; font-size:10pt\;\" color=\"#585858\">Correct answer:</font></TD></TR><TR><TD width=\"1\" ></TD><TD><input type=\"text\" style=\"border-color: Transparent\;\" style=\"resize:none\;\" readonly size=\"60\" value=\"$PMTA{correct_answer}\"></TD></TR>\n";
+                print"<TR><TD width=\"50\" ></TD><TD><input type=\"text\" style=\"resize:none\;\" readonly size=\"60\" value=\"$PMTA{answer}\"></TD></TR><TR><TD width=\"1\" ></TD><TD><font style=\"font-family:Arial\; font-size:10pt\;\" color=\"#585858\">Correct answer:</font></TD></TR><TR><TD width=\"1\" ></TD><TD><input type=\"text\" style=\"border-color: Transparent\;\" style=\"resize:none\;\" readonly size=\"60\" value=\"$PMTA{correct_answer}\"></TD></TR>\n";
                 }                             
         }
 
@@ -32347,7 +32377,7 @@ sub preview_quest {
 	my $question_rows = 1;
 	my $question_length = length($PVQ{question});
         
-	# fix display to show new lines in text of question
+	# fix display to show new lines in text of BASIC question
         my $content = $PVQ{question};
 	$content =~ s/\r[\n]*/\n/gm;
         my @lines = split(/\n/,$content);
@@ -43068,7 +43098,7 @@ sub export_quests_pdf {
 		        my $question_rows = 1;
 		 	my $question_length = length($QUESTIONS{$quest}{question});
 		 		
-		 	# fix display to show new lines in text of question
+		 	# fix display to show new lines in text of BASIC question
 		        my $content = $QUESTIONS{$quest}{question};
 		        $content =~ s/\r[\n]*/\n/gm;
 		        my @lines = split(/\n/,$content);
@@ -53813,6 +53843,7 @@ sub mobile_next_question {
         my $next_quest = $quests[$next_order];
         ++$next_order;
         my $key;
+        my $show_eq;
         
         &print_style_sheet();
         
@@ -53907,7 +53938,11 @@ sub mobile_next_question {
                                 \}
                         \}
                 \}\n";
-				      	
+       		      			
+       	&print_clear_memory_many();
+       		      			
+        &print_stop_F12();
+
         &print_javascript_end();
         
         #check if time has expired
@@ -53922,15 +53957,14 @@ sub mobile_next_question {
                 my %QUESTION_ANSWERED = &select_questions_already_answered("query","select answer,quest_no from qsts where u_id=\"$NQ{u_id}\" and quest_no=\"$next_quest\" and attempt=\"$NQ{attempt}\" and qst=\"$NQ{qst}\"");
         
                 my $question_rows = 1;
-                my $question_length = length($QUESTIONS{$NQ{quest_no}}{question});
- 		
-                # fix display to show new lines in text of question
-                my $content = $QUESTIONS{$NQ{quest_no}}{question};
+
+                # fix display to show new lines in text of question for BASIC question
+                my $content = $QUESTIONS{$next_quest}{question};
                 $content =~ s/\r[\n]*/\n/gm;
                 my @number_of_newlines = split(/\n/,$content);
                 my $new_lines = @number_of_newlines;
                 $question_rows = $question_rows + $new_lines;
-
+					
                 if($NQ{show_time} > 1) {
 			print"<TABLE bgcolor=\"#00000\" width=\"100%\"><TR><TD><B><font style=\"font-size:13pt\; font-family:Arial\;\" color=\"white\">&nbsp\;&nbsp\;&nbsp\;&nbsp\; $NQ{qst_name} </font></b>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;<font color=\"white\"><B id=\"showtime\"></B></font></TD></TR></TABLE>";
 		        }
@@ -53958,9 +53992,97 @@ sub mobile_next_question {
                         }
                         
                 print"</center><form name=\"q_form\">\n";
-                print"<TABLE><TR><TD valign=\"top\"><B>$next_order\.</b></TD>\n";
-										
-                &print_out_question("question","$QUESTIONS{$next_quest}{question}","value","$QUESTIONS{$next_quest}{value}","image_id","$QUESTIONS{$next_quest}{image_id}","pdf","$QUESTIONS{$next_quest}{pdf}","vlink","$QUESTIONS{$next_quest}{vlink}","alink","$QUESTIONS{$next_quest}{alink}","type","$QUESTIONS{$next_quest}{type}","question_rows","$question_rows","mode","$QUESTIONS{$next_quest}{mode}","mobile","1","screen_width","$NQ{screen_width}");
+
+		if($QUESTIONS{$next_quest}{memory} ne "") { # MEMORY
+			$QUESTIONS{$next_quest}{memory} =~ s/&quot;/"/g;
+					
+			print"<DIV ID=\"MEMORY$next_quest\" style=\"display: block\;\">\n";
+			print"<TABLE><TR><TD valign=\"top\"><B><A NAME=\"$next_order\">$next_order\.</b></TD><TD NOWRAP valign=\"top\"><font size=\"-2\">($QUESTIONS{$next_quest}{value})</font></td><TD valign=\"top\">\n";
+			print"<TABLE><TR><TD width=\"15\"></TD><TD style=\"border: 1px solid #660616\; padding-left: 7px\; padding-right: 7px\; padding-top: 7px\; padding-bottom: 7px\">$QUESTIONS{$next_quest}{memory}</TD></TR></TABLE><BR><center><B onClick=\"clear_memory_many\(\'$next_quest\'\)\" style=\"cursor\:pointer\;\">Continue</B></center><P><HR width=\"90%\">\n";
+			print"</TD></TR></TABLE>\n";
+
+			print"</DIV>\n";
+			print"<DIV ID=\"QUESTION$next_quest\" style=\"display: none\">\n";
+			print"<TABLE><TR><TD valign=\"top\"><B>$next_order\.</b></TD><TD NOWRAP valign=\"top\"><font size=\"-2\">($QUESTIONS{$next_quest}{value})</font></td><TD valign=\"top\">\n";				
+			}
+								
+		else {                                                        
+                        print"<TABLE><TR><TD valign=\"top\"><B>$next_order\.</b></TD><TD NOWRAP valign=\"top\"><font size=\"-2\">($QUESTIONS{$next_quest}{value})</font></td><TD valign=\"top\">\n";
+			}
+			
+		my $empty_question = $QUESTIONS{$next_quest}{question};
+		$empty_question =~ s/\r\n//g;
+		$empty_question =~ s/\s//g;
+				
+		if($QUESTIONS{$next_quest}{ans_mode} == 2) {
+			$show_eq = 2;
+			}
+	
+		if($QUESTIONS{$next_quest}{mode} == 1) { # ADVANCED
+                        print"$QUESTIONS{$next_quest}{question}</TD></TR></TABLE>\n";
+                        }
+                                        
+                elsif($QUESTIONS{$next_quest}{mode} == 2) { # EQUATION
+                        $show_eq = 2;
+                        print"$QUESTIONS{$next_quest}{question}</TD></TR></TABLE>\n";
+                        }
+                                        
+                else { # BASIC
+                        if($empty_question eq "") { # no text in question
+                        	if(defined $QUESTIONS{$next_quest}{image_id} && $QUESTIONS{$next_quest}{image_id} > 0) {
+                                	my %QUEST_IMAGE = &select4("query","select number,file_name from qst_files where number=\"$QUESTIONS{$next_quest}{image_id}\"");
+                                        my @extension = split(/\./, $QUEST_IMAGE{$QUESTIONS{$next_quest}{image_id}});
+                                        my $image = "\/schools\/qst_files\/"."$QUESTIONS{$next_quest}{image_id}"."\."."$extension[1]";
+                                        print"&nbsp\;<img src=\"$image\"></TD></TR></TABLE>\n";
+                                        }
+						
+				if(defined $QUESTIONS{$next_quest}{pdf} && $QUESTIONS{$next_quest}{pdf} > 0) {
+					my $pdf = "\/schools\/qst_files\/"."$QUESTIONS{$next_quest}{pdf}"."\."."pdf";
+					print"<table><td WIDTH=\"60\"></td><td STYLE=\"cursor: pointer\;\" onclick=\"window.open('$pdf','pdf_windo','width=700,height=800')\"><i>$LANGUAGE{$set_language}{ViewPDF}</i></td></table><P>\n";
+					}
+						        
+                                if($QUESTIONS{$next_quest}{vlink} && $QUESTIONS{$next_quest}{vlink} ne "0") {
+                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" oncontextmenu=\"return false\" controlslist=\"nodownload\" controls=\"\"><source src=\"$QUESTIONS{$next_quest}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$next_quest}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$next_quest}{vlink}\" type=\"video/webm\">Your browser does not support the video tag.</video>></td></table><P>\n";
+                                        }
+                                        
+                                if($QUESTIONS{$next_quest}{alink} && $QUESTIONS{$next_quest}{alink} ne "0") {
+                                        print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$next_quest}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$next_quest}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$next_quest}{alink}\" type=\"audio/wav\">Your browser does not support the audio tag.</video></td></table><P>\n";
+                                        }
+                                }
+                                                
+                        else { # text in question
+                        	if($NQ{mobile} == 1) {
+                                	&print_mobile_textarea_p_question("screen_width","$NQ{screen_width}","question","$QUESTIONS{$next_quest}{question}","question_rows","$question_rows","type","$QUESTIONS{$next_quest}{type}");
+                                        }
+                                else {
+                                        print"<textarea class=\"show_quest\" style=\"resize\:none\; font-weight:bold\" readonly rows=\"$question_rows\" cols=\"60\">$QUESTIONS{$next_quest}{question}</textarea></b></TD></TR></TABLE>\n";
+                                        }
+                                                
+                                if(defined $QUESTIONS{$next_quest}{image_id} && $QUESTIONS{$next_quest}{image_id} > 0) {
+                                        my %QUEST_IMAGE = &select4("query","select number,file_name from qst_files where number=\"$QUESTIONS{$next_quest}{image_id}\"");
+                                        my @extension = split(/\./, $QUEST_IMAGE{$QUESTIONS{$next_quest}{image_id}});
+                                        my $image = "\/schools\/qst_files\/"."$QUESTIONS{$next_quest}{image_id}"."\."."$extension[1]";
+                                        print"<table><td WIDTH=\"60\"></td><td><img src=\"$image\"></td></table><P>\n";
+                                        }
+						
+				if(defined $QUESTIONS{$next_quest}{pdf} && $QUESTIONS{$next_quest}{pdf} > 0) {
+					my $pdf = "\/schools\/qst_files\/"."$QUESTIONS{$next_quest}{pdf}"."\."."pdf";
+					print"<table><td WIDTH=\"60\"></td><td STYLE=\"cursor: pointer\;\" onclick=\"window.open('$pdf','pdf_windo','width=700,height=800')\"><i>$LANGUAGE{$set_language}{ViewPDF}</i></td></table><P>\n";
+					}
+						        
+                                if($QUESTIONS{$next_quest}{vlink} && $QUESTIONS{$next_quest}{vlink} ne "0") {
+                                        print"<table><td WIDTH=\"60\"></td><td><video width=\"320\" height=\"240\" oncontextmenu=\"return false\" controlslist=\"nodownload\" controls=\"\"><source src=\"$QUESTIONS{$next_quest}{vlink}\" type=\"video/mp4\"><source src=\"$QUESTIONS{$next_quest}{vlink}\" type=\"video/ogg\"><source src=\"$QUESTIONS{$next_quest}{vlink}\" type=\"video/webm\">Your browser does not support the video tag.</video>></td></table><P>\n";
+                                        }
+                                        
+                                if($QUESTIONS{$next_quest}{alink} && $QUESTIONS{$next_quest}{alink} ne "0") {
+                                        print"<table><td WIDTH=\"60\"></td><td><audio controls><source src=\"$QUESTIONS{$next_quest}{alink}\" type=\"audio/mpeg\"><source src=\"$QUESTIONS{$next_quest}{alink}\" type=\"audio/ogg\"><source src=\"$QUESTIONS{$next_quest}{alink}\" type=\"audio/wav\">Your browser does not support the audio tag.</video></td></table><P>\n";
+                                        }
+                                print"</TD></TR></TABLE>\n";
+                                }
+			}
+		
+		
+#     #           &print_out_question("question","$QUESTIONS{$next_quest}{question}","value","$QUESTIONS{$next_quest}{value}","image_id","$QUESTIONS{$next_quest}{image_id}","pdf","$QUESTIONS{$next_quest}{pdf}","vlink","$QUESTIONS{$next_quest}{vlink}","alink","$QUESTIONS{$next_quest}{alink}","type","$QUESTIONS{$next_quest}{type}","question_rows","$question_rows","mode","$QUESTIONS{$next_quest}{mode}","mobile","1","screen_width","$NQ{screen_width}");
 										
                 &print_out_question_answers("quest","$next_quest","index","$next_order","type","$QUESTIONS{$next_quest}{type}","key","$key","answer","$QUESTION_ANSWERED{$next_quest}","kolum","$QUESTIONS{$next_quest}{kolum}","attempt","$NQ{attempt}","qst","$NQ{qst}","ans_mode","$QUESTIONS{$next_quest}{ans_mode}","mobile","1","screen_width","$NQ{screen_width}");
                       
@@ -54179,7 +54301,7 @@ sub next_question2 {
                 my $question_rows = 1;
                 my $question_length = length($QUESTIONS{$NQ{quest_no}}{question});
  		
-                # fix display to show new lines in text of question
+                # fix display to show new lines in text of BASIC question
                 my $content = $QUESTIONS{$NQ{quest_no}}{question};
                 $content =~ s/\r[\n]*/\n/gm;
                 my @number_of_newlines = split(/\n/,$content);
@@ -54391,7 +54513,7 @@ sub resume_next_question2 {
         	my $question_rows = 1;
         	my $question_length = length($QUESTIONS{$NQ{quest_no}}{question});
  		
-        	# fix display to show new lines in text of question
+        	# fix display to show new lines in text of BASIC question
         	my $content = $QUESTIONS{$NQ{quest_no}}{question};
         	$content =~ s/\r[\n]*/\n/gm;
         	my @number_of_newlines = split(/\n/,$content);
@@ -54559,7 +54681,7 @@ sub modal_next_question2 {
                 my $question_rows = 1;
                 my $question_length = length($QUESTIONS{$NQ{quest_no}}{question});
  		
-                # fix display to show new lines in text of question
+                # fix display to show new lines in text of BASIC question
                 my $content = $QUESTIONS{$NQ{quest_no}}{question};
                 $content =~ s/\r[\n]*/\n/gm;
                 my @number_of_newlines = split(/\n/,$content);
@@ -54678,7 +54800,7 @@ sub next_question3 {
                 my $question_rows = 1;
                 my $question_length = length($QUESTIONS{$NQ{quest_no}}{question});
  		
-                # fix display to show new lines in text of question
+                # fix display to show new lines in text of BASIC question
                 my $content = $QUESTIONS{$NQ{quest_no}}{question};
                 $content =~ s/\r[\n]*/\n/gm;
                 my @number_of_newlines = split(/\n/,$content);
@@ -54794,7 +54916,7 @@ sub resume_next_question3 {
         	        my $question_rows = 1;
         	        my $question_length = length($QUESTIONS{$NQ{quest_no}}{question});
  		
-        	        # fix display to show new lines in text of question
+        	        # fix display to show new lines in text of BASIC question
         	        my $content = $QUESTIONS{$NQ{quest_no}}{question};
         	        $content =~ s/\r[\n]*/\n/gm;
         	        my @number_of_newlines = split(/\n/,$content);
@@ -54890,7 +55012,7 @@ sub modal_next_question3 {
                 my $question_rows = 1;
                 my $question_length = length($QUESTIONS{$NQ{quest_no}}{question});
  		
-                # fix display to show new lines in text of question
+                # fix display to show new lines in text of BASIC question
                 my $content = $QUESTIONS{$NQ{quest_no}}{question};
                 $content =~ s/\r[\n]*/\n/gm;
                 my @number_of_newlines = split(/\n/,$content);
@@ -55009,7 +55131,7 @@ sub mem_quest3 {
                 my $question_rows = 1;
                 my $question_length = length($QUESTIONS{$NQ{quest_no}}{question});
  		
-                # fix display to show new lines in text of question
+                # fix display to show new lines in text of BASIC question
                 my $content = $QUESTIONS{$NQ{quest_no}}{question};
                 $content =~ s/\r[\n]*/\n/gm;
                 my @number_of_newlines = split(/\n/,$content);
@@ -55112,7 +55234,7 @@ sub modal_mem_quest3 {
                 my $question_rows = 1;
                 my $question_length = length($QUESTIONS{$NQ{quest_no}}{question});
  		
-                # fix display to show new lines in text of question
+                # fix display to show new lines in text of BASIC question
                 my $content = $QUESTIONS{$NQ{quest_no}}{question};
                 $content =~ s/\r[\n]*/\n/gm;
                 my @number_of_newlines = split(/\n/,$content);
@@ -55217,7 +55339,7 @@ sub modal_mem_quest2 {
                 my $question_rows = 1;
                 my $question_length = length($QUESTIONS{$NQ{quest_no}}{question});
  		
-                # fix display to show new lines in text of question
+                # fix display to show new lines in text of BASIC question
                 my $content = $QUESTIONS{$NQ{quest_no}}{question};
                 $content =~ s/\r[\n]*/\n/gm;
                 my @number_of_newlines = split(/\n/,$content);
@@ -55330,7 +55452,7 @@ sub modal_mem_quest {
                 my $question_rows = 1;
                 my $question_length = length($QUESTIONS{$NQ{quest_no}}{question});
  		
-                # fix display to show new lines in text of question
+                # fix display to show new lines in text of BASIC question
                 my $content = $QUESTIONS{$NQ{quest_no}}{question};
                 $content =~ s/\r[\n]*/\n/gm;
                 my @number_of_newlines = split(/\n/,$content);
@@ -55539,7 +55661,7 @@ sub modal_next_question5 {
                 }
  		
  		
-        # fix display to show new lines in text of question
+        # fix display to show new lines in text of BASIC question
         my $question_rows = 1;
         my $content = $QUESTIONS{$next_quest}{question};
         $content =~ s/\r[\n]*/\n/gm;
@@ -56350,7 +56472,7 @@ sub next_question4 {
                 my $question_rows = 1;
                 my $question_length = length($QUESTIONS{$NQ{quest_no}}{question});
  		
-                # fix display to show new lines in text of question
+                # fix display to show new lines in text of BASIC question
                 my $content = $QUESTIONS{$NQ{quest_no}}{question};
                 $content =~ s/\r[\n]*/\n/gm;
                 my @number_of_newlines = split(/\n/,$content);
@@ -56534,7 +56656,7 @@ sub modal_next_question4 {
                 my $question_rows = 1;
                 my $question_length = length($QUESTIONS{$NQ{quest_no}}{question});
  		
-                # fix display to show new lines in text of question
+                # fix display to show new lines in text of BASIC question
                 my $content = $QUESTIONS{$NQ{quest_no}}{question};
                 $content =~ s/\r[\n]*/\n/gm;
                 my @number_of_newlines = split(/\n/,$content);
@@ -56688,7 +56810,7 @@ sub modal_mem_quest4 {
                 my $question_rows = 1;
                 my $question_length = length($QUESTIONS{$NQ{quest_no}}{question});
  		
-                # fix display to show new lines in text of question
+                # fix display to show new lines in text of BASIC question
                 my $content = $QUESTIONS{$NQ{quest_no}}{question};
                 $content =~ s/\r[\n]*/\n/gm;
                 my @number_of_newlines = split(/\n/,$content);
@@ -58204,10 +58326,9 @@ sub show_mobile_qsts_for_students {
 	var qstWindow
 	var loading_done = false\n";
 
-        print"function display_mobile\(qst,class_id,class_name,type_name\)\{\n";
+        print"function display_mobile\(qst,class_id,type_name\)\{\n";
 	print"document.form1.qst.value=qst
 	document.form1.class_id.value=class_id
-	document.form1.class_name.value=class_name
 	document.getElementById(\"demo\").innerHTML = txt\;
 	document.form1.screen_width.value=screen.width
 	document.form1.submit\(\)
@@ -58241,7 +58362,6 @@ sub show_mobile_qsts_for_students {
 		my %RETURN1 = &select_qst_attempts_info("query","SELECT qst_no,attempts,end,resume from qst_attempts WHERE u_id=\"$ids\"");
                
 		if(keys %RETURN) { # && $attempts_left > 0) {
-                        
 			print"&nbsp\;<U>Attempts</U><BR>\n";
 			foreach my $key1(sort keys %RETURN) {
 				my $attempts = 0;
@@ -58264,7 +58384,7 @@ sub show_mobile_qsts_for_students {
 					
                                                 if($attempts != 0 || ($RETURN1{$key1}{resume} == 1 && $RETURN{$key1}{attempts} == 1)) {
 							my %RETURN4 = &select_qst("query","select number,name,questions,marks,random_q,random_order,type from qst WHERE number=\"$key1\"");
-
+							
 							if($RETURN4{$key1}{type} != 2) { # quizzes/tests
                                                                 if($RETURN{$key1}{branching} == 1) {
                                                                         print"<TABLE><TR><TD width=\"75\" align=\"center\">$attempts</TD><TD>&nbsp\;&nbsp\;&nbsp\;&nbsp\;<font STYLE=\"cursor: pointer\" onClick=\"Show_Stuff\(document.getElementById\(\'display$dis\'\)\)\">$RETURN4{$key1}{name}</font></TD></TR></TABLE>\n";
@@ -58288,41 +58408,33 @@ sub show_mobile_qsts_for_students {
                                                                         }
 								}
 								
-					#		if($attempts <= 0) {
-					#			if($RETURN{$key1}{submissions} == 1 && $RETURN4{$key1}{type} != 2) {
-                                        #                                
-					#				}
-					#			}
-					#			
-					#		else {
-								if($RETURN{$key1}{submissions} == 1) {
-									if($RETURN{$key1} != 0) {
-										print"<span ID=\"display$dis\" style=\"display\:none\"><table ><tr><TD width=\"150\"></TD><TD align=\"center\"><font STYLE=\"cursor: pointer\" onClick=\"display_mobile";
+							if($RETURN{$key1}{submissions} == 1) {
+								if($RETURN{$key1} != 0) {
+									print"<span ID=\"display$dis\" style=\"display\:none\"><table ><tr><TD width=\"150\"></TD><TD align=\"center\"><font STYLE=\"cursor: pointer\" onClick=\"display_mobile";
                                                                                      
-										print"\(\'$key1\',\'$SQFS{class_id}\',\'$RETURN4{$key1}{name}\',\'$assign[$RETURN4{$key1}{type}]\',\'$SQFS{name}\'\)\" size=\"-1\"> Start </font></td></TR></TABLE></span>";									
-										}
-									else {
-									
-										print"<span ID=\"display$dis\" style=\"display\:none\"><table ><tr><TD width=\"150\"></TD><TD align=\"center\"><font STYLE=\"cursor: pointer\" onClick=\"display_mobile\(\'$key1\',\'$SQFS{class_id}\',\'$RETURN4{$key1}{name}\',\'$assign[$RETURN4{$key1}{type}]\',\'$SQFS{name}\'\)\" size=\"-1\"> Start </font></td></TR></TABLE></span>\n";
-										}
+									print"\(\'$key1\',\'$SQFS{class_id}\',\'$assign[$RETURN4{$key1}{type}]\',\'$SQFS{name}\'\)\" size=\"-1\"> Start </font></td></TR></TABLE></span>";									
 									}
-									
 								else {
-									if ($RETURN4{$key1}{type} == 2) { # surveys
-                                                                                print"<span ID=\"display$dis\" style=\"display\:none\"><table ><tr><TD width=\"150\"></TD><TD align=\"center\"><font STYLE=\"cursor: pointer\" onClick=\"display_mobile";
-                                                                                        
-										print"\(\'$key1\',\'$SQFS{class_id}\',\'$RETURN4{$key1}{name}\',\'$assign[$RETURN4{$key1}{type}]\',\'$SQFS{name}\'\)\" size=\"-1\"> Start </font></td></TR></TABLE></span>\n";
-										}
-										
-									else { # quizzes/tests
-                                                                                print"<span ID=\"display$dis\" style=\"display\:none\"><table ><tr><TD width=\"150\"></TD><TD align=\"center\"><font STYLE=\"cursor: pointer\" onClick=\"display_mobile";                                                                                      
-                                                                                        
-										print"\(\'$key1\',\'$SQFS{class_id}\',\'$RETURN4{$key1}{name}\',\'$assign[$RETURN4{$key1}{type}]\',\'$SQFS{name}\'\)\" size=\"-1\"> Start </font></td></TR>";
-										
-										print"</TABLE></span>\n";
-										}
+									
+									print"<span ID=\"display$dis\" style=\"display\:none\"><table ><tr><TD width=\"150\"></TD><TD align=\"center\"><font STYLE=\"cursor: pointer\" onClick=\"display_mobile\(\'$key1\',\'$SQFS{class_id}\',\'$RETURN4{$key1}{name}\',\'$assign[$RETURN4{$key1}{type}]\',\'$SQFS{name}\'\)\" size=\"-1\"> Start </font></td></TR></TABLE></span>\n";
 									}
-								#}
+								}
+									
+							else {
+								if ($RETURN4{$key1}{type} == 2) { # surveys
+                                                                        print"<span ID=\"display$dis\" style=\"display\:none\"><table ><tr><TD width=\"150\"></TD><TD align=\"center\"><font STYLE=\"cursor: pointer\" onClick=\"display_mobile";
+                                                                                        
+									print"\(\'$key1\',\'$SQFS{class_id}\',\'$assign[$RETURN4{$key1}{type}]\',\'$SQFS{name}\'\)\" size=\"-1\"> Start </font></td></TR></TABLE></span>\n";
+									}
+										
+								else { # quizzes/tests
+                                                                        print"<span ID=\"display$dis\" style=\"display\:none\"><table ><tr><TD width=\"150\"></TD><TD align=\"center\"><font STYLE=\"cursor: pointer\" onClick=\"display_mobile";                                                                                      
+                                                                                        
+									print"\(\'$key1\',\'$SQFS{class_id}\',\'$assign[$RETURN4{$key1}{type}]\',\'$SQFS{name}\'\)\" size=\"-1\"> Start </font></td></TR>";
+										
+									print"</TABLE></span>\n";
+									}
+								}
 								
 							++$dis;
 							}
@@ -58340,9 +58452,9 @@ sub show_mobile_qsts_for_students {
 									if($attempts == 10) { 
 										print"<TABLE><TR><TD width=\"75\" align=\"center\">10</TD><TD><font align=\"top\" size=\"-1\"> &nbsp\;&nbsp\;&nbsp\;<B>$RETURN3{$key1}{questions}<font color=\"#FF3300\">\?</font> $RETURN3{$key1}{marks}$image15</B> </font> <font STYLE=\"cursor: pointer\" onClick=\"Show_Stuff\(document.getElementById\(\'display$dis\'\)\)\">$RETURN3{$key1}{name}</font></TD></TR></TABLE>\n";
 										
-										print"<span ID=\"display$dis\" style=\"display\:none\"><table ><tr><TD width=\"150\"></TD><TD bgcolor=\"\#BBBBBB\" align=\"center\"><font STYLE=\"cursor: pointer\" onClick=\"display_mobile";
+										print"<span ID=\"display$dis\" style=\"display\:none\"><table ><tr><TD width=\"150\"></TD><TD align=\"center\"><font STYLE=\"cursor: pointer\" onClick=\"display_mobile";
                                                                                        
-										print"\(\'$key1\',\'$SQFS{class_id}\',\'$RETURN3{$key1}{name}\',\'$assign[$RETURN3{$key1}{type}]\',\'$SQFS{name}\'\)\" size=\"-1\"> Start </font></td></TR></TABLE></span>\n";
+										print"\(\'$key1\',\'$SQFS{class_id}\',\'$assign[$RETURN3{$key1}{type}]\',\'$SQFS{name}\'\)\" size=\"-1\"> Start </font></td></TR></TABLE></span>\n";
 										}
 									else {
                                                                                 if($RETURN3{$key1}{branching} == 1) {
@@ -58352,43 +58464,35 @@ sub show_mobile_qsts_for_students {
                                                                                         print"<TABLE><TR><TD width=\"75\" align=\"center\">$attempts</TD><TD><font align=\"top\" size=\"-1\"> &nbsp\;&nbsp\;&nbsp\;<B>$RETURN3{$key1}{questions}<font color=\"#FF3300\">\?</font> $RETURN3{$key1}{marks}$image15</B> </font> <font STYLE=\"cursor: pointer\" onClick=\"Show_Stuff\(document.getElementById\(\'display$dis\'\)\)\">$RETURN3{$key1}{name}</font></TD></TR></TABLE>\n";
                                                                                         }
                                                                                         
-                                                                                print"<span ID=\"display$dis\" style=\"display\:none\"><table ><tr><TD width=\"150\"></TD><TD bgcolor=\"\#BBBBBB\" align=\"center\"><font STYLE=\"cursor: pointer\" onClick=\"display_mobile";
+                                                                                print"<span ID=\"display$dis\" style=\"display\:none\"><table ><tr><TD width=\"150\"></TD><TD  align=\"center\"><font STYLE=\"cursor: pointer\" onClick=\"display_mobile";
                                                                                         
-										print"\(\'$key1\',\'$SQFS{class_id}\',\'$RETURN3{$key1}{name}\',\'$assign[$RETURN3{$key1}{type}]\',\'$SQFS{name}\'\)\" size=\"-1\"> Start </font></td></TR></TABLE></span>";										
+										print"\(\'$key1\',\'$SQFS{class_id}\',\'$assign[$RETURN3{$key1}{type}]\',\'$SQFS{name}\'\)\" size=\"-1\"> Start </font></td></TR></TABLE></span>";										
 										}
 									}
 									
 								elsif ($RETURN3{$key1}{type} == 2 && $attempts == 1) { # surveys
 									print"<TABLE><TR><TD width=\"75\" align=\"center\">$attempts</TD><TD><font align=\"top\" size=\"-1\"> &nbsp\;&nbsp\;&nbsp\;<B>$RETURN3{$key1}{questions}<font color=\"#FF3300\">\?</font></B> </font> <font STYLE=\"cursor: pointer\" onClick=\"Show_Stuff\(document.getElementById\(\'display$dis\'\)\)\">$RETURN3{$key1}{name}</font></TD></TR></TABLE>\n";
 									
-									print"<span ID=\"display$dis\" style=\"display\:none\"><table ><tr><TD width=\"150\"></TD><TD bgcolor=\"\#BBBBBB\" align=\"center\"><font STYLE=\"cursor: pointer\" onClick=\"display_mobile";
+									print"<span ID=\"display$dis\" style=\"display\:none\"><table ><tr><TD width=\"150\"></TD><TD align=\"center\"><font STYLE=\"cursor: pointer\" onClick=\"display_mobile";
                                                                                         
-                                                                        print"\(\'$key1\',\'$SQFS{class_id}\',\'$RETURN3{$key1}{name}\',\'$assign[$RETURN3{$key1}{type}]\',\'$SQFS{name}\'\)\" size=\"-1\"> Start </font></td></TR></TABLE></span>\n";
+                                                                        print"\(\'$key1\',\'$SQFS{class_id}\',\'$assign[$RETURN3{$key1}{type}]\',\'$SQFS{name}\'\)\" size=\"-1\"> Start </font></td></TR></TABLE></span>\n";
 									}
 									
-#								if($attempts <= 0) {
-#									if($RETURN{$key1}{submissions} == 1) {
-#										print"<span ID=\"display$dis\" style=\"display\:none\"><table ><tr><TD width=\"150\"></TD><TD  bgcolor=\"\#DDDDDD\"><a href=\"javascript\:void\(0\)\" onClick=\"\"><font STYLE=\"text-decoration:none\" onClick=\"Show_Stuff\(display$dis\)\" color=\"\#666666\" size=\"-1\"><center>View</center></font></a></td></TR></TABLE></span>\n";
-#										}
-#									}
-#									
-#								else {
-									if($RETURN{$key1}{submissions} == 1) {
-                                                                                if($RETURN{$key1} != 0) {
-                                                                                        print"<span ID=\"display$dis\" style=\"display\:none\"><table ><tr><TD width=\"150\"></TD><TD bgcolor=\"\#BBBBBB\" align=\"center\"><font STYLE=\"cursor: pointer\" onClick=\"display_mobile";
+								if($RETURN{$key1}{submissions} == 1) {
+                                                                        if($RETURN{$key1} != 0) {
+                                                                                 print"<span ID=\"display$dis\" style=\"display\:none\"><table ><tr><TD width=\"150\"></TD><TD  align=\"center\"><font STYLE=\"cursor: pointer\" onClick=\"display_mobile";
                                                                                         
-                                                                                        print"\(\'$key1\',\'$SQFS{class_id}\',\'$RETURN3{$key1}{name}\',\'$assign[$RETURN3{$key1}{type}]\',\'$SQFS{name}\'\)\" size=\"-1\"> Start </font></td></TR></TABLE></span>\n";
-                                                                                        }
-                                                                                else {
+                                                                                 print"\(\'$key1\',\'$SQFS{class_id}\',\'$assign[$RETURN3{$key1}{type}]\',\'$SQFS{name}\'\)\" size=\"-1\"> Start  </font></td></TR></TABLE></span>\n";
+                                                                                 }
+                                                                        else {
 									
-                                                                                        print"<span ID=\"display$dis\" style=\"display\:none\"><table ><tr><TD width=\"150\"></TD><TD align=\"center\"><font STYLE=\"cursor: pointer\" onClick=\"display_mobile\(\'$key1\',\'$SQFS{class_id}\',\'$RETURN3{$key1}{name}\',\'$assign[$RETURN3{$key1}{type}]\',\'$SQFS{name}\'\)\" size=\"-1\"> Start </font></td></TR></TABLE></span>\n";
-                                                                                        }
+                                                                                 print"<span ID=\"display$dis\" style=\"display\:none\"><table ><tr><TD width=\"150\"></TD><TD align=\"center\"><font STYLE=\"cursor: pointer\" onClick=\"display_mobile\(\'$key1\',\'$SQFS{class_id}\',\'$RETURN3{$key1}{name}\',\'$assign[$RETURN3{$key1}{type}]\',\'$SQFS{name}\'\)\" size=\"-1\"> Start </font></td></TR></TABLE></span>\n";
+                                                                                 }
 
-										}
-									else {
-										print"<span ID=\"display$dis\" style=\"display\:none\"><table ><tr><TD width=\"150\"></TD><TD align=\"center\"><a href=\"javascript\:void\(0\)\"  onClick=\"\"><font STYLE=\"text-decoration:none\" onClick=\"display_mobile\(\'$key1\',\'$SQFS{class_id}\',\'$RETURN3{$key1}{name}\',\'$assign[$RETURN3{$key1}{type}]\'\)\" size=\"-1\"> Start </font></a></td></TR></TABLE></span>\n";
-										}
-									#}
+									}
+								else {
+									print"<span ID=\"display$dis\" style=\"display\:none\"><table ><tr><TD width=\"150\"></TD><TD align=\"center\"><a href=\"javascript\:void\(0\)\"  onClick=\"\"><font STYLE=\"text-decoration:none\" onClick=\"display_mobile\(\'$key1\',\'$SQFS{class_id}\',\'$RETURN3{$key1}{name}\',\'$assign[$RETURN3{$key1}{type}]\'\)\" size=\"-1\"> Start </font></a></td></TR></TABLE></span>\n";
+									}
                         
 								++$dis;
 								}
@@ -58405,9 +58509,9 @@ sub show_mobile_qsts_for_students {
 	print"</DL>\n";
 	&help;
 	print"<B>Once the quiz/survey/test is begun, it counts as an attempt.</B><P>\n";
-  	&print_form("form_name","form1","input","do_mobile","form_target","_self","qst","","class_id","","class_name","","u_id","$SQFS{u_id}","session_id","$SQFS{session_id}","org_id","$SQFS{org_id}","mobile","1","screen_width","","iphone","$SQFS{iphone}");
+  	&print_form("form_name","form1","input","do_mobile","form_target","_self","qst","","class_id","","u_id","$SQFS{u_id}","session_id","$SQFS{session_id}","org_id","$SQFS{org_id}","mobile","1","screen_width","","iphone","$SQFS{iphone}");
   	
-        &print_form("form_name","form2","input","print_mobile","form_target","_self","qst","","class_id","","class_name","","u_id","$SQFS{u_id}","session_id","$SQFS{session_id}","org_id","$SQFS{org_id}","mobile","1","iphone","$SQFS{iphone}");
+        &print_form("form_name","form2","input","print_mobile","form_target","_self","qst","","class_id","","u_id","$SQFS{u_id}","session_id","$SQFS{session_id}","org_id","$SQFS{org_id}","mobile","1","iphone","$SQFS{iphone}");
 
 	&print_form("form_name","logout","form_target","_self","input","logout_mobile","u_id","$SQFS{u_id}","session_id","$SQFS{session_id}","mobile","$SQFS{mobile}");
 	}
@@ -58593,25 +58697,6 @@ sub show_modal_qsts_for_students {
 	document.form1.submit\(\)
 	 }\n";
 	 
-	 # HERE FOR POSSIBLE LATER USE
-#	print"function view_qst\(qst,name_in,class_id,type\) \{\n";
-#	print"qstWindow = window.open\(\"\",\"qstWindow\",\"top=10,left=40,width=900,height=800\"\)\n";
-#	print"qstWindow.focus\(\)\n";
-#	print"qstWindow.document.writeln\(\'\<html oncontextmenu=\"return false\"\>\<head\>\<title\>QST\</title\>\</head\>\'\)\n";
-#	print"qstWindow.document.writeln\(\'\<FRAMESET COLS=\"80\%,20\%\" onLoad=\"loading_done = true\" border=0>\'\)\n";
-#	print"qstWindow.document.writeln\(\'\<FRAME SRC=\"/schools/empty.htm\" name=\"qst_left\" NORESIZE border=0>\'\)\n";
-#	print"qstWindow.document.writeln\(\'\<FRAMESET ROWS=\"10%,90\%\" NORESIZE border=0>\'\)\n";
-#	print"qstWindow.document.writeln\(\'\<FRAME SRC=\"/schools/empty.htm\" name=\"right_top\" NORESIZE border=0>\'\)\n";
-#	print"qstWindow.document.writeln\(\'\<FRAME SRC=\"/schools/empty.htm\" name=\"right_bot\" NORESIZE border=0>\'\)\n";
-#	print"qstWindow.document.writeln\(\'\</FRAMESET\>\'\)\n";
-#	print"qstWindow.document.writeln\(\'\</FRAMESET\>\'\)\n";
-#	print"qstWindow.document.writeln\(\'\<html\>\'\)\n";
-#	print"qstWindow.document.close()\n";
-#	print"document.form1.qst.value=qst
-#	document.form1.class_id.value=class_id
-#	document.form1.input.value=\"students_view_qst\"
-#	document.form1.submit\(\)
-#	 }\n";
 
 	print"function reload_sub\(\) \{
 	document.forms\[0\].submit\(\)
@@ -62778,7 +62863,7 @@ sub print_do_type_resume_qst {
              		my $question_rows = 1;
  			my $question_length = length($QUESTIONS{$real_no}{question});
  		
- 			# fix display to show new lines in text of question
+ 			# fix display to show new lines in text of BASIC question
                         my $content = $QUESTIONS{$real_no}{question};
                         $content =~ s/\r[\n]*/\n/gm;
                         my @lines = split(/\n/,$content);
@@ -64373,7 +64458,8 @@ sub view_mark_type {
 		my $is_there = 0;
 		my @results;
 		my %BEGUN_SUBMITTED = ();
-
+		my $memory_num = 0;
+	
 		print"<span class=\"sticky\" style=\"width:100%\; display: inline-block\;\"><TABLE width=\"100%\" $action_bar><TR><TD style=\"padding-top: 4px\; padding-bottom: 4px\"><font color=\"white\"><B>&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;$QST_INFO{$qst}{name} &nbsp\;&nbsp\;-&nbsp\;&nbsp\; $STUDENTS_NAME{$s_id}{name} </font></b></TD><TD  align=\"right\"><font color=\"white\" STYLE=\"font-size:11pt; font-family:Arial;\"><B STYLE=\"cursor:pointer\" onClick=\"print_handler()\">$LANGUAGE{$set_language}{Print} / PDF &nbsp\;&nbsp\;&nbsp\;&nbsp\;&nbsp\;</B></font</TD></TR></TABLE></span><BR> \n";
 		
 		my %STARTED_SUBMITTED = &select_started_submitted("qst_no","$qst","u_id","$s_id");
@@ -64524,14 +64610,15 @@ sub view_mark_type {
 	        	### MEMORY
 			if($QUESTIONS{$real_no}{memory} ne "") {
 				$QUESTIONS{$real_no}{memory} =~ s/&quot;/"/g;
-				print"<span ID=\"memory$num\" class=\"memory\" style=\"display\: none\"><TABLE><TR><TD width=\"5\"></TD><TD style=\"border: 1px solid #660616; padding-left: 7px; padding-right: 7px; padding-top: 7px; padding-bottom: 7px\">$QUESTIONS{$real_no}{memory}</TD></TR></TABLE><BR></span>\n";
+				print"<span ID=\"memory$memory_num\" class=\"memory\" style=\"display\: none\"><TABLE><TR><TD width=\"5\"></TD><TD style=\"border: 1px solid #660616; padding-left: 7px; padding-right: 7px; padding-top: 7px; padding-bottom: 7px\">$QUESTIONS{$real_no}{memory}</TD></TR></TABLE><BR></span>\n";
+				++$memory_num;
 				}
 
 
              		my $question_rows = 1;
  			my $question_length = length($QUESTIONS{$real_no}{question});
  		
- 			# fix display to show new lines in text of question
+ 			# fix display to show new lines in text of BASIC question
                         my $content = $QUESTIONS{$real_no}{question};
                         $content =~ s/\r[\n]*/\n/gm;
                         my @lines = split(/\n/,$content);
@@ -64578,7 +64665,7 @@ sub view_mark_type {
                                                 }
                                         }
                                 else {
-                                        print"<textarea class=\"show_quest\" style=\"resize\:none\; font-weight:bold\" readonly rows=\"$question_rows\" cols=\"70\">$QUESTIONS{$real_no}{question}</textarea></b></TD></TR></TABLE>\n";
+                                        print"<textarea class=\"show_quest\" style=\"resize\:none\;\" readonly rows=\"$question_rows\" cols=\"70\">$QUESTIONS{$real_no}{question}</textarea></TD></TR></TABLE>\n";
           			
                                         if(defined $QUESTIONS{$real_no}{image_id} && $QUESTIONS{$real_no}{image_id} > 0) {
                                                 my %QUEST_IMAGE = &select4("query","select number,file_name from qst_files where number=\"$QUESTIONS{$real_no}{image_id}\"");
@@ -65112,7 +65199,7 @@ sub view_indiv_branch_qst {
 			# print out question
                  	print"<TABLE><TR><TD valign=\"top\"><B><A NAME=\"$index_pt2\">$index_pt2</a>\.</b></TD></TD><TD valign=\"top\">";
  		
- 			# fix display to show new lines in text of question
+ 			# fix display to show new lines in text of BASIC question
  			my $question_rows = 0;
                         my $content = $QUESTIONS{$real_no}{question};
                         $content =~ s/\r[\n]*/\n/gm;
@@ -66759,8 +66846,8 @@ sub view_qst {
              			my $question_rows = 1;
  				my $question_length = length($QUESTIONS{$key1}{question});
  		
- 				# fix display to show new lines in text of question
-                                my $content = $QUESTIONS{$key1}{question}; #$QUESTION{$VQ{number}}{question};
+ 				# fix display to show new lines in text of BASIC question
+                                my $content = $QUESTIONS{$key1}{question};
                                 $content =~ s/\r[\n]*/\n/gm;
                                 my @lines = split(/\n/,$content);
                                 my $rows = @lines;
@@ -66782,7 +66869,7 @@ sub view_qst {
                                                 }
                                                 
                                         else {
-                                                print"<TD NOWRAP valign=\"top\"></TD><TD valign=\"top\"><textarea class=\"show_quest\" style=\"resize\:none\; font-weight:bold\" readonly rows=\"$question_rows\" cols=\"60\">$QUESTIONS{$key1}{question}</textarea></b></TD></TR></TABLE>\n";
+                                                print"<TD NOWRAP valign=\"top\"></TD><TD valign=\"top\"><textarea class=\"show_quest\" style=\"resize\:none\;\" readonly rows=\"$question_rows\" cols=\"60\">$QUESTIONS{$key1}{question}</textarea></b></TD></TR></TABLE>\n";
                                                 }
             				}
             			else { # quizzes/tests
@@ -66803,7 +66890,7 @@ sub view_qst {
                                                 }
                                                 
                                         else {
-                                                print"<TD NOWRAP valign=\"top\"><font size=\"-1\">\($PRIMARY_QUESTIONS{$key1}{value}\)</font></TD><TD valign=\"top\"><textarea class=\"show_quest\" style=\"resize\:none\; font-weight:bold\" readonly rows=\"$question_rows\" cols=\"60\">$QUESTIONS{$key1}{question}</textarea></b></TD></TR></TABLE>\n";
+                                                print"<TD NOWRAP valign=\"top\"><font size=\"-1\">\($PRIMARY_QUESTIONS{$key1}{value}\)</font></TD><TD valign=\"top\"><textarea class=\"show_quest\" style=\"resize\:none\;\" readonly rows=\"$question_rows\" cols=\"60\">$QUESTIONS{$key1}{question}</textarea></b></TD></TR></TABLE>\n";
                                                 }
 					}
 		
@@ -66926,12 +67013,12 @@ sub view_qst {
 				print"<DIV ID=\"QUESTION$index\" style=\"display: none\" >\n";
 				}
 
- 			# fix display to show new lines in text of question
- 			if($QUESTIONS{$ORDER{$key}}{question} =~ /\r\n/g) {
- 				my @number_of_newlines = split(/\r\n/,$QUESTIONS{$ORDER{$key}}{question});
- 				my $new_lines = @number_of_newlines;
- 				$question_rows = $question_rows + $new_lines;
- 				}
+ 			# fix display to show new lines in text of BASIC question
+                        my $content = $QUESTIONS{$ORDER{$key}}{question};
+                        $content =~ s/\r[\n]*/\n/gm;
+                        my @lines = split(/\n/,$content);
+                        my $rows = @lines;
+                        $question_rows = $question_rows + $rows;
 
             		if($VQST{type} == 2 || $RETURN{$VQST{quiz_no}}{branching} == 1) { # SURVEYS OR BRANCHING
 				print"<TD NOWRAP valign=\"top\"></TD><TD valign=\"top\">";
@@ -66951,7 +67038,7 @@ sub view_qst {
                                         }
                                         
                                 else {
-                                        print"<textarea class=\"show_quest\" style=\"resize\:none\; font-weight:bold\" readonly rows=\"$question_rows\" cols=\"60\">$QUESTIONS{$ORDER{$key}}{question}</textarea></b></TD></TR></TABLE><P>\n";
+                                        print"<textarea class=\"show_quest\" style=\"resize\:none\;\" readonly rows=\"$question_rows\" cols=\"60\">$QUESTIONS{$ORDER{$key}}{question}</textarea></b></TD></TR></TABLE><P>\n";
                                         }
             			}
             			
@@ -66971,7 +67058,7 @@ sub view_qst {
                                         }
                                         
                                 else {
-                                        print"<textarea class=\"show_quest\" style=\"resize\:none\; font-weight:bold\" readonly rows=\"$question_rows\" cols=\"60\">$QUESTIONS{$ORDER{$key}}{question}</textarea></b></TD></TR></TABLE><P>\n";
+                                        print"<textarea class=\"show_quest\" style=\"resize\:none\;\" readonly rows=\"$question_rows\" cols=\"60\">$QUESTIONS{$ORDER{$key}}{question}</textarea></b></TD></TR></TABLE><P>\n";
                                         }
 				}
 			
@@ -67189,12 +67276,12 @@ EOP
 
 	my $question_rows = 1;
 	my $question_length = length("$QUESTION{$VQ{number}}{question}");
-        my $cols = 56;
-        if($question_length < 56) {
+        my $cols = 60;
+        if($question_length < 60) {
                 $cols = $question_length;
                 }
 		
-	# fix display to show new lines in text of question
+	# fix display to show new lines in text of BASIC question
         my $content = $QUESTION{$VQ{number}}{question};
 	$content =~ s/\r[\n]*/\n/gm;
         my @lines = split(/\n/,$content);
@@ -67224,7 +67311,7 @@ EOP
                 
         else {  # BASIC EDITOR
                 print"<TABLE><TR><TD><B> \n";
-                print"<textarea class=\"show_quest\" style=\"resize\:none\; font-weight:bold\" readonly rows=\"$rows\" cols=\"$cols\">$QUESTION{$VQ{number}}{question}</textarea></b>\n";
+                print"<textarea class=\"show_quest\" style=\"resize\:none\;\" readonly rows=\"$rows\" cols=\"$cols\">$QUESTION{$VQ{number}}{question}</textarea></b>\n";
                 print" </TD></TR></TABLE>\n";
 
                 if(defined $QUESTION{$VQ{number}}{image_id} && $QUESTION{$VQ{number}}{image_id} ne "0") {
@@ -67823,7 +67910,7 @@ sub stats_view_quest {
 	my $question_rows = 1;
 	my $question_length = length("$QUESTION{$VQ{number}}{question}");
 		
-	# fix display to show new lines in text of question
+	# fix display to show new lines in text of BASIC question
         my $content = $QUESTION{$VQ{number}}{question};
 	$content =~ s/\r[\n]*/\n/gm;
         my @lines = split(/\n/,$content);
@@ -68283,7 +68370,7 @@ EOP
 	my $question_rows = 1;
 	my $question_length = length("$QUESTION{$VQ{number}}{question}");
 
-	# fix display to show new lines in text of question
+	# fix display to show new lines in text of BASIC question
         my $content = $QUESTION{$VQ{number}}{question};
 	$content =~ s/\r[\n]*/\n/gm;
         my @lines = split(/\n/,$content);
@@ -73549,7 +73636,7 @@ sub print_javascript_time_remaining1 {
 ##################
 sub print_style_sheet {
         print"<style type=\"text/css\">
-	textarea.show_quest{ border-color: Transparent\; font-family\:Arial\; font-size\: 12pt\; font-weight: bold\; overflow:auto\;}
+	textarea.show_quest{ border-color: Transparent\; font-family\:Arial\; font-size\: 12pt\; overflow:auto\;}
 	textarea.show_panswer{ font-family\:Arial\; font-size\: 11pt\; overflow:auto\;}
 	textarea.show_p_answer{ border-color: Transparent\; font-family\:Arial\; font-size\: 10pt\; overflow:auto\;}
 	textarea.show_sanswer{ font-family\:Arial\; font-size\: 11pt\; overflow:auto\;}

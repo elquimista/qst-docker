@@ -1,0 +1,29 @@
+name: Mirror to GitLab
+
+on:
+  push:
+  delete:
+  schedule:
+    - cron: "0 8 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mirror-to-gitlab
+  cancel-in-progress: false
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Mirror repository to GitLab
+        env:
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+        run: |
+          git clone --mirror https://github.com/${{ github.repository }}.git repo.git
+          cd repo.git
+          git remote set-url --push origin https://oauth2:${GITLAB_TOKEN}@gitlab.com/${{ github.repository }}.git
+          git push --mirror
